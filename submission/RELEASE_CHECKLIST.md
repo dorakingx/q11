@@ -2,20 +2,22 @@
 
 Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external). Nothing below the "APPROVAL REQUIRED" line is executed without the user's explicit, written approval naming the target and time.
 
+> The ticks dated 02:24–03:30 UTC applied to the pre-redesign build (2cfae98). The redesign (2026-10-10 18:15 JST →) must pass every gate again; rows below show the redesign state.
+
 ## Pre-publication gates (all must be ☑ before asking for approval)
-- ☑ `npm run verify:release` exits 0 — passed:true at SHA 0e950e8, 2026-10-10 02:24 UTC (`reports/release-verification.json`); re-run after the review fixes (STATUS.md)
-- ☑ Quantum verification: 4,746 comparisons, 0 mismatches (`reports/QUANTUM_VERIFICATION.md`)
-- ☑ Real-browser screenshots reviewed 2026-10-10 10:50 JST + manual pane checks 11:30 JST (EVIDENCE_INDEX)
-- ☑ GitHub `dorakingx/q11` private (`isPrivate: true`), `main` pushed at every milestone; final SHA in STATUS.md A5
-- ☑ Vercel `q11`: Vercel Authentication = All Deployments since creation; `check-protection` 16/16 blocked (`reports/protection-check.json`); authenticated fetch verified, bypass secret revoked
-- ☑ Deployments are Git-triggered, so each carries `meta.githubCommitSha`; final pair recorded in STATUS.md A6
-- ☑ Qollab draft exists (private); 8 runs incl. 4 IonQ Aria 1 jobs with ids — `reports/qollab-runs.md`
-- ☑ Icons reviewed at 16/32/64/128 on dark and light — `reports/icons/REVIEW.md`
-- ☑ `submission/DEMO.mp4` recorded from the real app (final take 149 s, sha256 d3260716…, `reports/demo-recording.json`); NOT uploaded
-- ☑ MIT `LICENSE`; `ATTRIBUTION.md` complete; attribution line present in README, project page and the game's title screen
+- ☐ `npm run verify:release` exits 0 on the redesigned build (lint, typecheck, unit, build, verify:quantum, e2e on 4 browser projects) — redesign: pending the fix wave; last orchestrator runs: lint 0 · typecheck 0 · unit 404/404 · build 0 · verify:quantum 4746/0 · e2e 86 passed / 9 skipped-by-design / 1 WebKit timing flake (test made robust, re-run 10/10)
+- ☑ Quantum verification: 4,746 comparisons, 0 mismatches (`reports/QUANTUM_VERIFICATION.md`) — unchanged by the redesign (engine/fixtures mechanics untouched)
+- ☑ Real-browser screenshots: 62 "after" screenshots at 1440×900 / 768×1024 / 390×844 / 375×812 (`reports/screenshots/after/`), reviewed; "before" set kept in `reports/screenshots/before/`
+- ☑ GitHub `dorakingx/q11` private (`isPrivate: true`), `main` pushed at every milestone; final redesign SHA recorded in STATUS.md at the end
+- ☑ Vercel `q11`: Vercel Authentication = All Deployments since creation (never changed); anonymous/authenticated checks re-run on the final redesign deployment: pending
+- ☑ Qollab draft exists (private); 10 runs incl. 4 IonQ Aria 1 jobs with ids; redesigned page uploaded and self-tested on the built-in simulator (run 10, job cdeaf054…) — `reports/qollab-runs.md`
+- ☑ Icons reviewed at 16/32/64/128 on dark and light — `reports/icons/REVIEW.md` (brand mark unchanged by the redesign)
+- ☐ `submission/DEMO.mp4` re-recorded from the redesigned app (city map, truck, spray, four results, Why?, JA) 120–180 s, sha256 recorded; NOT uploaded — pending
+- ☑ MIT `LICENSE`; `ATTRIBUTION.md` updated for the redesign art + JA copy; attribution line present in README, project page and the game's title screen
 - ☑ Secret-pattern scan 0 hits in tracked files (verify:release); `.env*`, `.vercel/` ignored
-- ☑ `submission/KNOWN_LIMITATIONS.md` current (updated after the review wave)
-- ☑ Final code commit d537465 pushed, working tree clean (docs-only commits follow); deployment dpl_x1f6VTdK8hLQ6HNGpT3kvniv8iHz protected + authenticated check done
+- ☑ `submission/KNOWN_LIMITATIONS.md` updated for the redesign
+- ☐ Project Card on the Qollab draft re-pasted from the redesigned `submission/PROJECT_PAGE.md` — pending
+- ☐ Final redesign commit pushed; working tree clean; protected deployment of that SHA checked (anon blocked / auth works) — pending
 
 ## ────────── APPROVAL REQUIRED BELOW THIS LINE ──────────
 The user must explicitly approve *which* of the following to perform and *when*. Each step is independent.

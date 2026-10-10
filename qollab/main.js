@@ -34,7 +34,7 @@ const backendName = await detectBackendName();
 backendLine.textContent = `Backend selected in the Run dialog: ${backendName}`;
 
 // One job per run on IonQ backends (Qollab rule). We enforce one cloud verification per Run for every backend
-// except the local simulators, where more are allowed; the UI explains this.
+// except the local simulators, where more are allowed; the UI explains this (Verify button in the result's Details fold).
 const isLocal = /basic|aer|braket|local|fake/i.test(backendName) && !/ionq/i.test(backendName);
 let jobsThisRun = 0;
 const recorded = [];
@@ -121,7 +121,7 @@ if (AUTO_VERIFY.enabled && (isLocal || !AUTO_VERIFY.onlyLocal)) {
     const share = typeof a.predictedSyndromeShare === 'number' ? Math.round(a.predictedSyndromeShare * 100) + '%' : 'n/a';
     const lshare = Array.isArray(a.predictedLogicalShare) && typeof a.predictedLogicalShare[0] === 'number' ? Math.round(a.predictedLogicalShare[0] * 100) + '%' : 'n/a';
     const agree = a.dominantMatches ? Object.values(a.dominantMatches).every((v) => v === true || v === null) : null;
-    backendLine.textContent = `Backend: ${backendName} — self-test ${AUTO_VERIFY.missionId}: predicted alarms in ${share} of shots, predicted logical bit in ${lshare}; dominant outcome ${agree === null ? 'n/a' : agree ? 'agrees' : 'disagrees'} with the Pauli-frame verdict (${(r.prediction && r.prediction.verdict) || '?'}). Job ${r.jobId || 'n/a'}. Open mission 4's debrief to see the result card.`;
+    backendLine.textContent = `Backend: ${backendName} — self-test ${AUTO_VERIFY.missionId}: predicted alarms in ${share} of shots, predicted logical bit in ${lshare}; dominant outcome ${agree === null ? 'n/a' : agree ? 'agrees' : 'disagrees'} with the Pauli-frame verdict (${(r.prediction && r.prediction.verdict) || '?'}). Job ${r.jobId || 'n/a'}. Play Central District and open Details on the result to see this run's card.`;
     console.log('Q11 self-test ' + JSON.stringify({ backend: backendName, source: r.source, missionId: r.missionId, correction: r.correction, shots: r.shots, jobId: r.jobId, predictedSyndromeShare: a.predictedSyndromeShare, predictedLogicalShare: a.predictedLogicalShare, dominantMatches: a.dominantMatches, exactMatchesIdealModel: a.matches, verdict: r.prediction && r.prediction.verdict, counts: r.counts }));
   } else {
     backendLine.textContent = `Backend: ${backendName} — self-test failed: ${r.message}`;

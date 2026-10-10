@@ -1,4 +1,22 @@
-# Evidence index (real values only; "final SHA" rows are updated by the last commit of the build)
+# Evidence index (real values only)
+
+> **Redesign (2026-10-10 18:15 JST →).** The table at the bottom ("pre-redesign") is kept for the record of commit 2cfae98. The redesign rows below are updated as gates re-run; rows marked *pending* have not been executed on the redesigned build yet.
+
+## Redesign build
+| Area | Evidence | Location / value |
+|---|---|---|
+| Acceptance criteria | R1–R15 | `docs/UX_REDESIGN.md`; screen spec `docs/UX_SCREENS.md` |
+| Unit tests | vitest | 24 files, 404 tests passed (orchestrator run 2026-10-10 11:45 UTC, after wave C) |
+| E2E | Playwright: desktop-chromium 1280×800, mobile-chromium 390×844, tablet-chromium 768×1024, desktop-webkit (smoke/city/spray) | 96 listed: 86 passed, 9 skipped by design (viewport matrix only on desktop-chromium; keyboard-only test not on WebKit), 1 WebKit timing flake in city.spec (test made robust in ff3fb77; re-run 10/10) — `reports/e2e-full.log` |
+| Input latency | Playwright measurement house tap → DOM update | max 3.9 ms desktop / 3.8 ms mobile / 3.8 ms tablet — `reports/perf.json` |
+| Screenshots | before (6, pre-redesign) / after (62: title, settings, how, city, briefing, training, challenge, spray-mid, four results, result screen, why, summary × 1440×900/768×1024/390×844/375×812 + tutorial/city-panel at 1280×800) | `reports/screenshots/before/`, `reports/screenshots/after/` |
+| Art | SVG parts gallery + previews | `reports/art/gallery.png`, `reports/city/*.png`, `reports/scene/*.png` with REVIEW.md each |
+| Quantum verification | unchanged mechanics | 4,746 comparisons / 0 mismatches (`reports/quantum-verification.json`) |
+| Qollab | redesigned page uploaded (zip → Unpack → Keep and add) | run 10: built-in simulator self-test exact, job cdeaf054-507d-4424-b67e-a2eda678404c (`reports/qollab-runs.md`); IonQ runs 1–8 remain valid (circuits unchanged) |
+| Review | 4 read-only reviewers (play-test, science/secrecy, a11y, docs): 19 major / 30 minor / 10 nit | fix wave in progress; see docs/STATUS.md |
+| verify:release, demo video, final deployment check | *pending* | — |
+
+## Pre-redesign build (commit 2cfae98) — superseded
 
 | Area | Evidence | Location / value |
 |---|---|---|
