@@ -22,6 +22,13 @@ Limits: ≤100 files, ≤2 MB each. `index.html` + `main.js` at the top level ma
 - `main.py` is wrapped by the runtime (code is prepended), so `from __future__ import ...` in **main.py** fails with `SyntaxError: from __future__ imports must occur at the beginning of the file`; modules under `q11/` may use it. A `.zip` dropped on Browse offers *Upload as a file* / *Unpack*; *Unpack* then asks *Keep and add* / *Erase first*.
 - Drafts auto-save ("Saved just now"). **Publish** is a separate orange button — never pressed without approval.
 
+## What was actually done (2026-10-10) — reproducible
+1. `npm run build:qollab` → `qollab/game/q11-game.js` + `qollab/main.css` (manifest in `reports/qollab-manifest.json`).
+2. `cd qollab && zip -r q11-js-project.zip index.html main.js main.css game main.py requirements.txt q11` (17 files, ~420 KB).
+3. Qollab editor → Code → Edit Code → File tree view → **Browse** → pick the zip → **Unpack** → **Keep and add**. The header changes to "This project runs as HTML/JS".
+4. **Run Project → Run → Built-in simulator (24q)**: the game page renders above the console; `main.js` runs a self-test (blind-dispatch circuit, 100 shots) through the Python package and prints `Q11 self-test {...}` with a job id and agreement flags. Then play; in a surface-code debrief press **Verify on <backend> (100 shots)**.
+5. **Run → IonQ Aria 1 (25q)** (free): the page loads; on IonQ the self-test is off (one job per run is reserved for the player's Verify button). Our IonQ verification of the page's bridge used a one-off variant with `AUTO_VERIFY.onlyLocal = false` (job 01a12396-c213-7984-9259-bb3fb25b8f46), after which the shipped `main.js` was restored.
+
 ## Steps (user or assistant with the user's signed-in session)
 1. Sign in at https://qollab.xyz/login (Google or GitHub). Drafts are private to the owner.
 2. Create a new project (title "Q11 — Quantum Emergency Response"). Keep it a **draft** (do not publish).
