@@ -1,4 +1,13 @@
-# Q11 icon set — visual review
+# Q11 Emergency icon set — visual review
+
+> **Mark v2 (2026-10-11).** The app was renamed "Q11 Emergency" and the owner asked for an icon that fits the title and the game, shows that it is about *error correction*, and stays as simple as possible. The mark is now three flat shapes: a **blue ring** (`#3b7dff`, the Q and the protected qubit), a **red flame** inside it (`#ff5a3c`, the error / the emergency) and the Q's tail drawn as a **green check mark** (`#1f9d55`, the correction). No gradients, no text, no city. Everything below the next heading was rebuilt by `node scripts/build-icons.mjs` from `public/icon.svg` / `public/icon-rounded.svg` (navy tile kept for home screens; the transparent variant is used for favicons); the inline React copy (`src/ui/glyphs.tsx` `Q11Mark`) uses the same geometry so the Qollab bundle needs no asset URL.
+>
+> Six candidates were rendered side by side at 16 / 32 / 64 / 128 px on cream, navy, a cream tile and a navy tile (scratch contact sheet): check tail in blue, check tail in green, a tighter check, an ink ring, the old diagonal tail and a larger flame. The old diagonal tail still read as a magnifying glass next to the others; the ink ring vanished on navy; the larger flame touched the ring. The **green check tail** was kept because it is the one variant where "corrected" is legible without words from 32 px up, and the third colour stays flat.
+>
+> Legibility (from the regenerated `preview-light.png` / `preview-dark.png`): 16 px = a blue ring with a red dot and a green notch (identifiable, not readable — same limit as v1); 32 px = ring, flame and check all distinguishable; 64 / 128 px = clearly "a Q with a flame, ticked". Maskable: the farthest drawn point (the ring's left edge, ≈230 units from the bbox centre) sits at ≈166 px of the 204.8 px safe radius at scale 0.72 — checked with a safe-zone circle overlay. OG image (1200×630) re-rendered with the title "Q11 Emergency" + "Quantum Emergency Response"; all text fits with margin. ICO read-back: 16 / 32 / 48 PNG entries.
+
+## Mark v1 review (2026-10-10, superseded)
+
 
 Reviewer: build agent (icon task), 2026-10-10. Everything below was produced by `node scripts/build-icons.mjs`
 from the two hand-authored sources `public/icon.svg` and `public/icon-rounded.svg`; nothing was drawn by hand

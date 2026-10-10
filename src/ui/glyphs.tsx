@@ -18,15 +18,14 @@ export function GearIcon({ size = 22 }: { readonly size?: number }) {
   );
 }
 
-/** The Q11 mark (same geometry as public/icon.svg), inlined so the Qollab bundle needs no asset URL. */
+/** The Q11 Emergency mark (same geometry as public/icon.svg), inlined so the Qollab bundle needs no asset URL. */
 export function Q11Mark({ size = 72, label }: { readonly size?: number; readonly label?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 512 512" role="img" aria-label={label ?? 'Q11 mark: a Q-shaped protective ring with a small flame inside'} focusable="false">
-      <g fill="none" stroke="#8fc1ff" strokeWidth="56" strokeLinecap="round">
-        <circle cx="248" cy="240" r="170" />
-        <line x1="334" y1="326" x2="424" y2="416" />
-      </g>
-      <path fill="#ff5a3c" transform="translate(158 125.2) scale(0.8)" d="M116 14 C128 58 160 102 160 190 A60 60 0 0 1 40 190 C40 150 66 134 66 104 C66 90 60 80 56 72 C76 80 84 96 86 108 C98 86 100 56 116 14 Z" />
+    <svg width={size} height={size} viewBox="0 0 512 512" role="img" aria-label={label ?? 'Q11 Emergency mark: a Q-shaped ring with a flame inside; the tail of the Q is a check mark'} focusable="false">
+      {/* the Q ring = the protected qubit, the flame = the error, the check-mark tail = the correction (same geometry as public/icon.svg) */}
+      <circle cx="228" cy="228" r="158" fill="none" stroke="#3b7dff" strokeWidth="54" />
+      <polyline points="330,330 378,396 476,296" fill="none" stroke="#1f9d55" strokeWidth="54" strokeLinecap="round" strokeLinejoin="round" />
+      <path fill="#ff5a3c" transform="translate(180 136) scale(0.8)" d="M116 14 C128 58 160 102 160 190 A60 60 0 0 1 40 190 C40 150 66 134 66 104 C66 90 60 80 56 72 C76 80 84 96 86 108 C98 86 100 56 116 14 Z" />
     </svg>
   );
 }

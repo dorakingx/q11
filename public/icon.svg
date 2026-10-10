@@ -1,8 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Q11 mark: a Q-shaped protective ring with a small flame inside">
-  <!-- Q11 — Quantum Emergency Response. Original mark (Q guard ring + flame), MIT. Transparent variant. -->
-  <g fill="none" stroke="#8fc1ff" stroke-width="56" stroke-linecap="round">
-    <circle cx="248" cy="240" r="170"/>
-    <line x1="334" y1="326" x2="424" y2="416"/>
-  </g>
-  <path fill="#ff5a3c" transform="translate(158 125.2) scale(0.8)" d="M116 14 C128 58 160 102 160 190 A60 60 0 0 1 40 190 C40 150 66 134 66 104 C66 90 60 80 56 72 C76 80 84 96 86 108 C98 86 100 56 116 14 Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Q11 Emergency mark: a Q-shaped ring with a flame inside; the tail of the Q is a check mark">
+  <!-- Q11 Emergency — Quantum Emergency Response. Original mark, MIT: the Q ring is the protected qubit, the flame is the error, the check-mark tail is the correction. Three flat colours, no gradients. Transparent variant. -->
+  <circle cx="228" cy="228" r="158" fill="none" stroke="#3b7dff" stroke-width="54"/>
+  <polyline points="330,330 378,396 476,296" fill="none" stroke="#1f9d55" stroke-width="54" stroke-linecap="round" stroke-linejoin="round"/>
+  <path fill="#ff5a3c" transform="translate(180 136) scale(0.8)" d="M116 14 C128 58 160 102 160 190 A60 60 0 0 1 40 190 C40 150 66 134 66 104 C66 90 60 80 56 72 C76 80 84 96 86 108 C98 86 100 56 116 14 Z"/>
 </svg>

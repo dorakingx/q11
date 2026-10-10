@@ -2,7 +2,7 @@
 /**
  * Q11 icon build — renders every raster icon from the two hand-authored SVG sources.
  *
- *   public/icon.svg          transparent variant (ring #8fc1ff + flame #ff5a3c)
+ *   public/icon.svg          transparent variant (ring #3b7dff + flame #ff5a3c + check-mark tail #1f9d55)
  *   public/icon-rounded.svg  navy rounded-square variant
  *
  * Outputs (public/): favicon-16/32/64.png, favicon.ico (16/32/48 PNG entries), apple-touch-icon.png (180),
@@ -22,15 +22,16 @@ const pub = path.join(root, 'public');
 const reportDir = path.join(root, 'reports', 'icons');
 
 const NAVY = '#0b1a33';
-const RING = '#8fc1ff';
+const RING = '#3b7dff';
+const CHECK = '#1f9d55';
 const FLAME = '#ff5a3c';
 const TEXT = '#e8eefc';
 const MUTED = '#9fb3d9';
-const TITLE = 'Q11 — Quantum Emergency Response';
+const TITLE = 'Q11 Emergency — Quantum Emergency Response';
 const FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 
-// Bounding box of the drawn content inside icon.svg (viewBox units): ring outer edge + tail cap.
-const ICON_BBOX = { x0: 50, y0: 42, x1: 452, y1: 444 };
+// Bounding box of the drawn content inside icon.svg (viewBox units): ring outer edge + the check mark's caps.
+const ICON_BBOX = { x0: 43, y0: 43, x1: 503, y1: 423 };
 
 const png = { compressionLevel: 9, adaptiveFiltering: true };
 
@@ -63,15 +64,17 @@ function near(rgb, hex, tol = 24) {
 
 async function sanityCheck(transparent512) {
   // Guard against a silent renderer change (e.g. librsvg ignoring a colour): sample known points.
-  const ringTop = await pixelAt(transparent512, 248, 70); // on the ring stroke (cy - r)
-  const flameCore = await pixelAt(transparent512, 238, 262); // inside the flame body
+  const ringTop = await pixelAt(transparent512, 228, 70); // on the ring stroke (cy - r)
+  const flameCore = await pixelAt(transparent512, 258, 282); // inside the flame body
+  const checkArm = await pixelAt(transparent512, 440, 332); // on the long arm of the check mark
   const corner = await pixelAt(transparent512, 8, 8); // outside everything
-  const hole = await pixelAt(transparent512, 160, 150); // inside the ring, left of the flame
+  const hole = await pixelAt(transparent512, 150, 170); // inside the ring, left of the flame
   const problems = [];
-  if (!(ringTop[3] > 240 && near(ringTop, RING))) problems.push(`ring pixel at (248,70) is ${ringTop}, expected ${RING}`);
-  if (!(flameCore[3] > 240 && near(flameCore, FLAME))) problems.push(`flame pixel at (238,262) is ${flameCore}, expected ${FLAME}`);
+  if (!(ringTop[3] > 240 && near(ringTop, RING))) problems.push(`ring pixel at (228,70) is ${ringTop}, expected ${RING}`);
+  if (!(flameCore[3] > 240 && near(flameCore, FLAME))) problems.push(`flame pixel at (258,282) is ${flameCore}, expected ${FLAME}`);
+  if (!(checkArm[3] > 240 && near(checkArm, CHECK))) problems.push(`check pixel at (440,332) is ${checkArm}, expected ${CHECK}`);
   if (corner[3] !== 0) problems.push(`corner pixel at (8,8) is not transparent: ${corner}`);
-  if (hole[3] !== 0) problems.push(`ring interior at (160,150) is not transparent: ${hole}`);
+  if (hole[3] !== 0) problems.push(`ring interior at (150,170) is not transparent: ${hole}`);
   if (problems.length) throw new Error('sanity check failed:\n  ' + problems.join('\n  '));
 }
 
@@ -120,7 +123,7 @@ export function readIco(buffer) {
 
 function maskableSvg(iconInner) {
   // Content must stay inside the central 80 % safe zone (radius 0.4 * 512 = 204.8 px).
-  // The farthest drawn point from the bbox centre is the tail cap (~273 units) -> scale 0.72 keeps it at ~197 px.
+  // The farthest drawn point from the bbox centre is the ring's left edge (~230 units) -> scale 0.72 keeps it at ~166 px.
   const cx = (ICON_BBOX.x0 + ICON_BBOX.x1) / 2;
   const cy = (ICON_BBOX.y0 + ICON_BBOX.y1) / 2;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
@@ -152,7 +155,7 @@ async function ogSvg(iconInner) {
   const textX = 470;
   const maxWidth = 1200 - textX - 56;
   const lines = [
-    { text: 'Q11', size: 120, weight: 700, fill: TEXT, gapAfter: 10 },
+    { text: 'Q11 Emergency', size: 110, weight: 700, fill: TEXT, gapAfter: 10 },
     { text: 'Quantum Emergency Response', size: 52, weight: 700, fill: TEXT, gapAfter: 34 },
     { text: 'Read the alarms. Dispatch the crews.', size: 30, weight: 400, fill: MUTED, gapAfter: 8 },
     { text: 'Protect the logical qubit.', size: 30, weight: 400, fill: MUTED, gapAfter: 30 },

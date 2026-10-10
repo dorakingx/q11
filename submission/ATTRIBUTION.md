@@ -30,7 +30,7 @@ The shipped web app contains only React/react-dom at runtime (MIT). Apache-2.0 t
 - Vercel docs: Deployment Protection / Vercel Authentication.
 
 ## Assets
-- All art — the Q-ring logo and wordmark, flames, helmets, alarm stations, houses, memory tower, fire station, conversion lab, bridge, fire trucks, firefighters, hoses/water, city tiles and chapter badges — is original SVG created for Q11 (`src/ui/art`). No third-party art, emoji sets, web fonts (system font stack; Nunito is used only if installed locally), or agency insignia.
+- All art — the Q-ring / flame / check-mark logo and wordmark, flames, helmets, alarm stations, houses, memory tower, fire station, conversion lab, bridge, fire trucks, firefighters, hoses/water, city tiles and chapter badges — is original SVG created for Q11 (`src/ui/art`). No third-party art, emoji sets, web fonts (system font stack; Nunito is used only if installed locally), or agency insignia.
 - Sounds: synthesized at runtime with Web Audio; no samples.
 
 ## Not used
