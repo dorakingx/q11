@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 160" width="380" height="160" role="img" aria-label="Q11">
+  <!-- Q11 wordmark: the Q guard ring with its flame, followed by hand-drawn "11". No fonts. MIT. -->
+  <g transform="translate(6 6) scale(0.29)">
+    <g fill="none" stroke="#8fc1ff" stroke-width="56" stroke-linecap="round">
+      <circle cx="248" cy="240" r="170"/>
+      <line x1="334" y1="326" x2="424" y2="416"/>
+    </g>
+    <path fill="#ff5a3c" transform="translate(158 125.2) scale(0.8)" d="M116 14 C128 58 160 102 160 190 A60 60 0 0 1 40 190 C40 150 66 134 66 104 C66 90 60 80 56 72 C76 80 84 96 86 108 C98 86 100 56 116 14 Z"/>
+  </g>
+  <g fill="none" stroke="#8fc1ff" stroke-width="16.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M184 44 L210 20 L210 134"/>
+    <path d="M264 44 L290 20 L290 134"/>
+  </g>
+</svg>

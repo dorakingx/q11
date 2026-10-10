@@ -71,10 +71,13 @@ const bridge = {
         mission_id: request.missionId,
         correction: request.correction,
         readout_basis: request.readoutBasis ?? 'Z',
+        prep: request.prep ?? '0',
       }));
       const prediction = toPlain(await circuits.predict.callPromisingKwargs({
         mission_id: request.missionId,
         correction: request.correction,
+        prep: request.prep ?? '0',
+        readout_basis: request.readoutBasis ?? 'Z',
       }));
       return {
         status: 'ok',

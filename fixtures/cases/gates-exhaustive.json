@@ -1,0 +1,727 @@
+{
+  "cases": [
+    {
+      "circuit": [
+        {"kind": "H", "q": 0}
+      ],
+      "id": 0,
+      "input": "I",
+      "kind": "gate",
+      "n": 1,
+      "output": "I"
+    },
+    {
+      "circuit": [
+        {"kind": "H", "q": 0}
+      ],
+      "id": 1,
+      "input": "X",
+      "kind": "gate",
+      "n": 1,
+      "output": "Z"
+    },
+    {
+      "circuit": [
+        {"kind": "H", "q": 0}
+      ],
+      "id": 2,
+      "input": "Z",
+      "kind": "gate",
+      "n": 1,
+      "output": "X"
+    },
+    {
+      "circuit": [
+        {"kind": "H", "q": 0}
+      ],
+      "id": 3,
+      "input": "Y",
+      "kind": "gate",
+      "n": 1,
+      "output": "Y"
+    },
+    {
+      "circuit": [
+        {"kind": "S", "q": 0}
+      ],
+      "id": 4,
+      "input": "I",
+      "kind": "gate",
+      "n": 1,
+      "output": "I"
+    },
+    {
+      "circuit": [
+        {"kind": "S", "q": 0}
+      ],
+      "id": 5,
+      "input": "X",
+      "kind": "gate",
+      "n": 1,
+      "output": "Y"
+    },
+    {
+      "circuit": [
+        {"kind": "S", "q": 0}
+      ],
+      "id": 6,
+      "input": "Z",
+      "kind": "gate",
+      "n": 1,
+      "output": "Z"
+    },
+    {
+      "circuit": [
+        {"kind": "S", "q": 0}
+      ],
+      "id": 7,
+      "input": "Y",
+      "kind": "gate",
+      "n": 1,
+      "output": "X"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 8,
+      "input": "II",
+      "kind": "gate",
+      "n": 2,
+      "output": "II"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 9,
+      "input": "XI",
+      "kind": "gate",
+      "n": 2,
+      "output": "XX"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 10,
+      "input": "ZI",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZI"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 11,
+      "input": "YI",
+      "kind": "gate",
+      "n": 2,
+      "output": "YX"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 12,
+      "input": "IX",
+      "kind": "gate",
+      "n": 2,
+      "output": "IX"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 13,
+      "input": "XX",
+      "kind": "gate",
+      "n": 2,
+      "output": "XI"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 14,
+      "input": "ZX",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZX"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 15,
+      "input": "YX",
+      "kind": "gate",
+      "n": 2,
+      "output": "YI"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 16,
+      "input": "IZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZZ"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 17,
+      "input": "XZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "YY"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 18,
+      "input": "ZZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "IZ"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 19,
+      "input": "YZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "XY"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 20,
+      "input": "IY",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZY"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 21,
+      "input": "XY",
+      "kind": "gate",
+      "n": 2,
+      "output": "YZ"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 22,
+      "input": "ZY",
+      "kind": "gate",
+      "n": 2,
+      "output": "IY"
+    },
+    {
+      "circuit": [
+        {"c": 0, "kind": "CNOT", "t": 1}
+      ],
+      "id": 23,
+      "input": "YY",
+      "kind": "gate",
+      "n": 2,
+      "output": "XZ"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 24,
+      "input": "II",
+      "kind": "gate",
+      "n": 2,
+      "output": "II"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 25,
+      "input": "XI",
+      "kind": "gate",
+      "n": 2,
+      "output": "XI"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 26,
+      "input": "ZI",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZZ"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 27,
+      "input": "YI",
+      "kind": "gate",
+      "n": 2,
+      "output": "YZ"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 28,
+      "input": "IX",
+      "kind": "gate",
+      "n": 2,
+      "output": "XX"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 29,
+      "input": "XX",
+      "kind": "gate",
+      "n": 2,
+      "output": "IX"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 30,
+      "input": "ZX",
+      "kind": "gate",
+      "n": 2,
+      "output": "YY"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 31,
+      "input": "YX",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZY"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 32,
+      "input": "IZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "IZ"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 33,
+      "input": "XZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "XZ"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 34,
+      "input": "ZZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZI"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 35,
+      "input": "YZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "YI"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 36,
+      "input": "IY",
+      "kind": "gate",
+      "n": 2,
+      "output": "XY"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 37,
+      "input": "XY",
+      "kind": "gate",
+      "n": 2,
+      "output": "IY"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 38,
+      "input": "ZY",
+      "kind": "gate",
+      "n": 2,
+      "output": "YX"
+    },
+    {
+      "circuit": [
+        {"c": 1, "kind": "CNOT", "t": 0}
+      ],
+      "id": 39,
+      "input": "YY",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZX"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 40,
+      "input": "II",
+      "kind": "gate",
+      "n": 2,
+      "output": "II"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 41,
+      "input": "XI",
+      "kind": "gate",
+      "n": 2,
+      "output": "XZ"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 42,
+      "input": "ZI",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZI"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 43,
+      "input": "YI",
+      "kind": "gate",
+      "n": 2,
+      "output": "YZ"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 44,
+      "input": "IX",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZX"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 45,
+      "input": "XX",
+      "kind": "gate",
+      "n": 2,
+      "output": "YY"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 46,
+      "input": "ZX",
+      "kind": "gate",
+      "n": 2,
+      "output": "IX"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 47,
+      "input": "YX",
+      "kind": "gate",
+      "n": 2,
+      "output": "XY"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 48,
+      "input": "IZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "IZ"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 49,
+      "input": "XZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "XI"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 50,
+      "input": "ZZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZZ"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 51,
+      "input": "YZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "YI"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 52,
+      "input": "IY",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZY"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 53,
+      "input": "XY",
+      "kind": "gate",
+      "n": 2,
+      "output": "YX"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 54,
+      "input": "ZY",
+      "kind": "gate",
+      "n": 2,
+      "output": "IY"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "CZ"}
+      ],
+      "id": 55,
+      "input": "YY",
+      "kind": "gate",
+      "n": 2,
+      "output": "XX"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 56,
+      "input": "II",
+      "kind": "gate",
+      "n": 2,
+      "output": "II"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 57,
+      "input": "XI",
+      "kind": "gate",
+      "n": 2,
+      "output": "IX"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 58,
+      "input": "ZI",
+      "kind": "gate",
+      "n": 2,
+      "output": "IZ"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 59,
+      "input": "YI",
+      "kind": "gate",
+      "n": 2,
+      "output": "IY"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 60,
+      "input": "IX",
+      "kind": "gate",
+      "n": 2,
+      "output": "XI"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 61,
+      "input": "XX",
+      "kind": "gate",
+      "n": 2,
+      "output": "XX"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 62,
+      "input": "ZX",
+      "kind": "gate",
+      "n": 2,
+      "output": "XZ"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 63,
+      "input": "YX",
+      "kind": "gate",
+      "n": 2,
+      "output": "XY"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 64,
+      "input": "IZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZI"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 65,
+      "input": "XZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZX"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 66,
+      "input": "ZZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZZ"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 67,
+      "input": "YZ",
+      "kind": "gate",
+      "n": 2,
+      "output": "ZY"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 68,
+      "input": "IY",
+      "kind": "gate",
+      "n": 2,
+      "output": "YI"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 69,
+      "input": "XY",
+      "kind": "gate",
+      "n": 2,
+      "output": "YX"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 70,
+      "input": "ZY",
+      "kind": "gate",
+      "n": 2,
+      "output": "YZ"
+    },
+    {
+      "circuit": [
+        {"a": 0, "b": 1, "kind": "SWAP"}
+      ],
+      "id": 71,
+      "input": "YY",
+      "kind": "gate",
+      "n": 2,
+      "output": "YY"
+    }
+  ],
+  "count": 72,
+  "engineVersion": "1",
+  "generator": "scripts/gen-fixtures.ts"
+}

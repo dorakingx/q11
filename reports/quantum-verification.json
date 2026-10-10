@@ -1,0 +1,2658 @@
+{
+  "generatedAt": "2026-10-10T01:30:34Z",
+  "versions": {
+    "python": "3.12.3",
+    "qiskit": "2.5.2",
+    "qiskit_aer": "0.17.2",
+    "qiskit_ionq": "1.1.1",
+    "numpy": "2.5.3",
+    "q11_python_engine": "1.0.0"
+  },
+  "model": "Clifford+Pauli educational model, perfect syndrome extraction, no measurement noise",
+  "totals": {
+    "casesCompared": 4749,
+    "mismatches": 0
+  },
+  "perFile": {
+    "codeInvariants": {
+      "compared": 4,
+      "mismatches": 0
+    },
+    "gates-exhaustive.json (symplectic)": {
+      "compared": 72,
+      "mismatches": 0
+    },
+    "propagation-1000.json (symplectic)": {
+      "compared": 1000,
+      "mismatches": 0
+    },
+    "rsc3-single.json (symplectic)": {
+      "compared": 28,
+      "mismatches": 0
+    },
+    "rsc3-logical.json (symplectic)": {
+      "compared": 52,
+      "mismatches": 0
+    },
+    "verdicts-1000.json (symplectic)": {
+      "compared": 1000,
+      "mismatches": 0
+    },
+    "missions.json expected (symplectic)": {
+      "compared": 6,
+      "mismatches": 0,
+      "missions": [
+        {
+          "mission": "first-alarm",
+          "syndrome": [
+            1,
+            1
+          ],
+          "propagated": "IXI",
+          "fixtureMinWeightCorrection": "IXI",
+          "pythonReferenceCorrection": "IXI",
+          "exactMatch": true,
+          "stabilizerEquivalent": true,
+          "fixtureVerdict": "success",
+          "pythonReferenceVerdict": "success"
+        },
+        {
+          "mission": "red-forward-blue-backward",
+          "syndrome": [],
+          "propagated": "YY",
+          "fixtureMinWeightCorrection": "YY",
+          "pythonReferenceCorrection": "YY",
+          "exactMatch": true,
+          "stabilizerEquivalent": true,
+          "fixtureVerdict": "success",
+          "pythonReferenceVerdict": "success"
+        },
+        {
+          "mission": "color-switch",
+          "syndrome": [],
+          "propagated": "XZ",
+          "fixtureMinWeightCorrection": "XZ",
+          "pythonReferenceCorrection": "XZ",
+          "exactMatch": true,
+          "stabilizerEquivalent": true,
+          "fixtureVerdict": "success",
+          "pythonReferenceVerdict": "success"
+        },
+        {
+          "mission": "blind-dispatch",
+          "syndrome": [
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "propagated": "IIIIXIIII",
+          "fixtureMinWeightCorrection": "IIIIXIIII",
+          "pythonReferenceCorrection": "IIIIXIIII",
+          "exactMatch": true,
+          "stabilizerEquivalent": true,
+          "fixtureVerdict": "success",
+          "pythonReferenceVerdict": "success"
+        },
+        {
+          "mission": "two-kinds-of-trouble",
+          "syndrome": [
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "propagated": "IXIIIIIZI",
+          "fixtureMinWeightCorrection": "IXIIIIZII",
+          "pythonReferenceCorrection": "IYIIZIIII",
+          "exactMatch": false,
+          "stabilizerEquivalent": false,
+          "fixtureVerdict": "success",
+          "pythonReferenceVerdict": "logical-error"
+        },
+        {
+          "mission": "silent-failure",
+          "syndrome": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "propagated": "IXXIIIIII",
+          "fixtureMinWeightCorrection": "XIIIIIIII",
+          "pythonReferenceCorrection": "XIIIIIIII",
+          "exactMatch": true,
+          "stabilizerEquivalent": true,
+          "fixtureVerdict": "logical-error",
+          "pythonReferenceVerdict": "logical-error"
+        }
+      ]
+    },
+    "training captions (symplectic)": {
+      "compared": 4,
+      "mismatches": 0
+    },
+    "gates-exhaustive.json (qiskit Clifford evolve)": {
+      "compared": 72,
+      "mismatches": 0
+    },
+    "gates-exhaustive.json (qiskit Operator matrix)": {
+      "compared": 72,
+      "mismatches": 0
+    },
+    "propagation-1000.json (qiskit Clifford evolve)": {
+      "compared": 1000,
+      "mismatches": 0
+    },
+    "propagation-1000.json (qiskit Operator matrix)": {
+      "compared": 1000,
+      "mismatches": 0
+    },
+    "rsc3-single.json (qiskit StabilizerState, 6 eigenstates each)": {
+      "compared": 28,
+      "mismatches": 0,
+      "statesChecked": 168
+    },
+    "rsc3-logical.json (qiskit StabilizerState, 6 eigenstates each)": {
+      "compared": 52,
+      "mismatches": 0,
+      "statesChecked": 312
+    },
+    "verdicts-1000.json sample (every 5th, 200 cases) (qiskit StabilizerState, 6 eigenstates each)": {
+      "compared": 200,
+      "mismatches": 0,
+      "statesChecked": 1200
+    },
+    "logical eigenstate preparation (Aer statevector, all generators +1)": {
+      "compared": 24,
+      "mismatches": 0
+    },
+    "propagation missions (Aer statevector + Operator)": {
+      "compared": 42,
+      "mismatches": 0
+    },
+    "mission circuits on AerSimulator (shots=2000, deterministic syndrome + logical readout)": {
+      "compared": 45,
+      "mismatches": 0
+    },
+    "mission circuits serialize with qiskit-ionq (qis gateset, offline, no job)": {
+      "compared": 42,
+      "mismatches": 0
+    },
+    "mission circuits on qiskit BasicSimulator (Qollab built-in class, 200 shots)": {
+      "compared": 6,
+      "mismatches": 0
+    }
+  },
+  "codeInvariants": {
+    "rsc3": {
+      "n": 9,
+      "k": 1,
+      "checks": 8,
+      "rank": 8,
+      "hxHzTzero": true,
+      "bruteForceDistance": 3,
+      "geometryAgrees": true,
+      "rankHx+rankHz": 8,
+      "weight1Corrected": 28
+    },
+    "rep3": {
+      "n": 3,
+      "k": 1,
+      "checks": 2,
+      "rank": 2,
+      "hxHzTzero": true,
+      "xOnlyDistance": 3,
+      "fullDistanceBruteForce": 1
+    },
+    "trivial2": {
+      "n": 2,
+      "k": 2,
+      "checks": 0,
+      "rank": 0,
+      "hxHzTzero": true
+    },
+    "trivial3": {
+      "n": 3,
+      "k": 3,
+      "checks": 0,
+      "rank": 0,
+      "hxHzTzero": true
+    }
+  },
+  "stabilizerStateChecks": {
+    "rsc3-single.json": {
+      "cases": 28,
+      "eigenstatesChecked": 168,
+      "mismatches": 0
+    },
+    "rsc3-logical.json": {
+      "cases": 52,
+      "eigenstatesChecked": 312,
+      "mismatches": 0
+    },
+    "verdicts-1000.json sample (every 5th, 200 cases)": {
+      "cases": 200,
+      "eigenstatesChecked": 1200,
+      "mismatches": 0
+    }
+  },
+  "aerRuns": [
+    {
+      "mission": "first-alarm",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "IXI",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 5,
+      "depth": 18,
+      "circuitSha256": "89724b91730c81b0fee3641215ced7aec287341b5c0167b78427994679e04afc",
+      "syndromeHistogram": {
+        "11": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          1
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "III"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.251
+    },
+    {
+      "mission": "first-alarm",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "IXI",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 5,
+      "depth": 15,
+      "circuitSha256": "1cf063c2d6398bc0df904058315b61eb1bd2153362b51e9fe08d9aaea5e44a81",
+      "syndromeHistogram": {
+        "11": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          1
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "III"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.026
+    },
+    {
+      "mission": "first-alarm",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "IXI",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 5,
+      "depth": 18,
+      "circuitSha256": "4f5c70457013a0691f2491c4d411cc72584f44121d98c87df9a9c8e13dcef881",
+      "syndromeHistogram": {
+        "11": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          1
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "III"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.027
+    },
+    {
+      "mission": "first-alarm",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "III",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 5,
+      "depth": 18,
+      "circuitSha256": "3c22b2bb93d118701191aa77aadacb9a27bf5d2bdc5a64ed336f5bb39f0417c8",
+      "syndromeHistogram": {
+        "11": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "detectable",
+        "syndrome": [
+          1,
+          1
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IXI"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.024
+    },
+    {
+      "mission": "first-alarm",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "III",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 5,
+      "depth": 15,
+      "circuitSha256": "840cfdc9885bc9c41f1c4fddb04c92ba87bb278caa6a0dde3283e5463aa59d93",
+      "syndromeHistogram": {
+        "11": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "detectable",
+        "syndrome": [
+          1,
+          1
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IXI"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.117
+    },
+    {
+      "mission": "first-alarm",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "III",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 5,
+      "depth": 18,
+      "circuitSha256": "f617663eead9bf605c1a8a300696fc581825f7ce0434f9dd29997ac002a5e26c",
+      "syndromeHistogram": {
+        "11": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "detectable",
+        "syndrome": [
+          1,
+          1
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IXI"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.027
+    },
+    {
+      "mission": "red-forward-blue-backward",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "YY",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 5,
+      "circuitSha256": "335bfadf767d1728d8cfb363bfcc388878c7d881655213b3f3bd6904dd07fc12",
+      "syndromeHistogram": {
+        "": 2000
+      },
+      "logicalBits": [
+        "0",
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        },
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [],
+        "logicalBits": [
+          0,
+          0
+        ],
+        "residual": "II"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.02
+    },
+    {
+      "mission": "red-forward-blue-backward",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "YY",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 7,
+      "circuitSha256": "c5b46ea49665ca2cce13980203a41f99b84489c4af7a1f5b28cbfb6fe01405e6",
+      "syndromeHistogram": {
+        "": 2000
+      },
+      "logicalBits": [
+        "0",
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        },
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [],
+        "logicalBits": [
+          0,
+          0
+        ],
+        "residual": "II"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.011
+    },
+    {
+      "mission": "red-forward-blue-backward",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "YY",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 11,
+      "circuitSha256": "5b6af7852336758ce4bf88f8dbb510c4c8351442db3cc41fd10b2f1a34ccb643",
+      "syndromeHistogram": {
+        "": 2000
+      },
+      "logicalBits": [
+        "0",
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        },
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [],
+        "logicalBits": [
+          0,
+          0
+        ],
+        "residual": "II"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.015
+    },
+    {
+      "mission": "red-forward-blue-backward",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "II",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 4,
+      "circuitSha256": "b77c81032e89dc61b24a78bdc7ad36ef13912f781c7af6c02acaf7940ebeed39",
+      "syndromeHistogram": {
+        "": 2000
+      },
+      "logicalBits": [
+        "1",
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "1": 2000
+        },
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [],
+        "logicalBits": [
+          1,
+          0
+        ],
+        "residual": "YY"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.017
+    },
+    {
+      "mission": "red-forward-blue-backward",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "II",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 6,
+      "circuitSha256": "459ae03f750dca7d3a515c7a8f151fc346f5cb9cf84f1332c165b4c9a4b2e342",
+      "syndromeHistogram": {
+        "": 2000
+      },
+      "logicalBits": [
+        "0",
+        "1"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        },
+        {
+          "1": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [],
+        "logicalBits": [
+          0,
+          1
+        ],
+        "residual": "YY"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.017
+    },
+    {
+      "mission": "red-forward-blue-backward",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "II",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 10,
+      "circuitSha256": "a568d27dfd960345dd5ed692366a94378c8f930a9c325681e8c39e44e9b00954",
+      "syndromeHistogram": {
+        "": 2000
+      },
+      "logicalBits": [
+        "1",
+        "1"
+      ],
+      "logicalHistograms": [
+        {
+          "1": 2000
+        },
+        {
+          "1": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [],
+        "logicalBits": [
+          1,
+          1
+        ],
+        "residual": "YY"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.221
+    },
+    {
+      "mission": "color-switch",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "XZ",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 9,
+      "circuitSha256": "bffa97b4c982c6ea08a0e422c0903b29386a0ec9817157a9b72267ad13d73917",
+      "syndromeHistogram": {
+        "": 2000
+      },
+      "logicalBits": [
+        "0",
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        },
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [],
+        "logicalBits": [
+          0,
+          0
+        ],
+        "residual": "II"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.021
+    },
+    {
+      "mission": "color-switch",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "XZ",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 11,
+      "circuitSha256": "f5b4506b2b592dbfe197c0892a580c4408e813e9ed615bb76dde124870ffd6f2",
+      "syndromeHistogram": {
+        "": 2000
+      },
+      "logicalBits": [
+        "0",
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        },
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [],
+        "logicalBits": [
+          0,
+          0
+        ],
+        "residual": "II"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.054
+    },
+    {
+      "mission": "color-switch",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "XZ",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 15,
+      "circuitSha256": "876e916ec27bb0b5fd98725177201f2013e6d8be34763182fd0067c94a931641",
+      "syndromeHistogram": {
+        "": 2000
+      },
+      "logicalBits": [
+        "0",
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        },
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [],
+        "logicalBits": [
+          0,
+          0
+        ],
+        "residual": "II"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.072
+    },
+    {
+      "mission": "color-switch",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "II",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 8,
+      "circuitSha256": "fd1118627af2df5369dcd33840916465e13abdc89ee5d2e6df45356f58b8741e",
+      "syndromeHistogram": {
+        "": 2000
+      },
+      "logicalBits": [
+        "0",
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        },
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [],
+        "logicalBits": [
+          0,
+          0
+        ],
+        "residual": "XZ"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.014
+    },
+    {
+      "mission": "color-switch",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "II",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 10,
+      "circuitSha256": "6e7d9b175d098a183652a6b9339c210a71425ce8f2434984af1cc6f61f8a8971",
+      "syndromeHistogram": {
+        "": 2000
+      },
+      "logicalBits": [
+        "1",
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "1": 2000
+        },
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [],
+        "logicalBits": [
+          1,
+          0
+        ],
+        "residual": "XZ"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.01
+    },
+    {
+      "mission": "color-switch",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "II",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 14,
+      "circuitSha256": "9ccc8aa03713b0aa9ecd898614e4ec3df24b74637797a693640cf0432892312a",
+      "syndromeHistogram": {
+        "": 2000
+      },
+      "logicalBits": [
+        "1",
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "1": 2000
+        },
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [],
+        "logicalBits": [
+          1,
+          0
+        ],
+        "residual": "XZ"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.01
+    },
+    {
+      "mission": "blind-dispatch",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "IIIIXIIII",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 26,
+      "circuitSha256": "fb7c21bab41350ee5b09e1423fab783b0dddaadb76148cfb71583df21766424c",
+      "syndromeHistogram": {
+        "11000000": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.097
+    },
+    {
+      "mission": "blind-dispatch",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "IIIIXIIII",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 21,
+      "circuitSha256": "b59a4056e798f47a8068d6ebdc7688f9248f5130cb6befaf8b4f22592db5591d",
+      "syndromeHistogram": {
+        "11000000": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.087
+    },
+    {
+      "mission": "blind-dispatch",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "IIIIXIIII",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 38,
+      "circuitSha256": "1afaea90572ee5d108bda17299e47d1a6a6b51f115e155b0a134c2a62f659388",
+      "syndromeHistogram": {
+        "11000000": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.077
+    },
+    {
+      "mission": "blind-dispatch",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "IIIIIIIII",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 26,
+      "circuitSha256": "3e66a621167ef08740ac671ec8f7b3e0ac88046087248017b2a42a1bed16fa32",
+      "syndromeHistogram": {
+        "11000000": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "detectable",
+        "syndrome": [
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIXIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.061
+    },
+    {
+      "mission": "blind-dispatch",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "IIIIIIIII",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 21,
+      "circuitSha256": "fa7703f2053eb5faed11156bdc705b990fad2e20bf96a760daaa88b4b2045d6b",
+      "syndromeHistogram": {
+        "11000000": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "detectable",
+        "syndrome": [
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIXIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.056
+    },
+    {
+      "mission": "blind-dispatch",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "IIIIIIIII",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 38,
+      "circuitSha256": "c10bbb9968b1910f3845d2016dd719b710a05cbc94e336c3c411a2c5a334ebc3",
+      "syndromeHistogram": {
+        "11000000": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "detectable",
+        "syndrome": [
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIXIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.048
+    },
+    {
+      "mission": "two-kinds-of-trouble",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "IYIIZIIII",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 26,
+      "circuitSha256": "ab7277871c7b74550750a2fb5759333fae2f24b92f6822bb5380ad04241e6f95",
+      "syndromeHistogram": {
+        "10100100": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IZIIZIIZI"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.046
+    },
+    {
+      "mission": "two-kinds-of-trouble",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "IYIIZIIII",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 20,
+      "circuitSha256": "52468761d21bb2fb4ea15033191b5f1e3fcb495516798622d17c7ed21d3e222b",
+      "syndromeHistogram": {
+        "10100100": 2000
+      },
+      "logicalBits": [
+        "1"
+      ],
+      "logicalHistograms": [
+        {
+          "1": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "logicalBits": [
+          1
+        ],
+        "residual": "IZIIZIIZI"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.066
+    },
+    {
+      "mission": "two-kinds-of-trouble",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "IYIIZIIII",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 39,
+      "circuitSha256": "280981a1946c72fd60caa9ddf6044731ae4d63db3122b83fcbd2990029c019fb",
+      "syndromeHistogram": {
+        "10100100": 2000
+      },
+      "logicalBits": [
+        "1"
+      ],
+      "logicalHistograms": [
+        {
+          "1": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "logicalBits": [
+          1
+        ],
+        "residual": "IZIIZIIZI"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.07
+    },
+    {
+      "mission": "two-kinds-of-trouble",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "IIIIIIIII",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 26,
+      "circuitSha256": "e2863339d0920221e8ef04c95d12c9c5f56afb25ec33b9051af3fb941e0c9f47",
+      "syndromeHistogram": {
+        "10100100": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "detectable",
+        "syndrome": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IXIIIIIZI"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.052
+    },
+    {
+      "mission": "two-kinds-of-trouble",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "IIIIIIIII",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 20,
+      "circuitSha256": "fc2d8bbbf09c08a75f2666a8c54919cf277b86c5336b4c6e7a318c048ae01a07",
+      "syndromeHistogram": {
+        "10100100": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "detectable",
+        "syndrome": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IXIIIIIZI"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.05
+    },
+    {
+      "mission": "two-kinds-of-trouble",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "IIIIIIIII",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 39,
+      "circuitSha256": "4b57c7c3d7395d613b707b4180800e22cb5e8a85b86c65cc70c63022d3a87cb9",
+      "syndromeHistogram": {
+        "10100100": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "detectable",
+        "syndrome": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IXIIIIIZI"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.065
+    },
+    {
+      "mission": "two-kinds-of-trouble",
+      "correctionLabel": "counterfactual: exact propagated error",
+      "correction": "IXIIIIIZI",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 26,
+      "circuitSha256": "23b6fd6b76db0fcbbe14c5eaa9659763e3d79af6b820767ee320c6ec16e26a71",
+      "syndromeHistogram": {
+        "10100100": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.051
+    },
+    {
+      "mission": "two-kinds-of-trouble",
+      "correctionLabel": "counterfactual: exact propagated error",
+      "correction": "IXIIIIIZI",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 20,
+      "circuitSha256": "89d34d73f15535a74a193c73000c7a9341bf2c84baff8819ed4880fc24c6ba71",
+      "syndromeHistogram": {
+        "10100100": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.35
+    },
+    {
+      "mission": "two-kinds-of-trouble",
+      "correctionLabel": "counterfactual: exact propagated error",
+      "correction": "IXIIIIIZI",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 40,
+      "circuitSha256": "e1fa2515bb39e3b2f3e3024385f0194ee28578aabb6c5bdc956d0457eac1b901",
+      "syndromeHistogram": {
+        "10100100": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.12
+    },
+    {
+      "mission": "two-kinds-of-trouble",
+      "correctionLabel": "fixture min-weight correction (TS tie-break)",
+      "correction": "IXIIIIZII",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 26,
+      "circuitSha256": "91eb57fa182ee7f939a970d827428621e25746996dbb87f0dfe8215e17d4b12b",
+      "syndromeHistogram": {
+        "10100100": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIIIZZI"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.096
+    },
+    {
+      "mission": "two-kinds-of-trouble",
+      "correctionLabel": "fixture min-weight correction (TS tie-break)",
+      "correction": "IXIIIIZII",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 20,
+      "circuitSha256": "5d06d1b0bfffac31b0c0f87d02c63d59567cae52e4d89760154c5c1266c730cc",
+      "syndromeHistogram": {
+        "10100100": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIIIZZI"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.073
+    },
+    {
+      "mission": "two-kinds-of-trouble",
+      "correctionLabel": "fixture min-weight correction (TS tie-break)",
+      "correction": "IXIIIIZII",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 39,
+      "circuitSha256": "c31073ce48407a62efdea8e4f1d409f288fd22ca6f61375467a02b77ee57882c",
+      "syndromeHistogram": {
+        "10100100": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIIIZZI"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.054
+    },
+    {
+      "mission": "silent-failure",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "XIIIIIIII",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 26,
+      "circuitSha256": "013509922b1c69da2598856b6119a840001d4618bee33d286ee9f397dc48eda4",
+      "syndromeHistogram": {
+        "10000000": 2000
+      },
+      "logicalBits": [
+        "1"
+      ],
+      "logicalHistograms": [
+        {
+          "1": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          1
+        ],
+        "residual": "XXXIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.073
+    },
+    {
+      "mission": "silent-failure",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "XIIIIIIII",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 20,
+      "circuitSha256": "606f01bcf42905ef69b92d2a1c2e20072a1d37f54113f6de1b22d4ed724cf277",
+      "syndromeHistogram": {
+        "10000000": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "XXXIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.142
+    },
+    {
+      "mission": "silent-failure",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "XIIIIIIII",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 39,
+      "circuitSha256": "ab6082503d99fa57a7ef4d9969d51e1b55ce5044f0dc190aec8af364884b0b1d",
+      "syndromeHistogram": {
+        "10000000": 2000
+      },
+      "logicalBits": [
+        "1"
+      ],
+      "logicalHistograms": [
+        {
+          "1": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          1
+        ],
+        "residual": "XXXIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.061
+    },
+    {
+      "mission": "silent-failure",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "IIIIIIIII",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 26,
+      "circuitSha256": "ea9feddec1b1f4e3d8b90ffbfc43ad0cd113719362286252855c3ffe644d52c1",
+      "syndromeHistogram": {
+        "10000000": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "detectable",
+        "syndrome": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IXXIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.088
+    },
+    {
+      "mission": "silent-failure",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "IIIIIIIII",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 20,
+      "circuitSha256": "6debd258ee5bddcada5c8c6ab6f4c784c2260510fa7a2f191d871504857d8720",
+      "syndromeHistogram": {
+        "10000000": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "detectable",
+        "syndrome": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IXXIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.061
+    },
+    {
+      "mission": "silent-failure",
+      "correctionLabel": "identity (no dispatch)",
+      "correction": "IIIIIIIII",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 39,
+      "circuitSha256": "0beb64deb55ebf016a43916a1fb8afb4524912ee7c1b885f4fab436859438048",
+      "syndromeHistogram": {
+        "10000000": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "detectable",
+        "syndrome": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IXXIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.071
+    },
+    {
+      "mission": "silent-failure",
+      "correctionLabel": "counterfactual: exact propagated error",
+      "correction": "IXXIIIIII",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 26,
+      "circuitSha256": "aba2e517381f0baeb521a2a0ee96dffa53ca4df03de65dd3672349b3cc958811",
+      "syndromeHistogram": {
+        "10000000": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.05
+    },
+    {
+      "mission": "silent-failure",
+      "correctionLabel": "counterfactual: exact propagated error",
+      "correction": "IXXIIIIII",
+      "prep": "+",
+      "readoutBasis": "X",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 20,
+      "circuitSha256": "c825c16cd0464d78221abd96dd9644ddc118818932f4e80cb38dc525d31bb742",
+      "syndromeHistogram": {
+        "10000000": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.063
+    },
+    {
+      "mission": "silent-failure",
+      "correctionLabel": "counterfactual: exact propagated error",
+      "correction": "IXXIIIIII",
+      "prep": "+i",
+      "readoutBasis": "Y",
+      "backend": "AerSimulator (local, ideal, method=stabilizer)",
+      "source": "local-simulator",
+      "shots": 2000,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 39,
+      "circuitSha256": "40145771dd3b65c9788417da17b8d9941cc7b91490c4dc0145c11106cb7f2f8b",
+      "syndromeHistogram": {
+        "10000000": 2000
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 2000
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": 0.076
+    },
+    {
+      "mission": "first-alarm",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "IXI",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "qiskit BasicSimulator (local, ideal; same class as Qollab's built-in simulator)",
+      "source": "local-simulator",
+      "shots": 200,
+      "seed": 20261010,
+      "numQubits": 5,
+      "depth": 18,
+      "circuitSha256": "89724b91730c81b0fee3641215ced7aec287341b5c0167b78427994679e04afc",
+      "syndromeHistogram": {
+        "11": 200
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 200
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          1
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "III"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": null
+    },
+    {
+      "mission": "red-forward-blue-backward",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "YY",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "qiskit BasicSimulator (local, ideal; same class as Qollab's built-in simulator)",
+      "source": "local-simulator",
+      "shots": 200,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 5,
+      "circuitSha256": "335bfadf767d1728d8cfb363bfcc388878c7d881655213b3f3bd6904dd07fc12",
+      "syndromeHistogram": {
+        "": 200
+      },
+      "logicalBits": [
+        "0",
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 200
+        },
+        {
+          "0": 200
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [],
+        "logicalBits": [
+          0,
+          0
+        ],
+        "residual": "II"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": null
+    },
+    {
+      "mission": "color-switch",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "XZ",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "qiskit BasicSimulator (local, ideal; same class as Qollab's built-in simulator)",
+      "source": "local-simulator",
+      "shots": 200,
+      "seed": 20261010,
+      "numQubits": 2,
+      "depth": 9,
+      "circuitSha256": "bffa97b4c982c6ea08a0e422c0903b29386a0ec9817157a9b72267ad13d73917",
+      "syndromeHistogram": {
+        "": 200
+      },
+      "logicalBits": [
+        "0",
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 200
+        },
+        {
+          "0": 200
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [],
+        "logicalBits": [
+          0,
+          0
+        ],
+        "residual": "II"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": null
+    },
+    {
+      "mission": "blind-dispatch",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "IIIIXIIII",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "qiskit BasicSimulator (local, ideal; same class as Qollab's built-in simulator)",
+      "source": "local-simulator",
+      "shots": 200,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 26,
+      "circuitSha256": "fb7c21bab41350ee5b09e1423fab783b0dddaadb76148cfb71583df21766424c",
+      "syndromeHistogram": {
+        "11000000": 200
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 200
+        }
+      ],
+      "predicted": {
+        "verdict": "success",
+        "syndrome": [
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IIIIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": null
+    },
+    {
+      "mission": "two-kinds-of-trouble",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "IYIIZIIII",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "qiskit BasicSimulator (local, ideal; same class as Qollab's built-in simulator)",
+      "source": "local-simulator",
+      "shots": 200,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 26,
+      "circuitSha256": "ab7277871c7b74550750a2fb5759333fae2f24b92f6822bb5380ad04241e6f95",
+      "syndromeHistogram": {
+        "10100100": 200
+      },
+      "logicalBits": [
+        "0"
+      ],
+      "logicalHistograms": [
+        {
+          "0": 200
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "logicalBits": [
+          0
+        ],
+        "residual": "IZIIZIIZI"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": null
+    },
+    {
+      "mission": "silent-failure",
+      "correctionLabel": "reference (min-weight / predicted frame)",
+      "correction": "XIIIIIIII",
+      "prep": "0",
+      "readoutBasis": "Z",
+      "backend": "qiskit BasicSimulator (local, ideal; same class as Qollab's built-in simulator)",
+      "source": "local-simulator",
+      "shots": 200,
+      "seed": 20261010,
+      "numQubits": 17,
+      "depth": 26,
+      "circuitSha256": "013509922b1c69da2598856b6119a840001d4618bee33d286ee9f397dc48eda4",
+      "syndromeHistogram": {
+        "10000000": 200
+      },
+      "logicalBits": [
+        "1"
+      ],
+      "logicalHistograms": [
+        {
+          "1": 200
+        }
+      ],
+      "predicted": {
+        "verdict": "logical-error",
+        "syndrome": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "logicalBits": [
+          1
+        ],
+        "residual": "XXXIIIIII"
+      },
+      "matches": {
+        "syndrome": true,
+        "logical": true,
+        "dataChecks": true
+      },
+      "pass": true,
+      "wallSeconds": null
+    }
+  ],
+  "notes": [],
+  "mismatchLog": [],
+  "pass": true
+}

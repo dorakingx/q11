@@ -1,0 +1,891 @@
+{
+  "cases": [
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "XXXIIIIII",
+      "id": 0,
+      "kind": "logical",
+      "label": "logical X",
+      "logicalFlip": {
+        "x": [true],
+        "z": [false]
+      },
+      "residual": "XXXIIIIII",
+      "residualWeight": 3,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "YYXZZIIII",
+      "id": 1,
+      "kind": "logical",
+      "label": "logical X * Z0",
+      "logicalFlip": {
+        "x": [true],
+        "z": [false]
+      },
+      "residual": "YYXZZIIII",
+      "residualWeight": 5,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "XIIIXXIII",
+      "id": 2,
+      "kind": "logical",
+      "label": "logical X * X0",
+      "logicalFlip": {
+        "x": [true],
+        "z": [false]
+      },
+      "residual": "XIIIXXIII",
+      "residualWeight": 3,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "YYXZIZIZZ",
+      "id": 3,
+      "kind": "logical",
+      "label": "logical X * Z0*Z1",
+      "logicalFlip": {
+        "x": [true],
+        "z": [false]
+      },
+      "residual": "YYXZIZIZZ",
+      "residualWeight": 7,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "ZIZZIZYXY",
+      "id": 4,
+      "kind": "logical",
+      "label": "logical X * Z0*Z1*Z2*Z3*X0*X1*X2*X3",
+      "logicalFlip": {
+        "x": [true],
+        "z": [false]
+      },
+      "residual": "ZIZZIZYXY",
+      "residualWeight": 7,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "ZIIZIIZII",
+      "id": 5,
+      "kind": "logical",
+      "label": "logical Z",
+      "logicalFlip": {
+        "x": [false],
+        "z": [true]
+      },
+      "residual": "ZIIZIIZII",
+      "residualWeight": 3,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IZIIZIZII",
+      "id": 6,
+      "kind": "logical",
+      "label": "logical Z * Z0",
+      "logicalFlip": {
+        "x": [false],
+        "z": [true]
+      },
+      "residual": "IZIIZIZII",
+      "residualWeight": 3,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "ZXXZXXZII",
+      "id": 7,
+      "kind": "logical",
+      "label": "logical Z * X0",
+      "logicalFlip": {
+        "x": [false],
+        "z": [true]
+      },
+      "residual": "ZXXZXXZII",
+      "residualWeight": 7,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IZIIIZZZZ",
+      "id": 8,
+      "kind": "logical",
+      "label": "logical Z * Z0*Z1",
+      "logicalFlip": {
+        "x": [false],
+        "z": [true]
+      },
+      "residual": "IZIIIZZZZ",
+      "residualWeight": 5,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "XXYIIZXXY",
+      "id": 9,
+      "kind": "logical",
+      "label": "logical Z * Z0*Z1*Z2*Z3*X0*X1*X2*X3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [true]
+      },
+      "residual": "XXYIIZXXY",
+      "residualWeight": 7,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "YXXZIIZII",
+      "id": 10,
+      "kind": "logical",
+      "label": "logical Y",
+      "logicalFlip": {
+        "x": [true],
+        "z": [true]
+      },
+      "residual": "YXXZIIZII",
+      "residualWeight": 5,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "XYXIZIZII",
+      "id": 11,
+      "kind": "logical",
+      "label": "logical Y * Z0",
+      "logicalFlip": {
+        "x": [true],
+        "z": [true]
+      },
+      "residual": "XYXIZIZII",
+      "residualWeight": 5,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "YIIZXXZII",
+      "id": 12,
+      "kind": "logical",
+      "label": "logical Y * X0",
+      "logicalFlip": {
+        "x": [true],
+        "z": [true]
+      },
+      "residual": "YIIZXXZII",
+      "residualWeight": 5,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "XYXIIZZZZ",
+      "id": 13,
+      "kind": "logical",
+      "label": "logical Y * Z0*Z1",
+      "logicalFlip": {
+        "x": [true],
+        "z": [true]
+      },
+      "residual": "XYXIIZZZZ",
+      "residualWeight": 7,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IIZIIZXXY",
+      "id": 14,
+      "kind": "logical",
+      "label": "logical Y * Z0*Z1*Z2*Z3*X0*X1*X2*X3",
+      "logicalFlip": {
+        "x": [true],
+        "z": [true]
+      },
+      "residual": "IIZIIZXXY",
+      "residualWeight": 5,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "logical-error"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "ZZIZZIIII",
+      "id": 15,
+      "kind": "stabilizer",
+      "label": "Z0",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "ZZIZZIIII",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IIIIZZIZZ",
+      "id": 16,
+      "kind": "stabilizer",
+      "label": "Z1",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IIIIZZIZZ",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IZZIIIIII",
+      "id": 17,
+      "kind": "stabilizer",
+      "label": "Z2",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IZZIIIIII",
+      "residualWeight": 2,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IIIIIIZZI",
+      "id": 18,
+      "kind": "stabilizer",
+      "label": "Z3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IIIIIIZZI",
+      "residualWeight": 2,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IXXIXXIII",
+      "id": 19,
+      "kind": "stabilizer",
+      "label": "X0",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IXXIXXIII",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IIIXXIXXI",
+      "id": 20,
+      "kind": "stabilizer",
+      "label": "X1",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IIIXXIXXI",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "XIIXIIIII",
+      "id": 21,
+      "kind": "stabilizer",
+      "label": "X2",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "XIIXIIIII",
+      "residualWeight": 2,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IIIIIXIIX",
+      "id": 22,
+      "kind": "stabilizer",
+      "label": "X3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IIIIIXIIX",
+      "residualWeight": 2,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "ZZIZIZIZZ",
+      "id": 23,
+      "kind": "stabilizer",
+      "label": "Z0*Z1",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "ZZIZIZIZZ",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "ZIZZZIIII",
+      "id": 24,
+      "kind": "stabilizer",
+      "label": "Z0*Z2",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "ZIZZZIIII",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "ZZIZZIZZI",
+      "id": 25,
+      "kind": "stabilizer",
+      "label": "Z0*Z3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "ZZIZZIZZI",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "ZYXZYXIII",
+      "id": 26,
+      "kind": "stabilizer",
+      "label": "Z0*X0",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "ZYXZYXIII",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "ZZIYYIXXI",
+      "id": 27,
+      "kind": "stabilizer",
+      "label": "Z0*X1",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "ZZIYYIXXI",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "YZIYZIIII",
+      "id": 28,
+      "kind": "stabilizer",
+      "label": "Z0*X2",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "YZIYZIIII",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "ZZIZZXIIX",
+      "id": 29,
+      "kind": "stabilizer",
+      "label": "Z0*X3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "ZZIZZXIIX",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IZZIZZIZZ",
+      "id": 30,
+      "kind": "stabilizer",
+      "label": "Z1*Z2",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IZZIZZIZZ",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IIIIZZZIZ",
+      "id": 31,
+      "kind": "stabilizer",
+      "label": "Z1*Z3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IIIIZZZIZ",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IXXIYYIZZ",
+      "id": 32,
+      "kind": "stabilizer",
+      "label": "Z1*X0",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IXXIYYIZZ",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IIIXYZXYZ",
+      "id": 33,
+      "kind": "stabilizer",
+      "label": "Z1*X1",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IIIXYZXYZ",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "XIIXZZIZZ",
+      "id": 34,
+      "kind": "stabilizer",
+      "label": "Z1*X2",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "XIIXZZIZZ",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IIIIZYIZY",
+      "id": 35,
+      "kind": "stabilizer",
+      "label": "Z1*X3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IIIIZYIZY",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IZZIIIZZI",
+      "id": 36,
+      "kind": "stabilizer",
+      "label": "Z2*Z3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IZZIIIZZI",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IYYIXXIII",
+      "id": 37,
+      "kind": "stabilizer",
+      "label": "Z2*X0",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IYYIXXIII",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IZZXXIXXI",
+      "id": 38,
+      "kind": "stabilizer",
+      "label": "Z2*X1",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IZZXXIXXI",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "XZZXIIIII",
+      "id": 39,
+      "kind": "stabilizer",
+      "label": "Z2*X2",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "XZZXIIIII",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IZZIIXIIX",
+      "id": 40,
+      "kind": "stabilizer",
+      "label": "Z2*X3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IZZIIXIIX",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IXXIXXZZI",
+      "id": 41,
+      "kind": "stabilizer",
+      "label": "Z3*X0",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IXXIXXZZI",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IIIXXIYYI",
+      "id": 42,
+      "kind": "stabilizer",
+      "label": "Z3*X1",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IIIXXIYYI",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "XIIXIIZZI",
+      "id": 43,
+      "kind": "stabilizer",
+      "label": "Z3*X2",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "XIIXIIZZI",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IIIIIXZZX",
+      "id": 44,
+      "kind": "stabilizer",
+      "label": "Z3*X3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IIIIIXZZX",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IXXXIXXXI",
+      "id": 45,
+      "kind": "stabilizer",
+      "label": "X0*X1",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IXXXIXXXI",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "XXXXXXIII",
+      "id": 46,
+      "kind": "stabilizer",
+      "label": "X0*X2",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "XXXXXXIII",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IXXIXIIIX",
+      "id": 47,
+      "kind": "stabilizer",
+      "label": "X0*X3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IXXIXIIIX",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "XIIIXIXXI",
+      "id": 48,
+      "kind": "stabilizer",
+      "label": "X1*X2",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "XIIIXIXXI",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "IIIXXXXXX",
+      "id": 49,
+      "kind": "stabilizer",
+      "label": "X1*X3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "IIIXXXXXX",
+      "residualWeight": 6,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "XIIXIXIIX",
+      "id": 50,
+      "kind": "stabilizer",
+      "label": "X2*X3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "XIIXIXIIX",
+      "residualWeight": 4,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    },
+    {
+      "code": "rsc3",
+      "correction": "IIIIIIIII",
+      "error": "YXYZIZYXY",
+      "id": 51,
+      "kind": "stabilizer",
+      "label": "Z0*Z1*Z2*Z3*X0*X1*X2*X3",
+      "logicalFlip": {
+        "x": [false],
+        "z": [false]
+      },
+      "residual": "YXYZIZYXY",
+      "residualWeight": 8,
+      "syndromeE": [0, 0, 0, 0, 0, 0, 0, 0],
+      "syndromeR": [0, 0, 0, 0, 0, 0, 0, 0],
+      "verdict": "success"
+    }
+  ],
+  "count": 52,
+  "engineVersion": "1",
+  "generator": "scripts/gen-fixtures.ts"
+}
