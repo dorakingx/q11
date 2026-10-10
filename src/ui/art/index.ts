@@ -13,3 +13,5 @@ export * from './cityLayout';
 export * from './CityBackdrop';
 export * from './sceneLayout';
 export * from './scene';
+export * from './brandMarkMeta';
+export * from './brandMark';
