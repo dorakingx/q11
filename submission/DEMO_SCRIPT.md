@@ -1,25 +1,23 @@
-# Demo video script & storyboard (target 150 s; hard range 120–180 s)
+# Demo video script & storyboard (target ~140 s; hard range 120–180 s)
 
-**Recorded 2026-10-10 03:26 UTC** (final take, after the review fixes) with `scripts/record-demo.mjs` + `scripts/demo-shots.json` (96 scripted shots) against the built app: `submission/DEMO.mp4`, 149 s, sha256 `d3260716…` (`reports/demo-recording.json`). The debrief replay now auto-plays from step 1, so the storyboard's replay rows are covered by waits. Captions are burned in; no narration; no cloud run is shown as live (the Qollab/IonQ results are quoted in a caption with their recorded figures). The table below is the storyboard the shot list implements.
+**Redesign take (2026-10-10, after the city/scene redesign).** Recorded with `scripts/record-demo.mjs` + `scripts/demo-shots.json` (78 scripted shots) against the built app on `http://localhost:4173`: `submission/DEMO.mp4` (git-ignored, never uploaded). Duration, sha256 and the recording timestamp are in `reports/demo-recording.json` and `submission/EVIDENCE_INDEX.md`. Captions are burned in; no narration; no cloud run is shown as live (the Qollab/IonQ results are quoted in a caption with their recorded figures from `reports/qollab-runs.md`). The earlier 149 s take of the card-list build (2cfae98) is superseded.
 
-Recording: real app in Chromium at 1280×800 (desktop) with one mobile insert; captions burned in; no narration required (optional voice). No cloud run is shown as "live" unless it actually ran during recording.
+Recording: the real app in Chromium at 1280×800 (desktop) with one phone-size insert (390×844); captions burned in; no narration required. The table below is the storyboard the shot list implements (times approximate; spray showpieces and truck drives add a few seconds each).
 
 | t (s) | Shot | On screen | Caption |
 |---|---|---|---|
-| 0–8 | Title | Q11 icon, title, one sentence, Play | "Q11 — Quantum Emergency Response. Errors are fires. Checks are alarms. You are the dispatcher." |
-| 8–25 | Mission 1 First Alarm | Training: fire on block 0 → alarm Z0; challenge: two alarms ring; place red crew on block 1; confirm; debrief: Logical qubit safe | "Alarms are parity checks. Two alarms → the fire is between them." |
-| 25–45 | Mission 2 Red Forward / Blue Backward | Step through CNOT: red copies forward, blue copies backward; challenge XZ → predict YY; confirm; replay shows propagation | "Fires move only through gates: X forward, Z backward through a CNOT." |
-| 45–58 | Mission 3 Color Switch | H swaps colours; H–CNOT–H chain; replay | "A Hadamard swaps red and blue." |
-| 58–85 | Mission 4 Blind Dispatch | Surface code board; fires hidden; two amber alarms; place one red crew on block 4; confirm; debrief reveals the fire exactly there; what-if: decoder agrees | "Distance-3 surface code. You never see the fire — only the alarms." |
-| 85–100 | Mission 5 Two Kinds of Trouble | Red and blue alarms at once; red crew on block 1, blue crew on block 7 (decoder's equivalent: block 6) | "Red alarms for X, blue alarms for Z. Equivalent corrections differ by a stabilizer." |
-| 100–130 | Mission 6 Silent Failure | One alarm; red crew on block 0; confirm; **alarms all go quiet — verdict: Silent failure, logical qubit flipped**; replay shows two real fires on 1 and 2; what-if panel | "Every alarm is silent. The logical qubit flipped. Two fires can fool any dispatcher — that is what distance 3 means." |
-| 130–140 | Verification caption (on the mission 6 debrief) | Caption quoting the recorded Qollab runs: built-in simulator exact; IonQ Aria 1 simulator logical bit 1 in 97% of shots | "The same mission ran as a Qiskit circuit on Qollab…" |
-| 140–146 | Mobile insert + outro | Phone-size (390×844) mission 4 dispatch board; captions with MIT + "This effort is supported by Qollab & IonQ" | "Touch-friendly on a phone. Open source, MIT…" |
-
-Note: `scriptedSeconds` in `reports/demo-recording.json` is wall-clock including navigation waits; the encoded video is 146 s.
+| 0–8 | Title | Q11 icon, warm city title screen, Play | "Q11 — Quantum Emergency Response. A toy city where fires are quantum errors and alarms are parity checks." |
+| 8–24 | First call (Station Row, 3-qubit repetition code) | Straight into the three-tap experience: pick the red crew → tap house 1 → Spray. Answer check: the truck arrives, firefighters run, one hose = one exact Pauli correction; fires out, houses restored | "Both alarms ring — the fire is in the house they both watch." · "Fires out, houses restored. X·X = I." |
+| 24–32 | City map | The map replaces the card list: roads, fire station, districts; smoke clears over Station Row and a chapter badge appears; the next district unlocks | "The city map. Districts unlock in order; the smoke clears and a badge is earned." |
+| 32–58 | Harbor Bridge (CNOT) | Dispatch: the truck drives along the road. Training: tap where the fire will be after the CNOT (red copies forward, blue copies backward). Challenge: X on house 0 and Z on house 1 → predict both become Y; Spray; result | "Dispatch! The fire truck drives to Harbor Bridge." · "Red copies forward… Blue copies backward." · "Both become Y." |
+| 58–84 | Central District (distance-3 surface code) | Briefing skipped; fog hides the fires; tapping alarm station Z0 highlights the houses it watches; plan a red crew on house 4; Spray reveals the true fire and puts it out; every station goes quiet | "Fires are hidden behind fog. Tap a station to see the houses it watches." · "Z0 and Z1 both ring — only house 4 is watched by both." |
+| 84–92 | Free roam | Settings → "free selection" (for judges) → back to the city map; Old Town opens without playing the districts in between | — |
+| 92–118 | Old Town (Silent Failure) | One alarm; red crew on house 0; Spray; **every alarm goes quiet, yet the memory tower flips** (logical X); Why? shows the player's spray and the alternative side by side; "Investigation complete" (non-blaming) | "Every alarm goes quiet… yet the memory tower flips: two fires fooled the alarms. That is distance 3." · "Why? Your spray and the alternative side by side." |
+| 118–125 | Verification caption (on the Why? view) | Caption quoting the recorded Qollab runs: built-in simulator exact; IonQ Aria 1 simulator logical bit 1 in 97 % of shots | "The same missions run as Qiskit circuits on Qollab…" |
+| 125–135 | Phone insert + outro | 390×844 title screen; EN → JA switch; outro caption with MIT + "This effort is supported by Qollab & IonQ" | "日本語でも遊べます。タッチだけで操作。 Open source, MIT…" |
 
 ## Production notes
-- Capture with the Playwright-driven recorder (`scripts/record-demo.mjs`) or a screen recorder; 30 fps; ffmpeg to H.264 MP4, AAC silent track optional.
-- Keep the real UI; no mock-ups. Mission 6 must show the *actual* debrief text.
+- Capture with the Playwright-driven recorder (`BASE_URL=http://localhost:4173 node scripts/record-demo.mjs`) against `npm run build && npm run preview`; 30 fps; ffmpeg to H.264 MP4, no audio track (sound in the game is opt-in and off by default).
+- Keep the real UI; no mock-ups. Old Town must show the *actual* result overlay text and the real Why? comparison.
 - Verify duration with `ffprobe`; `npm run verify:release` enforces 120–180 s.
 - Store at `submission/DEMO.mp4` (git-ignored). Record sha256 in `EVIDENCE_INDEX.md`. Do not upload without approval.

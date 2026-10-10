@@ -196,13 +196,13 @@ test('reduced motion: the spray is a stepper with static frames; Why? steps both
   await expect(page.getByTestId('dispatch-alarms').locator('[data-check][data-ringing="1"]')).toHaveCount(2);
   await expect(page.locator('[data-house="4"]')).toHaveAttribute('data-house-state', 'fog');
   await page.getByTestId('spray-next').click(); // crew runs
-  await page.getByTestId('spray-next').click(); // water on
+  await page.getByTestId('spray-next').click(); // water on: the fog lifts and the TRUE fire is seen under the water
   await expect(page.locator('.firefighter[data-crew-q="4"]')).toHaveAttribute('data-pose', 'spray');
-  await expect(page.locator('[data-house="4"]')).toHaveAttribute('data-house-state', 'fog');
+  await expect(page.locator('[data-house="4"]')).toHaveAttribute('data-house-state', 'fire');
   await page.getByTestId('spray-next').click(); // impact: the engine's after-state
   await expect(page.locator('[data-house="4"]')).toHaveAttribute('data-house-state', 'restored');
   await page.getByTestId('spray-prev').click();
-  await expect(page.locator('[data-house="4"]')).toHaveAttribute('data-house-state', 'fog');
+  await expect(page.locator('[data-house="4"]')).toHaveAttribute('data-house-state', 'fire');
   await stepSprayToEnd(page);
   await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'restored');
   await page.getByTestId('result-why').click();

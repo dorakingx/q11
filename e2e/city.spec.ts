@@ -40,7 +40,9 @@ test('city: locked districts toast, Dispatch! drives the truck (skippable), free
   // stability check would otherwise wait on the same frames the truck is waiting for.
   // WebKit can finish the 1.5 s drive before this click runs; skipping is optional, arriving is what matters.
   const skip = page.getByTestId('travel-skip');
-  if (await skip.isVisible().catch(() => false)) await skip.click({ force: true }).catch(() => undefined);
+  // timeout: the overlay can unmount (arrival) between the visibility check and the click; without a bound the click
+  // would keep retrying against the detached button until the test timeout.
+  if (await skip.isVisible().catch(() => false)) await skip.click({ force: true, timeout: 2500 }).catch(() => undefined);
   await expect(page.getByTestId('briefing')).toBeVisible();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Harbor Bridge');
   await expectNoHorizontalOverflow(page);
