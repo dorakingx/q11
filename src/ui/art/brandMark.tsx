@@ -1,5 +1,5 @@
 /**
- * The Q11 Emergency brand mark: the game's own fire truck with a "Q11" plate, a red (X) flame and smoke behind it.
+ * The Q11 Emergency brand mark: the game's own fire truck with "Q11" painted in white on its red body, a red (X) flame and smoke behind it.
  * One source of truth for public/icon.svg (via scripts/build-icon-svg.tsx), the raster icon set and the in-app mark
  * (src/ui/glyphs.tsx `Q11Mark`), so the Qollab bundle needs no asset URL. Draw it inside a 512 × 512 frame.
  */
@@ -18,8 +18,9 @@ export function BrandMarkContent() {
       <Flame letter="X" x={390} y={250} scale={1.6} />
       <FireTruck x={230} y={430} scale={2.9} lights />
       <Part x={230} y={430} scale={2.9}>
-        <rect x={-68} y={-50} width={92} height={24} rx={4} fill={ART.paper} stroke={ART.ink} strokeWidth={1.8} />
-        <text x={-22} y={-31} textAnchor="middle" fontSize={21} fontWeight={900} fill={ART.fireX} fontFamily={FONT} letterSpacing={1} style={{ userSelect: 'none' }}>
+        {/* a plain red panel over the locker row, then "Q11" in white straight on the body */}
+        <rect x={-68} y={-50} width={92} height={21} rx={2} fill={ART.truck} />
+        <text x={-22} y={-32} textAnchor="middle" fontSize={23} fontWeight={900} fill={ART.paper} fontFamily={FONT} letterSpacing={1.5} style={{ userSelect: 'none' }}>
           Q11
         </text>
       </Part>
