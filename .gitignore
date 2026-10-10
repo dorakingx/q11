@@ -49,3 +49,4 @@ submission/*.webm
 submission/raw/
 reports/screenshots/*.png
 !reports/screenshots/.gitkeep
+.vercel
