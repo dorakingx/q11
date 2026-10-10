@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "source": "live-cloud",
+  "backendName": "IonQ Aria 1 simulator (25q) — ionq_simulator (noise model, free)",
+  "platform": "qollab.xyz draft project q11-quantum-emergency-response (owner doraking)",
+  "missionId": "silent-failure",
+  "correction": "XIIIIIIII",
+  "prep": "0",
+  "readoutBasis": "Z",
+  "shots": 100,
+  "jobId": "01a1237b-5f60-7349-89d0-a343dca0201c",
+  "circuitExecutionMs": 1000,
+  "endToEndSeconds": 12.7,
+  "startedAt": "2026-10-10T01:44:00Z",
+  "finishedAt": "2026-10-10T01:44:30Z",
+  "counts": {"00000011100000001": 3, "00000100100100001": 1, "00000111000000001": 6, "00000111000010001": 1, "00001000110010001": 1, "00010111000000001": 1, "00010111000000011": 1, "00010111010000001": 1, "00011000100000001": 7, "00011000101000001": 1, "00011011001000001": 1, "00011100000000001": 5, "00111011000001001": 1, "01101011000000001": 5, "01101011000010101": 1, "01101011000110001": 1, "01101011001000001": 1, "01101111100000001": 9, "01101111100100001": 1, "01110000000000001": 4, "01110011000100001": 1, "01110100100000000": 1, "01110100100000001": 2, "10000011110000001": 1, "10001000100000001": 7, "10001100000000001": 4, "10010011001000000": 1, "10010011100000001": 4, "10010101000000101": 1, "10110000000001001": 1, "11011000100101001": 1, "11100000000000001": 3, "11100000000100000": 1, "11100011001100001": 1, "11100100100000001": 2, "11100100100010001": 1, "11100111100110000": 1, "11101000000110011": 1, "11110000010010001": 1, "11111001000000101": 1, "11111010010010110": 1, "11111011000000001": 5, "11111111100000001": 6},
+  "syndromeHistogram": {"00000000": 1, "10000000": 73, "11000000": 1, "10100000": 2, "10010000": 2, "10001000": 2, "10101000": 1, "00000100": 1, "10000100": 3, "10010100": 1, "00001100": 1, "10001100": 1, "11001100": 1, "00000010": 1, "10000010": 3, "10000110": 1, "10000001": 2, "10001001": 2, "01101001": 1},
+  "logicalHistograms": [{"1": 97, "0": 3}],
+  "prediction": {"syndrome": [1,0,0,0,0,0,0,0], "residual": "XXXIIIIII", "verdict": "logical-error", "logicalFlip": {"x": [true], "z": [false]}, "referenceCorrection": "XIIIIIIII", "referenceVerdict": "logical-error", "equivalentToReference": true},
+  "note": "Transcribed from the Qollab console (raw counts printed by qollab/main.py). The logical readout majority is 1: the min-weight crew silenced the alarm (dominant syndrome 10000000 is the syndrome of E before correction, measured by the ancillas) yet flipped the logical qubit, as the GF(2) verdict predicts."
+}

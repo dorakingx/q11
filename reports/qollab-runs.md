@@ -13,6 +13,8 @@ Project: **Q11 — Quantum Emergency Response** — draft (private), owner `dora
 
 | 5 | 2026-10-10 01:40 | updated `main.py` (prints raw counts, sendFile record) | **IonQ Aria 1 (25q)** remote noise-model simulator (`ionq_simulator`), *Free* | remote noise-model simulator, free | 100 | mission=blind-dispatch, correction=IIIIXIIII | **job id 01a12378-c4f2-71ea-b5df-920acd440520**, 12.5 s; dominant alarms `11000000` 69%, logical `{"0": 93, "1": 7}`; raw counts saved to `reports/qollab-runs/blind-dispatch-aria1-01a12378.json` and re-analysed locally (histogram identical to the console) | dominant syndrome ✓ (69%), majority logical ✓ (93%) |
 
+| 6 | 2026-10-10 01:44 | same | **IonQ Aria 1 (25q)** remote noise-model simulator (`ionq_simulator`), *Free* | remote noise-model simulator, free | 100 | mission=silent-failure, correction=XIIIIIIII (min-weight crew) | **job id 01a1237b-5f60-7349-89d0-a343dca0201c**, 12.7 s; dominant alarms `10000000` 73% (syndrome of E), logical readout `{"1": 97, "0": 3}` — the **logical flip predicted by the verdict (residual XXX = X̄) is observed**; raw counts in `reports/qollab-runs/silent-failure-aria1-01a1237b.json`, re-analysed locally (histogram identical) | dominant syndrome ✓ (73%), majority logical ✓ (97%, bit 1 = flipped as predicted) |
+
 Notes
 - The `backend` object is pre-created by the runtime; the code never hard-codes a backend. `main(shots, error_qubit, correct)` appeared as a Run-settings form exactly as documented.
 - File upload: the editor's file-tree "Browse" accepts single files; uploading `main.py` asked "Erase existing files first?" → "Keep and add" replaced `main.py` and kept `README.md`, `requirements.txt`.
