@@ -107,3 +107,23 @@ const bridge = {
 };
 
 mountQ11(root, { bridge, storage: 'memory' });
+
+// Self-test: run the core mission circuit once on the selected backend right after Run, so the console
+// shows a real Qiskit result without any clicking. Local simulators are free and unlimited, so this is
+// on by default there. On IonQ backends (one job per run) the player triggers the job from a debrief
+// with "Verify on <backend>" instead — unless onlyLocal is set to false.
+const AUTO_VERIFY = { enabled: true, onlyLocal: true, missionId: 'blind-dispatch', correction: 'IIIIXIIII', shots: 100 };
+if (AUTO_VERIFY.enabled && (isLocal || !AUTO_VERIFY.onlyLocal)) {
+  backendLine.textContent = `Backend: ${backendName} — self-test running (${AUTO_VERIFY.missionId}, ${AUTO_VERIFY.shots} shots)…`;
+  const r = await bridge.run({ missionId: AUTO_VERIFY.missionId, correction: AUTO_VERIFY.correction, shots: AUTO_VERIFY.shots });
+  if (r.status === 'ok') {
+    const a = r.analysis || {};
+    const share = typeof a.predictedSyndromeShare === 'number' ? Math.round(a.predictedSyndromeShare * 100) + '%' : 'n/a';
+    const lshare = Array.isArray(a.predictedLogicalShare) && typeof a.predictedLogicalShare[0] === 'number' ? Math.round(a.predictedLogicalShare[0] * 100) + '%' : 'n/a';
+    const agree = a.dominantMatches ? Object.values(a.dominantMatches).every((v) => v === true || v === null) : null;
+    backendLine.textContent = `Backend: ${backendName} — self-test ${AUTO_VERIFY.missionId}: predicted alarms in ${share} of shots, predicted logical bit in ${lshare}; dominant outcome ${agree === null ? 'n/a' : agree ? 'agrees' : 'disagrees'} with the Pauli-frame verdict (${(r.prediction && r.prediction.verdict) || '?'}). Job ${r.jobId || 'n/a'}. Open mission 4's debrief to see the result card.`;
+    console.log('Q11 self-test ' + JSON.stringify({ backend: backendName, source: r.source, missionId: r.missionId, correction: r.correction, shots: r.shots, jobId: r.jobId, predictedSyndromeShare: a.predictedSyndromeShare, predictedLogicalShare: a.predictedLogicalShare, dominantMatches: a.dominantMatches, exactMatchesIdealModel: a.matches, verdict: r.prediction && r.prediction.verdict, counts: r.counts }));
+  } else {
+    backendLine.textContent = `Backend: ${backendName} — self-test failed: ${r.message}`;
+  }
+}

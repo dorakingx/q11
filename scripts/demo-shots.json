@@ -1,0 +1,419 @@
+[
+  {
+    "type": "goto",
+    "url": "/"
+  },
+  {
+    "type": "caption",
+    "text": "Q11 \u2014 Quantum Emergency Response. Errors are fires. Checks are alarms. You are the dispatcher.",
+    "ms": 5000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=play]"
+  },
+  {
+    "type": "caption",
+    "text": "Six hand-made missions: repetition code, propagation lessons, distance-3 surface code.",
+    "ms": 3500
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=mission-1]"
+  },
+  {
+    "type": "caption",
+    "text": "Mission 1 \u00b7 First Alarm. Alarm stations are parity checks (Z0Z1, Z1Z2).",
+    "ms": 3500
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=start-mission]"
+  },
+  {
+    "type": "caption",
+    "text": "Training: a visible fire on block 0 rings only Z0.",
+    "ms": 3500
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=start-challenge]"
+  },
+  {
+    "type": "caption",
+    "text": "Dispatch: the fire is hidden. Two alarms ring \u2192 the fire is between them.",
+    "ms": 3500
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=block-1]"
+  },
+  {
+    "type": "wait",
+    "ms": 800
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=confirm]"
+  },
+  {
+    "type": "caption",
+    "text": "Debrief: the truth is revealed. X\u00b7X = I \u2014 logical qubit safe.",
+    "ms": 4000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=to-result]"
+  },
+  {
+    "type": "wait",
+    "ms": 1500
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=next-mission]"
+  },
+  {
+    "type": "caption",
+    "text": "Mission 2 \u00b7 Red Forward / Blue Backward: fires move only through gates.",
+    "ms": 3000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=start-mission]"
+  },
+  {
+    "type": "caption",
+    "text": "CNOT: a red fire (X) on the control copies forward to the target.",
+    "ms": 3000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=training-next]"
+  },
+  {
+    "type": "wait",
+    "ms": 2500
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=training-next]"
+  },
+  {
+    "type": "caption",
+    "text": "A blue fire (Z) on the target copies backward to the control.",
+    "ms": 3000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=training-next]"
+  },
+  {
+    "type": "wait",
+    "ms": 2500
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=training-next]"
+  },
+  {
+    "type": "caption",
+    "text": "Challenge: X on block 0 and Z on block 1 \u2014 predict where the fires end up.",
+    "ms": 3500
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=palette-Y]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=block-0]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=block-1]"
+  },
+  {
+    "type": "wait",
+    "ms": 800
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=confirm]"
+  },
+  {
+    "type": "caption",
+    "text": "Both become Y = X\u00b7Z. Replay steps through the gate.",
+    "ms": 3000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=replay-auto]"
+  },
+  {
+    "type": "wait",
+    "ms": 6500
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=to-result]"
+  },
+  {
+    "type": "wait",
+    "ms": 1200
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=next-mission]"
+  },
+  {
+    "type": "caption",
+    "text": "Mission 3 \u00b7 Color Switch: a Hadamard swaps red and blue.",
+    "ms": 3000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=start-mission]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=training-next]"
+  },
+  {
+    "type": "wait",
+    "ms": 2000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=start-challenge]"
+  },
+  {
+    "type": "caption",
+    "text": "Z through H \u2192 X, through CNOT \u2192 copies, through H on the target \u2192 Z.",
+    "ms": 4000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=palette-X]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=block-0]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=palette-Z]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=block-1]"
+  },
+  {
+    "type": "wait",
+    "ms": 800
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=confirm]"
+  },
+  {
+    "type": "wait",
+    "ms": 2500
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=to-result]"
+  },
+  {
+    "type": "wait",
+    "ms": 1200
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=next-mission]"
+  },
+  {
+    "type": "caption",
+    "text": "Mission 4 \u00b7 Blind Dispatch \u2014 the distance-3 rotated surface code. Nine blocks, eight alarm stations.",
+    "ms": 4000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=start-mission]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=start-challenge]"
+  },
+  {
+    "type": "caption",
+    "text": "You never see the fire \u2014 only the alarms. Z0 and Z1 share one block: 4.",
+    "ms": 4500
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=block-4]"
+  },
+  {
+    "type": "wait",
+    "ms": 1000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=confirm]"
+  },
+  {
+    "type": "caption",
+    "text": "Logical qubit safe. The what-if panel compares your call with a minimum-weight decoder.",
+    "ms": 5000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=to-result]"
+  },
+  {
+    "type": "wait",
+    "ms": 1200
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=next-mission]"
+  },
+  {
+    "type": "caption",
+    "text": "Mission 5 \u00b7 Two Kinds of Trouble: red alarms for X fires, blue alarms for Z fires.",
+    "ms": 3500
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=start-mission]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=palette-X]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=block-1]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=palette-Z]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=block-6]"
+  },
+  {
+    "type": "wait",
+    "ms": 1000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=confirm]"
+  },
+  {
+    "type": "caption",
+    "text": "Block 6 or 7? Both work: they differ by a stabilizer. Equivalent corrections count as success.",
+    "ms": 5000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=to-result]"
+  },
+  {
+    "type": "wait",
+    "ms": 1200
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=next-mission]"
+  },
+  {
+    "type": "caption",
+    "text": "Mission 6 \u00b7 Silent Failure. One alarm. The best explanation is one fire on block 0.",
+    "ms": 4000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=start-mission]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=block-0]"
+  },
+  {
+    "type": "wait",
+    "ms": 1000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=confirm]"
+  },
+  {
+    "type": "caption",
+    "text": "Every alarm goes quiet\u2026 and the logical qubit flipped. Two fires can fool any dispatcher \u2014 that is distance 3.",
+    "ms": 7000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=replay-auto]"
+  },
+  {
+    "type": "wait",
+    "ms": 6500
+  },
+  {
+    "type": "caption",
+    "text": "Replay: your crew plus the two real fires form X on blocks 0,1,2 \u2014 a logical X every station sees as even.",
+    "ms": 6000
+  },
+  {
+    "type": "caption",
+    "text": "The same mission ran as a Qiskit circuit on Qollab: built-in simulator (exact) and IonQ Aria 1 simulator (logical bit 1 in 97% of shots).",
+    "ms": 7000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=to-result]"
+  },
+  {
+    "type": "wait",
+    "ms": 1500
+  },
+  {
+    "type": "viewport",
+    "width": 390,
+    "height": 844
+  },
+  {
+    "type": "goto",
+    "url": "/"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=play]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=mission-4]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=start-mission]"
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=start-challenge]"
+  },
+  {
+    "type": "caption",
+    "text": "Touch-friendly on a phone. Open source, MIT. Built for the Qollab \u00d7 IonQ Hackathon 2026.",
+    "ms": 6000
+  },
+  {
+    "type": "caption",
+    "text": "This effort is supported by Qollab & IonQ.",
+    "ms": 3000
+  }
+]

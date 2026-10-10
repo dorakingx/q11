@@ -444,20 +444,43 @@ function CloudResultCard({ result }: { readonly result: CloudResultOk }) {
           </li>
         ))}
       </ul>
-      {isRecord(result.analysis) ? (
-        <dl className="facts small">
-          {Object.entries(result.analysis)
-            .filter(([, v]) => typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean')
-            .map(([k, v]) => (
-              <div key={k}>
-                <dt>{k}</dt>
-                <dd>{String(v)}</dd>
-              </div>
-            ))}
-        </dl>
-      ) : null}
+      <dl className="facts small cloud-facts">
+        {summariseAnalysis(result).map(([k, v]) => (
+          <div key={k}>
+            <dt>{k}</dt>
+            <dd>{v}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   );
+}
+
+/** Curated, human-readable summary of the Python-side analysis (shape documented in qollab/q11/circuits.py). */
+function summariseAnalysis(result: CloudResultOk): readonly (readonly [string, string])[] {
+  const out: (readonly [string, string])[] = [];
+  const a = isRecord(result.analysis) ? result.analysis : {};
+  const p = isRecord(result.prediction) ? result.prediction : {};
+  const pct = (x: unknown): string | null => (typeof x === 'number' ? `${String(Math.round(x * 100))}%` : null);
+  const bits = (x: unknown): string | null => (Array.isArray(x) && x.every((b) => b === 0 || b === 1) ? x.map(String).join('') : null);
+  const dom = bits(a['dominantSyndrome']);
+  const predSyn = bits(p['syndrome']);
+  if (dom !== null) out.push(['Dominant alarm pattern', predSyn !== null ? `${dom} (predicted ${predSyn})` : dom]);
+  const synShare = pct(a['predictedSyndromeShare']);
+  if (synShare !== null) out.push(['Shots with the predicted alarms', synShare]);
+  const ls = a['predictedLogicalShare'];
+  if (Array.isArray(ls) && typeof ls[0] === 'number') out.push(['Shots with the predicted logical bit', pct(ls[0]) ?? '—']);
+  const dm = a['dominantMatches'];
+  if (isRecord(dm)) {
+    const ok = Object.values(dm).every((v) => v === true || v === null);
+    out.push(['Dominant outcome agrees with the verdict', ok ? 'yes' : 'no']);
+  }
+  const em = a['exactMatchesIdealModel'] ?? a['matches'];
+  if (isRecord(em)) out.push(['Exact match with the noiseless model', Object.values(em).every((v) => v === true || v === null) ? 'yes' : 'no (expected under a noise model)']);
+  if (typeof p['verdict'] === 'string') out.push(['Pauli-frame verdict', p['verdict']]);
+  if (result.jobId !== null) out.push(['Job id', result.jobId]);
+  if (typeof a['readoutBasis'] === 'string' && typeof a['prep'] === 'string') out.push(['Prepared / readout', `logical |${a['prep']}⟩ / ${a['readoutBasis']} basis`]);
+  return out;
 }
 
 function isRecord(v: unknown): v is Record<string, unknown> {

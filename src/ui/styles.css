@@ -252,3 +252,7 @@ button.block:hover { border-color: #5a7fbf; background: #1b3868; }
   .topbar-h { white-space: normal; }
   .setting-row { align-items: flex-start; }
 }
+
+/* cloud verification facts: long labels wrap instead of overlapping */
+.cloud-facts div { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 4px 10px; }
+.cloud-facts dt, .cloud-facts dd { overflow-wrap: anywhere; min-width: 0; margin: 0; }
