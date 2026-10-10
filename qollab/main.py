@@ -5,8 +5,7 @@
 #
 # `backend` is pre-created by the Qollab runtime (never hard-coded). One job per run on IonQ backends.
 # All measurements are at the end of the circuit: ancilla syndrome bits, then the data readout.
-from __future__ import annotations
-
+# NOTE: no `from __future__` here — Qollab prepends runtime code to main.py, so a __future__ import is a SyntaxError.
 import json
 import time
 

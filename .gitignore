@@ -53,3 +53,6 @@ reports/screenshots/*.png
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# local upload payloads for Qollab (regenerable)
+reports/qollab-upload/
