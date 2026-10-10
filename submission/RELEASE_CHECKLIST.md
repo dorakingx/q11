@@ -2,14 +2,14 @@
 
 Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external). Nothing below the "APPROVAL REQUIRED" line is executed without the user's explicit, written approval naming the target and time.
 
-> The ticks dated 02:24–03:30 UTC applied to the pre-redesign build (2cfae98). The redesign (2026-10-10 18:15 JST →) must pass every gate again; rows below show the redesign state.
+> All pre-publication gates below are ☑ for the redesigned build (commit b0a6f5f, web sources verified at c3581f9, 2026-10-10 13:45 UTC). Nothing below the approval line has been done.
 
 ## Pre-publication gates (all must be ☑ before asking for approval)
-- ☐ `npm run verify:release` exits 0 on the redesigned build (lint, typecheck, unit, build, verify:quantum, e2e on 4 browser projects) — redesign: pending the fix wave; last orchestrator runs: lint 0 · typecheck 0 · unit 404/404 · build 0 · verify:quantum 4746/0 · e2e 86 passed / 9 skipped-by-design / 1 WebKit timing flake (test made robust, re-run 10/10)
+- ☑ `npm run verify:release` exits 0 on the redesigned build at SHA c3581f9 (2026-10-10 13:40 UTC): lint 0 · typecheck 0 · unit 435/435 (25 files) · build 0 · verify:quantum 4746/0 · e2e 91 passed / 9 skipped-by-design / 0 failed on 4 browser projects · demo 138 s · secret-like lines 0 — `reports/release-verification.json`
 - ☑ Quantum verification: 4,746 comparisons, 0 mismatches (`reports/QUANTUM_VERIFICATION.md`) — unchanged by the redesign (engine/fixtures mechanics untouched)
 - ☑ Real-browser screenshots: 62 "after" screenshots at 1440×900 / 768×1024 / 390×844 / 375×812 (`reports/screenshots/after/`), reviewed; "before" set kept in `reports/screenshots/before/`
 - ☑ GitHub `dorakingx/q11` private (`isPrivate: true`), `main` pushed at every milestone; final redesign SHA recorded in STATUS.md at the end
-- ☑ Vercel `q11`: Vercel Authentication = All Deployments since creation (never changed); anonymous/authenticated checks re-run on the final redesign deployment: pending
+- ☑ Vercel `q11`: Vercel Authentication = All Deployments since creation (never changed); anonymous/authenticated checks on the final redesign deployment: see the last row of this list
 - ☑ Qollab draft exists (private); 12 runs incl. 4 IonQ Aria 1 jobs with ids; the final redesigned page (commit c3581f9 bundle) uploaded and self-tested on the built-in simulator (run 12, job 601a8c4d…, exact) — `reports/qollab-runs.md`
 - ☑ Icons reviewed at 16/32/64/128 on dark and light — `reports/icons/REVIEW.md` (brand mark unchanged by the redesign)
 - ☑ `submission/DEMO.mp4` re-recorded from the redesigned app (city map, truck, spray, four results, Why?, JA) — 138.4 s, sha256 3596c11d… (`reports/demo-recording.json`, 2026-10-10 13:36 UTC); NOT uploaded
@@ -17,7 +17,7 @@ Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external).
 - ☑ Secret-pattern scan 0 hits in tracked files (verify:release); `.env*`, `.vercel/` ignored
 - ☑ `submission/KNOWN_LIMITATIONS.md` updated for the redesign
 - ☑ Project Card on the Qollab draft re-pasted from the redesigned `submission/PROJECT_PAGE.md`; About set from `SHORT_DESCRIPTION.md` (222 chars); tags + thumbnail kept (2026-10-10 23:10 JST)
-- ☐ Final redesign commit pushed; working tree clean; protected deployment of that SHA checked (anon blocked / auth works) — pending
+- ☑ Final redesign commit pushed (b0a6f5f; web sources verified at c3581f9); working tree clean; protected deployment dpl_DtPwF1mnrNuL7S1VKcVNqVeGdCLP (q11-pou4pz35d-doraking.vercel.app + 3 aliases) checked 2026-10-10 13:43–13:45 UTC: 16/16 anonymous blocked, authenticated fetch returns the app, bypass secret revoked (0)
 
 ## ────────── APPROVAL REQUIRED BELOW THIS LINE ──────────
 The user must explicitly approve *which* of the following to perform and *when*. Each step is independent.

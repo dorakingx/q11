@@ -1,21 +1,23 @@
 # Evidence index (real values only)
 
-> **Redesign (2026-10-10 18:15 JST →).** The table at the bottom ("pre-redesign") is kept for the record of commit 2cfae98. The redesign rows below are updated as gates re-run; rows marked *pending* have not been executed on the redesigned build yet.
+> **Redesign (2026-10-10 18:15 JST →).** The table at the bottom ("pre-redesign") is kept for the record of commit 2cfae98. The redesign rows below are updated as gates re-run; no row is pending any more (final deployment b0a6f5f checked 2026-10-10 13:45 UTC).
 
 ## Redesign build
 | Area | Evidence | Location / value |
 |---|---|---|
 | Acceptance criteria | R1–R15 | `docs/UX_REDESIGN.md`; screen spec `docs/UX_SCREENS.md` |
-| Unit tests | vitest | 24 files, 404 tests passed (orchestrator run 2026-10-10 11:45 UTC, after wave C) |
-| E2E | Playwright: desktop-chromium 1280×800, mobile-chromium 390×844, tablet-chromium 768×1024, desktop-webkit (smoke/city/spray) | 96 listed: 86 passed, 9 skipped by design (viewport matrix only on desktop-chromium; keyboard-only test not on WebKit), 1 WebKit timing flake in city.spec (test made robust in ff3fb77; re-run 10/10) — `reports/e2e-full.log` |
+| Unit tests | vitest (in `verify:release`) | 25 files, 435 tests passed (2026-10-10 13:39 UTC) |
+| E2E | Playwright (in `verify:release`): desktop-chromium 1280×800, mobile-chromium 390×844, tablet-chromium 768×1024, desktop-webkit (smoke/city/spray) | 100 listed: **91 passed, 9 skipped by design** (viewport matrix only on desktop-chromium; keyboard-only test not on WebKit), 0 failed, 108 s — `reports/release-verification.log`; earlier full run + targeted re-runs in `reports/e2e-full.log`, `reports/e2e-rerun.log`, `reports/e2e-city-webkit-rerun.log` |
 | Input latency | Playwright measurement house tap → DOM update | max 3.9 ms desktop / 3.8 ms mobile / 3.8 ms tablet — `reports/perf.json` |
 | Screenshots | before (6, pre-redesign) / after (62: title, settings, how, city, briefing, training, challenge, spray-mid, four results, result screen, why, summary × 1440×900/768×1024/390×844/375×812 + tutorial/city-panel at 1280×800) | `reports/screenshots/before/`, `reports/screenshots/after/` |
 | Art | SVG parts gallery + previews | `reports/art/gallery.png`, `reports/city/*.png`, `reports/scene/*.png` with REVIEW.md each |
 | Quantum verification | unchanged mechanics | 4,746 comparisons / 0 mismatches (`reports/quantum-verification.json`) |
 | Qollab | final redesigned page uploaded (zip → Unpack → Keep and add) after commit c3581f9 | run 12: built-in simulator self-test exact, job 601a8c4d-c67b-4c78-a09b-ea4433446a44, verdict success, 10.0 s (`reports/qollab-runs.md`, raw counts `reports/qollab-runs/blind-dispatch-builtin-601a8c4d.json`); earlier redesign runs 10–11 also exact; IonQ Aria 1 runs 4–6 and 8 remain valid (circuits unchanged). Project Card write-up, About (222 chars), tags and thumbnail re-pasted from the redesign texts; Publish not pressed |
-| Review | 4 read-only reviewers (play-test, science/secrecy, a11y, docs): 19 major / 30 minor / 10 nit | fix wave in progress; see docs/STATUS.md |
+| Review | 4 read-only reviewers (play-test, science/secrecy, a11y, docs): 19 major / 30 minor / 10 nit | all fixed in the fix wave (commit 7675f81) + e2e stabilisation (c3581f9); see docs/STATUS.md |
 | Demo video | `BASE_URL=http://localhost:4173 node scripts/record-demo.mjs` with `scripts/demo-shots.json` (79 shots) on the redesigned build (commit c3581f9 sources) | `submission/DEMO.mp4` (git-ignored, local only, NOT uploaded): 138.4 s, 4,127,795 bytes, sha256 `3596c11ddf55a736337cde08080b71df9e16caa2f07b109923a0a79509fec3a7`, recorded 2026-10-10 13:36 UTC (`reports/demo-recording.json`); frames reviewed via contact sheets (title → three-tap first call → city map + badge → Harbor Bridge truck/training/challenge → free selection → Central District fog/detector/spray → Old Town silent failure + memory beacon → Why? → verification caption → JA phone insert) |
-| verify:release, final deployment check | *pending* | — |
+| verify:release | `node scripts/verify-release.mjs` at SHA c3581f9 (2026-10-10 13:38–13:40 UTC) | exit 0 — lint 0 · typecheck 0 · unit 435/435 · build 0 · verify:quantum 4746/0 · e2e 91 passed / 9 skipped · DEMO.mp4 138 s within 120–180 · secret-like lines 0 → `reports/release-verification.json`, `reports/release-verification.log` |
+| Final deployment | anonymous + authenticated checks | **dpl_DtPwF1mnrNuL7S1VKcVNqVeGdCLP** = `q11-pou4pz35d-doraking.vercel.app` (githubCommitSha **b0a6f5f**, production, READY, aliases q11-pied / q11-doraking / q11-git-main-doraking .vercel.app) — `reports/protection-check.json` (13:43 UTC): 16/16 anonymous requests → 302 vercel.com/sso-api, no body, bypass secrets 0; authenticated `npx vercel@latest curl` (13:45 UTC) → 938-byte app HTML, title + assets/index-DK6lR-WY.js / index-BXCs_vIa.css (= local verify:release build); bypass secret revoked immediately (0 after) |
+| Repository | `github.com/dorakingx/q11` private | verified web code SHA c3581f9; b0a6f5f = + reports/docs/bundle; later commits docs only |
 
 ## Pre-redesign build (commit 2cfae98) — superseded
 
