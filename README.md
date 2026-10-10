@@ -2,14 +2,17 @@
 
 A fire-dispatch command game about quantum error correction, built for the **Qollab × IonQ Global Quantum Hackathon 2026** (theme: Quantum Unlocked).
 
-> Fires are Pauli errors (red = X, blue = Z, split = Y). Alarm stations are stabilizer checks. Firefighters are corrections.
-> In training you watch fires propagate through CNOT and H. In the field you see only alarms, dispatch crews on a distance-3 rotated surface code, commit, and the debrief replays the truth — including the call that silences every alarm yet flips the logical qubit.
+> A toy city with houses, alarm stations and fire crews. Fires are Pauli errors (red = X, blue = Z, split = Y); alarm stations are stabilizer checks; crews are corrections.
+> Pick a district on the city map, ride the fire truck to the scene, read the alarms, plan your crews, press **Spray!** and watch the hoses do one exact Pauli correction each — then the answer-check replay reveals the hidden fires and one of four outcomes: houses restored, a harmless pattern, fires still burning, or a silent logical failure shown on the city's memory tower. English and Japanese.
 
 **This effort is supported by Qollab & IonQ.** License: MIT (see `LICENSE`). Attribution and tool disclosure: `submission/ATTRIBUTION.md`.
 
 ## Play
 - Web (Vite + React, client-side): `npm ci && npm run dev` → http://localhost:5173
 - Qollab (JS/Qiskit project, runs on Qollab's free simulators incl. IonQ's): see `submission/QOLLAB_IMPORT.md`.
+
+## The city (six districts, six lessons)
+Rowhouse Lane (First Alarm) → Harbor Bridge (CNOT: red forward, blue backward) → Conversion Lab (Hadamard colour switch) → Central District (Blind Dispatch on the distance-3 surface code) → Market Square (two kinds of alarms) → Old Town (Silent Failure and the memory tower). Districts unlock in order; solved districts can be replayed; a Free roam setting opens everything for review.
 
 ## Missions
 1. **First Alarm** — 3-qubit repetition code, X noise only: read two alarms, send one crew.

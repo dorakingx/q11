@@ -25,5 +25,10 @@
 - Japanese UI (P1) not implemented unless EVIDENCE_INDEX says otherwise. English only.
 - Sound is minimal (Web Audio tones), off by default.
 
+## Redesign (2026-10-10 evening)
+- The city map, scene art and spray animation are original SVG; animation timing is presentation only (outcomes come from the engine before the animation starts).
+- Automated browser checks: Chromium (desktop/tablet/phone emulation) and Playwright WebKit for the smoke/city/spray flows; no physical phone was tested.
+- Japanese copy was written for children by the author with AI assistance; the English fixture texts remain the reference for physics statements.
+
 ## Process
 - Built 2026-10-10 → 2026-10-12 JST within the hackathon window with AI assistance (Claude Code); disclosed in ATTRIBUTION.md.

@@ -10,17 +10,18 @@
 Quantum error correction is usually explained with equations: stabilizers, syndromes, decoders. The intuition behind them is simple but rarely *felt*: you never observe the error itself, only parity checks; a correction that looks right can still destroy the logical information; and the code distance tells you exactly when you are safe and when you are not. Q11 turns that reasoning into a game you can finish in a few minutes.
 
 ## How to play
-You are the dispatcher of a quantum city. Blocks are qubits. An arsonist called *Noise* lights **red fires (X errors)** and **blue fires (Z errors)**; a split red/blue fire is a **Y**. **Alarm stations** between the blocks are stabilizer checks: a station rings when the fire pattern anticommutes with its parity check — not because a fire is "near". You respond by sending **crews**: a red crew applies X, a blue crew applies Z. A crew on a burning block puts the fire out (X·X = I); a crew on a safe block starts a new one (it's XOR).
+You are the dispatcher of a toy quantum city. On the **city map**, each district is one mission: Rowhouse Lane, Harbor Bridge, Conversion Lab, Central District, Market Square and Old Town. Tap a district with smoke, press **Dispatch!**, and the fire truck drives you to the scene. Houses are qubits. An arsonist called *Noise* lights **red fires (X errors)** and **blue fires (Z errors)**; a split red/blue fire is a **Y**. **Alarm stations** between the blocks are stabilizer checks: a station rings when the fire pattern anticommutes with its parity check — not because a fire is "near". You respond by sending **crews**: a red crew applies X, a blue crew applies Z. A crew on a burning block puts the fire out (X·X = I); a crew on a safe block starts a new one (it's XOR).
 
 Each of the six missions has up to four phases:
 1. **Briefing** — one paragraph.
 2. **Training** — fires are visible. In the propagation missions you step through a small circuit and watch red fires copy *forward* through a CNOT, blue fires copy *backward*, and a Hadamard swap the colours.
-3. **Dispatch** — fires are hidden. You read the alarms, choose crews within a budget, and **confirm**. Nothing on screen reads the hidden error before you commit.
-4. **Debrief** — the truth is replayed step by step: the real fires, your crews, the residual, every check's result, and the verdict. A "what if" panel shows what a minimum-weight decoder would have done and whether it is equivalent to your call.
+3. **Plan** — fires are hidden behind fog. You read the alarms (tap a station to see which houses it watches), pick crews within a budget, place them as a plan (undo/redo), and press **Spray!**. Nothing on screen reads the hidden error before you commit.
+4. **Spray — the answer check** — crews run to their houses and the hoses spray. Each hose is exactly one Pauli correction computed by the engine: the same colour puts a fire out, a different colour changes it (X on Z → Y), and a crew on an empty house starts a new fire. Then the remaining true fires, the alarms and one of **four results** appear on the board: houses restored · a harmless pattern (a stabilizer: logical information safe) · fires still burning (with their alarms) · a silent logical failure, shown by the city's memory tower while every alarm stays quiet.
+5. **Why?** — your spray and the alternative correction (minimum-weight decoder or the true-fire crews) animate side by side on the same board; the step-by-step replay and the raw residual live under Details.
 
 Missions: **First Alarm** (3-qubit repetition code) · **Red Forward / Blue Backward** (CNOT) · **Color Switch** (Hadamard) · **Blind Dispatch** (distance-3 rotated surface code) · **Two Kinds of Trouble** (X and Z alarms together) · **Silent Failure** (two fires, one alarm — the optimal call silences every alarm and flips the logical qubit).
 
-Keyboard, mouse and touch are all supported; shapes and letters carry every meaning so colour is never required; sound is off by default; reduced motion is respected.
+The first run is a three-tap guided scene (pick a crew → tap a house → Spray!). Everything works by tapping; keyboard and screen readers are supported; shapes and X/Z/Y letters carry every meaning so colour is never required; the interface is available in **English and Japanese**; sound is off until you turn it on; reduced motion plays the same causality as static frames.
 
 ## What is original here
 Not "QEC as a game" — that exists. Q11's contribution is the *combination* inside one consistent model:
