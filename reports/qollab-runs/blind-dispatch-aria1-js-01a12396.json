@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "source": "live-cloud",
+  "backendName": "IonQ Aria 1 simulator (25q) — ionq_simulator (noise model, free)",
+  "platform": "qollab.xyz draft project q11-quantum-emergency-response (owner doraking) — JS/Qiskit page, on-load self-test through the JS→Python bridge",
+  "missionId": "blind-dispatch",
+  "correction": "IIIIXIIII",
+  "prep": "0",
+  "readoutBasis": "Z",
+  "shots": 100,
+  "jobId": "01a12396-c213-7984-9259-bb3fb25b8f46",
+  "circuitExecutionMs": 1000,
+  "endToEndSeconds": 22.7,
+  "startedAt": "2026-10-10T02:14:00Z",
+  "finishedAt": "2026-10-10T02:14:30Z",
+  "counts": {"00010011000000000":1,"00011111100000001":1,"11111100000000010":1,"00000000000000011":5,"00000100100000011":1,"00011011000000011":6,"00011111100000011":4,"01101000100000011":8,"01101100000000011":6,"01110011100000011":3,"01110111000000011":7,"10001011000000011":6,"10001111000000011":1,"10001111100000011":7,"10010000000000011":5,"10010100100000011":1,"11010000000000011":1,"11100011100000011":4,"11100111000000011":1,"11101100000000011":1,"11111000100000011":5,"11111100000000011":4,"00011010000000111":1,"10010110100000111":1,"00000001000010011":1,"01101100000010011":1,"10010011000010011":1,"10010100100010011":1,"00011110100010110":1,"00011101100010111":1,"01101011000100011":1,"01101100000100011":1,"10111000100101001":1,"10001111100110011":1,"01110100001000010":1,"01110110001000111":1,"00000000001010010":1,"01101000001100011":1,"01111010110000101":1,"10000100110010011":1,"00101100010101001":1,"01110111010110011":1,"00100011110111011":1},
+  "prediction": {"syndrome": [1,1,0,0,0,0,0,0], "residual": "IIIIIIIII", "verdict": "success", "logicalFlip": {"x": [false], "z": [false]}, "referenceCorrection": "IIIIXIIII", "referenceVerdict": "success", "equivalentToReference": true},
+  "note": "Transcribed from the Qollab console line 'Q11 self-test {...}' printed by qollab/main.js (variant with AUTO_VERIFY.onlyLocal=false). Page-reported: predictedSyndromeShare 0.76, predictedLogicalShare [0.97], dominantMatches all true, exactMatchesIdealModel all false."
+}
