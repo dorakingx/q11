@@ -19,7 +19,7 @@ src/game/      missions, state machine, scoring, replay
 src/ui/        React UI (city map + scene are the hero), accessibility; src/ui/art (SVG parts), src/ui/city, src/ui/scene, src/ui/i18n (EN/JA)
 public/        original icon assets (Q guard ring + flame)
 quantum/       Python/Qiskit independent reference implementation + comparison
-qollab/        Qollab-native Python/Qiskit project (main.py + data files)
+qollab/        Qollab JS/Qiskit project (game bundle + main.js bridge + q11/ Python package + main.py fallback)
 fixtures/      shared mission definitions and verification cases (JSON)
 scripts/       verification, packaging, protection checks
 submission/    project page draft, demo script, checklist, evidence index

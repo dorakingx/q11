@@ -1,5 +1,7 @@
 # Q11 — Final build report (2026-10-10 12:35 JST; deadline 2026-10-12 08:00 JST)
 
+> **Applies to commit 2cfae98 (pre-redesign).** Superseded by the redesign report in docs/STATUS.md once `verify:release` passes on the redesigned build.
+
 **Status: READY_FOR_RELEASE_APPROVAL.** All A1–A9 gates pass with execution evidence; nothing has been published or submitted.
 
 | # | Criterion | Result | Evidence |

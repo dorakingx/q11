@@ -7,7 +7,8 @@ Verified against the Qollab docs on 2026-10-10 (see `docs/QOLLAB_RUNTIME.md`). Q
 qollab/
   index.html          ← body-only markup (the runtime drops html/head/body; <script> tags do not run)
   main.js             ← entry; imports ./game/q11-game.js (bundled game) and Python modules q11.*
-  main.css            ← the only stylesheet the runtime loads
+  main.css            ← the only stylesheet the runtime loads (generated: main.base.css + the game bundle's CSS)
+  main.base.css       ← wrapper styles (source for main.css)
   game/q11-game.js    ← self-contained ESM bundle of the same game (built by `npm run build:qollab`)
   q11/__init__.py, pauli.py, gf2.py, codes.py, verdict.py, decoder.py, missions.py, circuits.py
   q11/data/codes.json, q11/data/missions.json   ← synced copies of fixtures/ (scripts/sync-qollab-data.mjs)
@@ -24,7 +25,7 @@ Limits: ≤100 files, ≤2 MB each. `index.html` + `main.js` at the top level ma
 
 ## What was actually done (2026-10-10) — reproducible
 1. `npm run build:qollab` → `qollab/game/q11-game.js` + `qollab/main.css` (manifest in `reports/qollab-manifest.json`).
-2. `cd qollab && zip -r q11-js-project.zip index.html main.js main.css game main.py requirements.txt q11` (17 files, ~420 KB).
+2. `cd qollab && zip -r q11-js-project.zip index.html main.js main.css game main.py requirements.txt q11` (17 files, ≈670 KB after the redesign).
 3. Qollab editor → Code → Edit Code → File tree view → **Browse** → pick the zip → **Unpack** → **Keep and add**. The header changes to "This project runs as HTML/JS".
 4. **Run Project → Run → Built-in simulator (24q)**: the game page renders above the console; `main.js` runs a self-test (blind-dispatch circuit, 100 shots) through the Python package and prints `Q11 self-test {...}` with a job id and agreement flags. Then play; in a surface-code debrief press **Verify on <backend> (100 shots)**.
 5. **Run → IonQ Aria 1 (25q)** (free): the page loads; on IonQ the self-test is off (one job per run is reserved for the player's Verify button). Our IonQ verification of the page's bridge used a one-off variant with `AUTO_VERIFY.onlyLocal = false` (job 01a12396-c213-7984-9259-bb3fb25b8f46), after which the shipped `main.js` was restored.

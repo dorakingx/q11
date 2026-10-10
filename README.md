@@ -30,7 +30,7 @@ commuting-but-not-stabilizer ⇒ logical error, anticommuting ⇒ detectable. De
 ## Verification
 ```bash
 npm run lint && npm run typecheck && npm run test:unit && npm run build
-npm run test:e2e            # Playwright, desktop 1280×800 + mobile 390×844 (Chromium)
+npm run test:e2e            # Playwright: Chromium desktop 1280×800 / tablet 768×1024 / phone 390×844 + WebKit desktop (smoke, city, spray); viewport matrix 1440/768/390/375 with screenshots in reports/screenshots/after
 npm run verify:quantum      # regenerates fixtures, runs the independent Python/Qiskit comparison (≥1000 seeded cases)
 npm run verify:release      # everything above + submission asset checks → reports/release-verification.json
 ```

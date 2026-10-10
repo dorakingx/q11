@@ -4,7 +4,7 @@
 
 ## Authorship
 - Concept, design, implementation and verification: Tomoya Hatanaka (GitHub `dorakingx`), 2026-10-10 → 2026-10-12 JST, during the Qollab × IonQ Global Quantum Hackathon window.
-- AI assistance: **Claude Code (Anthropic, model Claude Fable 5.1)** was used extensively for code generation, test authoring, documentation drafting and asset generation under the author's direction. All quantum definitions were machine-verified (see `reports/quantum-verification.json`). Disclosed per the hackathon terms.
+- AI assistance: **Claude Code (Anthropic, model Claude Fable 5.1)** was used extensively for code generation, test authoring, documentation drafting, SVG asset generation and the Japanese UI/mission copy (reviewed by the author) under the author's direction. All quantum definitions were machine-verified (see `reports/quantum-verification.json`). Disclosed per the hackathon terms.
 
 ## Libraries (all MIT-licensed unless noted) — exact versions in `package-lock.json` / `quantum/requirements.txt`
 | Library | Version | License | Use |
@@ -30,7 +30,7 @@ The shipped web app contains only React/react-dom at runtime (MIT). Apache-2.0 t
 - Vercel docs: Deployment Protection / Vercel Authentication.
 
 ## Assets
-- All icons, glyphs (flames, helmets, alarm stations, wordmark) and the Q-ring logo are original SVGs created for Q11. No third-party art, emoji sets, fonts (system font stack only), or agency insignia.
+- All art — the Q-ring logo and wordmark, flames, helmets, alarm stations, houses, memory tower, fire station, conversion lab, bridge, fire trucks, firefighters, hoses/water, city tiles and chapter badges — is original SVG created for Q11 (`src/ui/art`). No third-party art, emoji sets, web fonts (system font stack; Nunito is used only if installed locally), or agency insignia.
 - Sounds: synthesized at runtime with Web Audio; no samples.
 
 ## Not used

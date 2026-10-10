@@ -25,7 +25,7 @@ Logical failure: the memory beacon (old-town tower, or a corner tower in other g
 Side-by-side (stacked on phones) two mini scenes: "Your spray" vs "Alternative" (decoder dispatch or the true-fire crews), each animating the same timeline; captions explain equivalence / distance-3. Existing replay steps remain available under "Step by step".
 
 ## 8. Result / badges
-After Next district the city map shows the district restored (smoke clears, lights on, park) with a chapter badge toast ("Alarm Reader", "Gate Tracker", "Colour Switcher", "Blind Dispatcher", "Two-Colour Chief", "Investigator"). Summary screen after old-town: badges + stars + "Play again / Free roam".
+Next district returns to the city map, which shows the district restored (smoke clears, lights on, park) with a chapter badge toast and pre-selects the next district ("Alarm Reader", "Gate Tracker", "Colour Switcher", "Blind Dispatcher", "Two-Colour Chief", "Investigator"). Summary screen after old-town: badges + stars + "Play again / Free roam".
 
 ## 9. Settings
 Sound, Reduce motion, Language, Free roam, Reset progress, storage note.

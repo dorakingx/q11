@@ -3,7 +3,7 @@
 ## 1. Pauli frames
 An n-qubit Pauli operator (up to phase) is a pair of bit vectors (x, z) ∈ GF(2)^n × GF(2)^n:
 X_i ↔ x_i = 1, Z_i ↔ z_i = 1, Y_i ↔ x_i = z_i = 1. The product of two Paulis is the **XOR** of their vectors
-(phases dropped). Hence applying the same correction twice cancels, and a correction on a burning block puts the fire out:
+(phases dropped). Hence applying the same correction twice cancels, and a correction on a burning house puts the fire out:
 X·X = I. "Fires overlapping" is therefore XOR, never OR.
 
 Two Paulis commute iff their symplectic product Σ_i (a.x_i b.z_i + a.z_i b.x_i) is 0 mod 2.
@@ -52,7 +52,7 @@ and would be missed by a fidelity test on that state alone. The Python reference
 eigenstates (±X̄, ±Ȳ, ±Z̄) with Qiskit's StabilizerState.
 
 ## 5. Decoding and Mission 6
-The debrief compares the player's dispatch with a minimum-weight lookup decoder (brute force over all Paulis, cached).
+The Why? screen compares the player's dispatch with a minimum-weight lookup decoder (brute force over all Paulis, cached).
 For syndrome {Z0} alone the minimum-weight explanation is X on q0 (or q3). If the true error was X1X2 (weight 2), that
 correction yields R = X0X1X2 = X̄: all alarms silent, logical qubit flipped. A distance-3 code guarantees correction of
 one error; two errors can defeat *any* decoder — the game scores the call as optimal and the outcome as unlucky.

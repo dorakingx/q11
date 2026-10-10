@@ -1,4 +1,6 @@
-# Q11 — Game design brief (authoritative for the UI/game implementation)
+# Q11 — Game design brief
+
+> **2026-10-10 18:15 — partly superseded.** The fiction (fires = Pauli errors, alarm stations = checks, crews = corrections), the scoring rules and the architecture rules below remain authoritative. The *presentation* sections (modes, board rendering, visual language, persistence key) are superseded by `docs/UX_REDESIGN.md` (acceptance criteria) and `docs/UX_SCREENS.md` (screens): qubits are now **houses** in a toy city, the mission list is a **city map**, Confirm is **Spray!** (a spray answer-check with four readable results and a Why? comparison), the first run is a three-tap tutorial, districts unlock in order (Free roam setting), and the UI is EN/JA. Save data is v2 (migrated from v1).
 
 Q11 is a **fire-dispatch command game** about quantum error correction. The player is the dispatcher of a quantum city.
 Qubits are **city blocks**. Pauli errors are **fires** lit by an arsonist called *Noise*: red fire = X, blue fire = Z,

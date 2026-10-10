@@ -20,9 +20,9 @@
 
 ## Software
 - Client-side game; progress is in localStorage (none inside Qollab's sandbox). Not a tamper-proof competitive system.
-- E2E tests run on Chromium (desktop + mobile emulation). WebKit/real Safari was **not** part of automated runs unless stated in EVIDENCE_INDEX. The every-screen quality walk once exceeded the default 30 s timeout under full parallel load; the per-test timeout is now 90 s (no assertion was weakened).
+- E2E runs on Chromium (desktop 1280×800, tablet 768×1024, phone 390×844) and Playwright WebKit (desktop; smoke/city/spray specs); no physical Safari or phone was tested. Per-test timeout 120 s; the viewport matrix runs once on desktop-chromium (the other projects skip it by design).
 - Inside Qollab, the game runs in a sandboxed iframe: no storage between runs (progress is in memory for that Run), and the page's **Verify** button is the only way to send an IonQ job (one per Run). Browser-automation tools cannot click inside that iframe, so the page's IonQ path was verified with the on-load self-test variant (same code path), see `reports/qollab-runs.md` run 8.
-- Japanese UI (P1) not implemented unless EVIDENCE_INDEX says otherwise. English only.
+- Japanese UI: implemented on every screen (EN/JA switch on the title screen and in Settings). The original mission reports, replay step captions and the what-if explanation shown under Details are generated in English.
 - Sound is minimal (Web Audio tones), off by default.
 
 ## Redesign (2026-10-10 evening)
