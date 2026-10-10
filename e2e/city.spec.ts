@@ -66,7 +66,9 @@ test('the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
   await openCity(page);
   await page.getByTestId('mission-1').click();
   await page.getByTestId('dispatch-go').click();
-  await expect(page.getByTestId('travel-overlay')).toBeVisible();
+  // The drive lasts ≈1.5 s; on a loaded machine the click itself can take longer than that, so the overlay may already
+  // have given way to the briefing. Either state proves the dispatch happened; the briefing must follow exactly once.
+  await expect(page.getByTestId('travel-overlay').or(page.getByTestId('briefing'))).toBeVisible();
   await expect(page.getByTestId('briefing')).toBeVisible({ timeout: 10_000 });
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Rowhouse Lane');
 });

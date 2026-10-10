@@ -1,11 +1,132 @@
 {
-  "recordedAt": "2026-10-10T13:36:42.616Z",
+  "recordedAt": "2026-10-10T18:19:35.763Z",
   "base": "http://localhost:4173",
-  "shots": 79,
-  "scriptedSeconds": 142,
-  "durationSeconds": 138.4,
+  "shots": 91,
+  "narration": {
+    "voice": "Samantha",
+    "rate": 172,
+    "lines": 22,
+    "speechSeconds": 131.1,
+    "captions": false,
+    "leadMs": 2642,
+    "cues": [
+      {
+        "atSeconds": 3.4,
+        "seconds": 9.6,
+        "text": "Q11 Emergency. Quantum Emergency Response: a toy city where fires are quantum errors, alarm stations are parity checks, and you are the dispatcher."
+      },
+      {
+        "atSeconds": 13.7,
+        "seconds": 4.8,
+        "text": "Your first call takes three taps. Pick a crew, tap the house, and spray."
+      },
+      {
+        "atSeconds": 19.8,
+        "seconds": 3.8,
+        "text": "Both alarms ring, so the fire must be in the house they both watch."
+      },
+      {
+        "atSeconds": 24,
+        "seconds": 6,
+        "text": "Answer check. The truck arrives, the crew runs in, and one hose is exactly one Pauli correction."
+      },
+      {
+        "atSeconds": 30.4,
+        "seconds": 4.1,
+        "text": "Fires out, houses restored. X times X is the identity."
+      },
+      {
+        "atSeconds": 35,
+        "seconds": 5.2,
+        "text": "This is the city map. Districts unlock in order, the smoke clears, and you earn a badge."
+      },
+      {
+        "atSeconds": 41.5,
+        "seconds": 3,
+        "text": "Dispatch! The fire truck drives to Harbor Bridge."
+      },
+      {
+        "atSeconds": 45,
+        "seconds": 5.9,
+        "text": "Training first. Tap where the fire will be after the gate. A red fire copies forward through the coupler."
+      },
+      {
+        "atSeconds": 53.7,
+        "seconds": 1.9,
+        "text": "And a blue fire copies backward."
+      },
+      {
+        "atSeconds": 58.4,
+        "seconds": 10.1,
+        "text": "Now the challenge. A red fire starts on house zero and a blue fire on house one. After the gate, both houses carry a red-and-blue fire, so we send a Y crew to each."
+      },
+      {
+        "atSeconds": 70.8,
+        "seconds": 9.2,
+        "text": "Watch the fires travel first. Through the coupler the red fire copies forward and the blue fire copies backward. Then the crews spray, and every pair cancels."
+      },
+      {
+        "atSeconds": 82.8,
+        "seconds": 4.5,
+        "text": "For reviewers there is free selection: with this switch every district opens from the map."
+      },
+      {
+        "atSeconds": 89.7,
+        "seconds": 5.3,
+        "text": "Central District is the distance-three surface code. Nine houses, eight alarm stations."
+      },
+      {
+        "atSeconds": 96.3,
+        "seconds": 4.7,
+        "text": "Here the fires are hidden behind fog. Tap a station to see which houses it watches."
+      },
+      {
+        "atSeconds": 101.4,
+        "seconds": 6.4,
+        "text": "Z zero and Z one both ring, and only house four is watched by both. So we plan a red crew there and spray."
+      },
+      {
+        "atSeconds": 108.3,
+        "seconds": 4.5,
+        "text": "The hose reveals the true fire, puts it out, and every station goes quiet."
+      },
+      {
+        "atSeconds": 113.3,
+        "seconds": 5.8,
+        "text": "Central District is restored and a new badge is earned. With free selection, Old Town is already open."
+      },
+      {
+        "atSeconds": 120.4,
+        "seconds": 5.3,
+        "text": "Old Town. One alarm rings, and the best explanation is a single fire on house zero."
+      },
+      {
+        "atSeconds": 127.8,
+        "seconds": 7.2,
+        "text": "Every alarm goes quiet. And yet the memory tower flips. Two fires fooled the alarms. That is what distance three means."
+      },
+      {
+        "atSeconds": 135.4,
+        "seconds": 7.6,
+        "text": "Why? Your spray and the alternative, side by side. The investigation is complete: nobody could have known from the alarms alone."
+      },
+      {
+        "atSeconds": 143.4,
+        "seconds": 10,
+        "text": "The same missions run as Qiskit circuits on Qollab. Exact on the built-in simulator, and on IonQ's Aria 1 simulator the logical bit flipped in ninety-seven percent of shots."
+      },
+      {
+        "atSeconds": 154.8,
+        "seconds": 6.2,
+        "text": "Q11 Emergency is open source under the MIT license. This effort is supported by Qollab and IonQ."
+      }
+    ]
+  },
+  "scriptedSeconds": 160,
+  "durationSeconds": 162.6,
   "within120to180": true,
-  "bytes": 4127795,
-  "sha256": "3596c11ddf55a736337cde08080b71df9e16caa2f07b109923a0a79509fec3a7",
+  "audioStream": true,
+  "bytes": 7253364,
+  "sha256": "3b503c131e299048c5df397448c7decb84dd22507aecd1ad37f6c78a414093b7",
   "output": "submission/DEMO.mp4"
 }

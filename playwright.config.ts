@@ -11,7 +11,10 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,
-  timeout: 120_000, // every-mission walks and the viewport matrix take ~40 s unloaded; parallel load doubles that
+  // every-mission walks and the viewport matrix take ~40 s unloaded; parallel load doubles that. Q11_E2E_TIMEOUT (ms) and
+  // Q11_E2E_WORKERS let a loaded machine run the same assertions with more patience and less contention.
+  timeout: process.env.Q11_E2E_TIMEOUT ? Number(process.env.Q11_E2E_TIMEOUT) : 120_000,
+  workers: process.env.Q11_E2E_WORKERS ? Number(process.env.Q11_E2E_WORKERS) : undefined,
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'playwright-report' }]],
   globalTeardown: './e2e/perf-teardown.ts',
   use: {

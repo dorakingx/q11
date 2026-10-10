@@ -1,17 +1,17 @@
 {
-  "generatedAt": "2026-10-10T13:17:59.682Z",
+  "generatedAt": "2026-10-10T18:20:17.163Z",
   "fileCount": 17,
-  "totalBytes": 684402,
+  "totalBytes": 698081,
   "files": [
     {
       "path": "game/q11-game.js",
-      "bytes": 573933,
-      "sha256": "3be77d1b45994ba14d8edf2ab28b42680acd33b543dc07e35bf6a1969204e303"
+      "bytes": 586762,
+      "sha256": "bf86b79840bc640521542cad34d5c03a226cadd1b907dd6019a2f7ff999acc6f"
     },
     {
       "path": "index.html",
-      "bytes": 507,
-      "sha256": "d9fb3692eb99715bd0a6a46e9274a5e249c15dd1dedcd6115d5536c6983985fa"
+      "bytes": 527,
+      "sha256": "3374ba25077b8b900c27d0bc28a704f5fee4165201471f1f983e9e827576f0da"
     },
     {
       "path": "main.base.css",
@@ -20,18 +20,18 @@
     },
     {
       "path": "main.css",
-      "bytes": 37935,
-      "sha256": "c97dfcda1fffaecc740b174521af5dbcc7ea9b656d91bed0c84b1cecfb19eaf2"
+      "bytes": 38735,
+      "sha256": "2fedb8db143084ea7acc827bdab21490ec3c861f9e0b2dcc9f322a031b8274ee"
     },
     {
       "path": "main.js",
-      "bytes": 7091,
-      "sha256": "140d2f8e45c4babacedc1a790b08e8b997fe376f9db812ef78bd90bc3e3303ce"
+      "bytes": 7101,
+      "sha256": "6abd0e4e929863c1a63372f6163a36e8a4f67ffa1b4b2b94db0caa0fa2d60256"
     },
     {
       "path": "main.py",
-      "bytes": 6222,
-      "sha256": "c28c6511898f1815c102bc7b9a366a5074bda034184ed795b5971271c3951851"
+      "bytes": 6242,
+      "sha256": "d7a3aefdc669edbbd638e63c9fd4f9ba6be5de42e5a37a20ab0182379a1a82ab"
     },
     {
       "path": "q11/__init__.py",

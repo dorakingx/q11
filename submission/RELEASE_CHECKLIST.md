@@ -10,13 +10,13 @@ Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external).
 - ☑ Real-browser screenshots: 62 "after" screenshots at 1440×900 / 768×1024 / 390×844 / 375×812 (`reports/screenshots/after/`), reviewed; "before" set kept in `reports/screenshots/before/`
 - ☑ GitHub `dorakingx/q11` private (`isPrivate: true`), `main` pushed at every milestone; final redesign SHA recorded in STATUS.md at the end
 - ☑ Vercel `q11`: Vercel Authentication = All Deployments since creation (never changed); anonymous/authenticated checks on the final redesign deployment: see the last row of this list
-- ☑ Qollab draft exists (private); 12 runs incl. 4 IonQ Aria 1 jobs with ids; the final redesigned page (commit c3581f9 bundle) uploaded and self-tested on the built-in simulator (run 12, job 601a8c4d…, exact) — `reports/qollab-runs.md`
+- ☑ Qollab draft exists (private); 13 runs incl. 4 IonQ Aria 1 jobs with ids; the final Q11 Emergency page (commit aed04f3 bundle) uploaded and self-tested on the built-in simulator (run 13, job e7ec00e7…, exact) — `reports/qollab-runs.md`
 - ☑ Icons reviewed at 16/32/64/128 on dark and light — `reports/icons/REVIEW.md` (brand mark unchanged by the redesign)
-- ☑ `submission/DEMO.mp4` re-recorded from the redesigned app (city map, truck, spray, four results, Why?, JA) — 138.4 s, sha256 3596c11d… (`reports/demo-recording.json`, 2026-10-10 13:36 UTC); NOT uploaded
+- ☑ `submission/DEMO.mp4` re-recorded from the final app with narration (no captions, no phone insert): 162.6 s, sha256 3b503c13… (`reports/demo-recording.json`, 2026-10-10 18:19 UTC); NOT uploaded
 - ☑ MIT `LICENSE`; `ATTRIBUTION.md` updated for the redesign art + JA copy; attribution line present in README, project page and the game's title screen
 - ☑ Secret-pattern scan 0 hits in tracked files (verify:release); `.env*`, `.vercel/` ignored
 - ☑ `submission/KNOWN_LIMITATIONS.md` updated for the redesign
-- ☑ Project Card on the Qollab draft re-pasted from the redesigned `submission/PROJECT_PAGE.md`; About set from `SHORT_DESCRIPTION.md` (222 chars); tags + thumbnail kept (2026-10-10 23:10 JST)
+- ☑ Project Card on the Qollab draft re-pasted from the renamed `submission/PROJECT_PAGE.md` (2026-10-11 02:55 JST); title "Q11 Emergency — Quantum Emergency Response"; About (222 chars); thumbnail = the new truck og-image; tags kept
 - ☑ Final redesign commit pushed (b0a6f5f; web sources verified at c3581f9); working tree clean; protected deployment dpl_DtPwF1mnrNuL7S1VKcVNqVeGdCLP (q11-pou4pz35d-doraking.vercel.app + 3 aliases) checked 2026-10-10 13:43–13:45 UTC: 16/16 anonymous blocked, authenticated fetch returns the app, bypass secret revoked (0)
 
 ## ────────── APPROVAL REQUIRED BELOW THIS LINE ──────────

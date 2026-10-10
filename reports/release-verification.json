@@ -1,43 +1,43 @@
 {
-  "generatedAt": "2026-10-10T13:40:40.073Z",
-  "gitSha": "c3581f9b84e330067102ec01acbb1e6fdb3e74db",
+  "generatedAt": "2026-10-10T18:42:03.538Z",
+  "gitSha": "aed04f3e159c533190ea77745fbda52ba69d1ff8",
   "workingTreeClean": false,
   "steps": [
     {
       "name": "lint",
       "command": "npm run -s lint",
       "exitCode": 0,
-      "seconds": 37.5
+      "seconds": 75.4
     },
     {
       "name": "typecheck",
       "command": "npm run -s typecheck",
       "exitCode": 0,
-      "seconds": 12.3
+      "seconds": 21.1
     },
     {
       "name": "unit",
       "command": "npm run -s test:unit",
       "exitCode": 0,
-      "seconds": 16.3
+      "seconds": 25.1
     },
     {
       "name": "build",
       "command": "npm run -s build",
       "exitCode": 0,
-      "seconds": 18.6
+      "seconds": 25.3
     },
     {
       "name": "verify:quantum",
       "command": "node scripts/verify-quantum.mjs",
       "exitCode": 0,
-      "seconds": 23.6
+      "seconds": 29.8
     },
     {
       "name": "e2e",
       "command": "npm run -s test:e2e",
       "exitCode": 0,
-      "seconds": 108.2
+      "seconds": 259.3
     }
   ],
   "missingFiles": [],
@@ -60,9 +60,9 @@
   ],
   "demo": {
     "present": true,
-    "bytes": 4127795,
-    "sha256": "3596c11ddf55a736337cde08080b71df9e16caa2f07b109923a0a79509fec3a7",
-    "durationSeconds": 138,
+    "bytes": 7253364,
+    "sha256": "3b503c131e299048c5df397448c7decb84dd22507aecd1ad37f6c78a414093b7",
+    "durationSeconds": 163,
     "within120to180": true
   },
   "secretLikeLines": 0,

@@ -16,7 +16,8 @@ const SIZES: readonly (readonly [number, number])[] = [
 for (const [w, h] of SIZES) {
   test(`viewport ${String(w)}×${String(h)}: every screen fits, screenshots written`, async ({ page }, info) => {
     test.skip(info.project.name !== 'desktop-chromium', 'the matrix sets its own viewport; one engine is enough');
-    test.setTimeout(240_000);
+    // the matrix walks every screen three times; under Q11_E2E_TIMEOUT (loaded machine) allow twice that budget
+    test.setTimeout(process.env.Q11_E2E_TIMEOUT ? Number(process.env.Q11_E2E_TIMEOUT) * 2 : 240_000);
     await page.setViewportSize({ width: w, height: h });
     const tag = `${String(w)}x${String(h)}`;
     const check = async (name: string) => {
