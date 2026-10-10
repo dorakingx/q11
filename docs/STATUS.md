@@ -1,6 +1,6 @@
 # Q11 Status
 
-_Last updated: 2026-10-10 11:15 JST_
+_Last updated: 2026-10-10 11:25 JST_
 
 Overall: **IN PROGRESS** (foundation phase). Nothing deployed, nothing published.
 
@@ -16,6 +16,11 @@ Overall: **IN PROGRESS** (foundation phase). Nothing deployed, nothing published
 | A7 | Qollab IonQ simulator run of core mission confirmed | PASS | Draft project created in the user's account (private). Early check circuit (rep3 syndrome extraction + correction) ran on **Built-in simulator** (200 shots) and on **IonQ Aria 1 remote simulator** (`ionq_simulator`, 100 shots, 18.9 s) with results matching the Pauli-frame prediction 100% — `reports/qollab-runs.md`. **Core mission confirmed on IonQ**: blind-dispatch rsc3 circuit (17 qubits) ran on the Qollab built-in simulator (job aea7dacd…, exact match) and on **IonQ Aria 1 remote simulator** (job 01a12375-0bf0-71f4-ae8f-e30bd8185309, 100 shots, dominant syndrome 78%, majority logical 94%). Also silent-failure on IonQ Aria 1 (job 01a1237b-5f60-7349-89d0-a343dca0201c): predicted logical flip observed (97%). Raw counts in `reports/qollab-runs/*.json`. JS game page uploaded to the draft: renders above the console; on-load self-test through the JS→Python bridge on the built-in simulator exact (job 7d179532…). IonQ Aria 1 through the page's bridge: job 01a12396-c213-7984-9259-bb3fb25b8f46 (76% predicted alarms, 97% predicted logical bit). Shipped main.js restored (self-test local-only). |
 | A8 | Icons, README/MIT/attribution/Qollab materials, demo video | IN PROGRESS | icons done (`reports/icons/REVIEW.md`); README/MIT/ATTRIBUTION/PROJECT_PAGE/DEMO_SCRIPT/QOLLAB_IMPORT/KNOWN_LIMITATIONS/RELEASE_CHECKLIST/EVIDENCE_INDEX drafted; DEMO.mp4 recorded (146 s, sha256 75a4dd7a…, local only) — frames reviewed |
 | A9 | No publish/submit performed; only approval pending | OK so far | nothing public |
+
+## Qollab draft state (private, unpublished)
+- Files: JS/Qiskit project (index.html, main.js, main.css, game/q11-game.js, q11/ package + data, main.py fallback, requirements.txt, README.md). Runs: see `reports/qollab-runs.md` (8 runs; 4 on IonQ Aria 1 with job ids).
+- Project Card: write-up pasted from `submission/PROJECT_PAGE.md` (saved), thumbnail = `public/og-image.png`, tags being added (quantum, education, visualization, game). Project Website / Repository fields left empty (both are private until approval).
+- **Publish not pressed.**
 
 ## Open P0 items
 - [ ] Scaffold Vite/React/TS + vitest + playwright + eslint, pinned, lockfile
