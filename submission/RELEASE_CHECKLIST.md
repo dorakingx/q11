@@ -15,7 +15,7 @@ Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external).
 - ☑ MIT `LICENSE`; `ATTRIBUTION.md` complete; attribution line present in README, project page and the game's title screen
 - ☑ Secret-pattern scan 0 hits in tracked files (verify:release); `.env*`, `.vercel/` ignored
 - ☑ `submission/KNOWN_LIMITATIONS.md` current (updated after the review wave)
-- ☐ Final commit pushed; working tree clean (done at the end of the build — see STATUS.md)
+- ☑ Final code commit d537465 pushed, working tree clean (docs-only commits follow); deployment dpl_x1f6VTdK8hLQ6HNGpT3kvniv8iHz protected + authenticated check done
 
 ## ────────── APPROVAL REQUIRED BELOW THIS LINE ──────────
 The user must explicitly approve *which* of the following to perform and *when*. Each step is independent.
