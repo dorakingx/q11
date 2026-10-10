@@ -1,0 +1,70 @@
+{
+  "generatedAt": "2026-10-10T02:24:10.658Z",
+  "gitSha": "0e950e8c51786fc9dc74ae378f3b82e1d8676264",
+  "workingTreeClean": false,
+  "steps": [
+    {
+      "name": "lint",
+      "command": "npm run -s lint",
+      "exitCode": 0,
+      "seconds": 36
+    },
+    {
+      "name": "typecheck",
+      "command": "npm run -s typecheck",
+      "exitCode": 0,
+      "seconds": 25.4
+    },
+    {
+      "name": "unit",
+      "command": "npm run -s test:unit",
+      "exitCode": 0,
+      "seconds": 12.4
+    },
+    {
+      "name": "build",
+      "command": "npm run -s build",
+      "exitCode": 0,
+      "seconds": 19
+    },
+    {
+      "name": "verify:quantum",
+      "command": "node scripts/verify-quantum.mjs",
+      "exitCode": 0,
+      "seconds": 31.8
+    },
+    {
+      "name": "e2e",
+      "command": "npm run -s test:e2e",
+      "exitCode": 0,
+      "seconds": 74.2
+    }
+  ],
+  "missingFiles": [],
+  "checks": [
+    {
+      "label": "LICENSE is MIT",
+      "file": "LICENSE",
+      "ok": true
+    },
+    {
+      "label": "attribution line in project page",
+      "file": "submission/PROJECT_PAGE.md",
+      "ok": true
+    },
+    {
+      "label": "attribution line in README",
+      "file": "README.md",
+      "ok": true
+    }
+  ],
+  "demo": {
+    "present": true,
+    "bytes": 4063995,
+    "sha256": "75a4dd7af15b8f98279e9450390907723003f4d9f46fb95d803ba1c5c4d90765",
+    "durationSeconds": 146,
+    "within120to180": true
+  },
+  "secretLikeLines": 0,
+  "passed": true
+}
