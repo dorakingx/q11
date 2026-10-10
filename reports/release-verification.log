@@ -8,102 +8,55 @@
 
 [1m[46m RUN [49m[22m [36mv3.2.7 [39m[90m/Users/hatanakatomoya/Developer/App/Q11[39m
 
- [32m✓[39m src/quantum/gates.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 24[2mms[22m[39m
- [32m✓[39m src/quantum/pauli.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 180[2mms[22m[39m
- [32m✓[39m src/quantum/rng.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 285[2mms[22m[39m
- [32m✓[39m src/quantum/missions.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 660[2mms[22m[39m
-   [33m[2m✓[22m[39m missions.json[2m > [22mexpected blocks match recomputation by the engine [33m 624[2mms[22m[39m
- [32m✓[39m src/quantum/decoder.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 467[2mms[22m[39m
- [32m✓[39m src/quantum/codes.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 1086[2mms[22m[39m
-   [33m[2m✓[22m[39m code invariants: rsc3[2m > [22mbrute-force distance under its own noise model equals the declared distance (3) [33m 510[2mms[22m[39m
-   [33m[2m✓[22m[39m rep3 is NOT a general quantum code[2m > [22mrsc3 has distance 3 against X-only, Z-only and full Pauli noise [33m 358[2mms[22m[39m
- [32m✓[39m src/game/scoring.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 999[2mms[22m[39m
-   [33m[2m✓[22m[39m scoring[2m > [22m3 stars also for a stabilizer-equivalent dispatch (block 3 instead of block 0 on rsc3) [33m 956[2mms[22m[39m
- [32m✓[39m src/game/secrecy.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 678[2mms[22m[39m
-   [33m[2m✓[22m[39m reducer before debrief[2m > [22mstate before confirm has debrief = null and contains no "error"/"fires" keys; after confirm it does [33m 654[2mms[22m[39m
- [32m✓[39m src/game/machine.test.ts [2m([22m[2m22 tests[22m[2m)[22m[33m 723[2mms[22m[39m
-   [33m[2m✓[22m[39m full flow of every mission[2m > [22mblind-dispatch: min-weight dispatch yields the expected verdict and stars [33m 320[2mms[22m[39m
- [32m✓[39m src/game/replay.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 11[2mms[22m[39m
- [32m✓[39m src/game/bridge.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 7[2mms[22m[39m
- [32m✓[39m src/quantum/verdict.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 164[2mms[22m[39m
- [32m✓[39m src/quantum/gf2.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 48[2mms[22m[39m
- [32m✓[39m src/game/persistence.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 7[2mms[22m[39m
- [32m✓[39m src/quantum/fixtures.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1434[2mms[22m[39m
-   [33m[2m✓[22m[39m fixture generation[2m > [22mis deterministic across two generator runs in one process [33m 889[2mms[22m[39m
-   [33m[2m✓[22m[39m fixture generation[2m > [22mverdict cases replay through the engine, and include every verdict kind, both codes and degenerate pairs [33m 396[2mms[22m[39m
-[90mstderr[2m | src/ui/board.test.tsx[2m > [22m[2mApp[2m > [22m[2mboots to the title, plays to the mission list and back, with sound off by default
-[22m[39mError: Not implemented: window.scrollTo
-    at module.exports (/Users/hatanakatomoya/Developer/App/Q11/node_modules/jsdom/lib/jsdom/browser/not-implemented.js:9:17)
-    at /Users/hatanakatomoya/Developer/App/Q11/node_modules/jsdom/lib/jsdom/browser/Window.js:960:7
-    at /Users/hatanakatomoya/Developer/App/Q11/src/ui/App.tsx:120:18
-    at commitHookEffectListMount (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:23189:26)
-    at commitPassiveMountOnFiber (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24970:11)
-    at commitPassiveMountEffects_complete (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24930:9)
-    at commitPassiveMountEffects_begin (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24917:7)
-    at commitPassiveMountEffects (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24905:3)
-    at flushPassiveEffectsImpl (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:27078:3)
-    at flushPassiveEffects (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:27023:14) [90mundefined[39m
+ [32m✓[39m src/quantum/pauli.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32m✓[39m src/quantum/rng.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 157[2mms[22m[39m
+ [32m✓[39m src/quantum/missions.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 126[2mms[22m[39m
+ [32m✓[39m src/quantum/decoder.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32m✓[39m src/quantum/codes.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 127[2mms[22m[39m
+ [32m✓[39m src/game/secrecy.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 176[2mms[22m[39m
+ [32m✓[39m src/game/scoring.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 190[2mms[22m[39m
+ [32m✓[39m src/game/bridge.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/game/machine.test.ts [2m([22m[2m27 tests[22m[2m)[22m[32m 80[2mms[22m[39m
+ [32m✓[39m src/quantum/verdict.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m src/quantum/gates.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m src/quantum/gf2.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 65[2mms[22m[39m
+ [32m✓[39m src/game/persistence.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m src/game/replay.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/ui/sound.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 115[2mms[22m[39m
+ [32m✓[39m src/quantum/fixtures.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 524[2mms[22m[39m
+   [33m[2m✓[22m[39m fixture generation[2m > [22mis deterministic across two generator runs in one process [33m 393[2mms[22m[39m
+[90mstderr[2m | src/ui/board.test.tsx[2m > [22m[2mApp[2m > [22m[2mmoves focus to the new screen heading (debrief: the verdict banner), sets document.title and announces each screen
+[22m[39mWarning: An update to App inside a test was not wrapped in act(...).
 
-[90mstderr[2m | src/ui/board.test.tsx[2m > [22m[2mApp[2m > [22m[2mboots to the title, plays to the mission list and back, with sound off by default
-[22m[39mError: Not implemented: window.scrollTo
-    at module.exports (/Users/hatanakatomoya/Developer/App/Q11/node_modules/jsdom/lib/jsdom/browser/not-implemented.js:9:17)
-    at /Users/hatanakatomoya/Developer/App/Q11/node_modules/jsdom/lib/jsdom/browser/Window.js:960:7
-    at /Users/hatanakatomoya/Developer/App/Q11/src/ui/App.tsx:120:18
-    at commitHookEffectListMount (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:23189:26)
-    at commitPassiveMountOnFiber (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24970:11)
-    at commitPassiveMountEffects_complete (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24930:9)
-    at commitPassiveMountEffects_begin (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24917:7)
-    at commitPassiveMountEffects (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24905:3)
-    at flushPassiveEffectsImpl (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:27078:3)
-    at flushPassiveEffects (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:27023:14) [90mundefined[39m
+When testing, code that causes React state updates should be wrapped into act(...):
 
-[90mstderr[2m | src/ui/board.test.tsx[2m > [22m[2mApp[2m > [22m[2mboots to the title, plays to the mission list and back, with sound off by default
-[22m[39mError: Not implemented: window.scrollTo
-    at module.exports (/Users/hatanakatomoya/Developer/App/Q11/node_modules/jsdom/lib/jsdom/browser/not-implemented.js:9:17)
-    at /Users/hatanakatomoya/Developer/App/Q11/node_modules/jsdom/lib/jsdom/browser/Window.js:960:7
-    at /Users/hatanakatomoya/Developer/App/Q11/src/ui/App.tsx:120:18
-    at commitHookEffectListMount (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:23189:26)
-    at commitPassiveMountOnFiber (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24970:11)
-    at commitPassiveMountEffects_complete (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24930:9)
-    at commitPassiveMountEffects_begin (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24917:7)
-    at commitPassiveMountEffects (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24905:3)
-    at flushPassiveEffectsImpl (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:27078:3)
-    at flushPassiveEffects (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:27023:14) [90mundefined[39m
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
 
-[90mstderr[2m | src/ui/board.test.tsx[2m > [22m[2mApp[2m > [22m[2mboots to the title, plays to the mission list and back, with sound off by default
-[22m[39mError: Not implemented: window.scrollTo
-    at module.exports (/Users/hatanakatomoya/Developer/App/Q11/node_modules/jsdom/lib/jsdom/browser/not-implemented.js:9:17)
-    at /Users/hatanakatomoya/Developer/App/Q11/node_modules/jsdom/lib/jsdom/browser/Window.js:960:7
-    at /Users/hatanakatomoya/Developer/App/Q11/src/ui/App.tsx:120:18
-    at commitHookEffectListMount (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:23189:26)
-    at commitPassiveMountOnFiber (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24970:11)
-    at commitPassiveMountEffects_complete (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24930:9)
-    at commitPassiveMountEffects_begin (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24917:7)
-    at commitPassiveMountEffects (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:24905:3)
-    at flushPassiveEffectsImpl (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:27078:3)
-    at flushPassiveEffects (/Users/hatanakatomoya/Developer/App/Q11/node_modules/react-dom/cjs/react-dom.development.js:27023:14) [90mundefined[39m
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at App (/Users/hatanakatomoya/Developer/App/Q11/src/ui/App.tsx:48:16)
 
- [32m✓[39m src/ui/board.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[33m 2361[2mms[22m[39m
-   [33m[2m✓[22m[39m Board[2m > [22mrenders one button per block with accessible labels; non-interactive boards use images [33m 514[2mms[22m[39m
-   [33m[2m✓[22m[39m ChallengeScreen[2m > [22mplaces and removes crews, enforces the budget, swaps colour, confirms [33m 895[2mms[22m[39m
+ [32m✓[39m src/ui/board.test.tsx [2m([22m[2m17 tests[22m[2m)[22m[33m 1449[2mms[22m[39m
 
-[2m Test Files [22m [1m[32m16 passed[39m[22m[90m (16)[39m
-[2m      Tests [22m [1m[32m137 passed[39m[22m[90m (137)[39m
-[2m   Start at [22m 11:21:55
-[2m   Duration [22m 9.13s[2m (transform 5.44s, setup 0ms, collect 15.46s, tests 9.13s, environment 2.51s, prepare 11.53s)[22m
+[2m Test Files [22m [1m[32m17 passed[39m[22m[90m (17)[39m
+[2m      Tests [22m [1m[32m158 passed[39m[22m[90m (158)[39m
+[2m   Start at [22m 12:27:24
+[2m   Duration [22m 4.12s[2m (transform 1.22s, setup 104ms, collect 4.88s, tests 3.13s, environment 2.57s, prepare 3.29s)[22m
 
 
 [verify:release] unit: exit 0
 
 [36mvite v6.4.4 [32mbuilding for production...[36m[39m
 transforming...
-[32m✓[39m 59 modules transformed.
+[32m✓[39m 60 modules transformed.
 rendering chunks...
 computing gzip size...
 [2mdist/[22m[32mindex.html                 [39m[1m[2m  0.92 kB[22m[1m[22m[2m │ gzip:  0.47 kB[22m
-[2mdist/[22m[2massets/[22m[35mindex-CwCDEhpm.css  [39m[1m[2m 14.16 kB[22m[1m[22m[2m │ gzip:  3.81 kB[22m
-[2mdist/[22m[2massets/[22m[36mindex-B8nc2bcX.js   [39m[1m[2m241.19 kB[22m[1m[22m[2m │ gzip: 75.03 kB[22m
-[32m✓ built in 3.27s[39m
+[2mdist/[22m[2massets/[22m[35mindex-B4SNBEeE.css  [39m[1m[2m 15.35 kB[22m[1m[22m[2m │ gzip:  4.01 kB[22m
+[2mdist/[22m[2massets/[22m[36mindex-DBGQXHEr.js   [39m[1m[2m251.41 kB[22m[1m[22m[2m │ gzip: 78.22 kB[22m
+[32m✓ built in 1.33s[39m
 
 [verify:release] build: exit 0
 
@@ -113,7 +66,7 @@ gen-fixtures: 0 written, 6 unchanged, out=/Users/hatanakatomoya/Developer/App/Q1
 
 [verify:quantum] sync fixtures into qollab/q11/data: node scripts/sync-qollab-data.mjs
 [sync-qollab-data] fixtures/codes.json -> qollab/q11/data/codes.json: identical sha256=73e1aa93b8084279… 
-[sync-qollab-data] fixtures/missions.json -> qollab/q11/data/missions.json: identical sha256=178b4b62842321a0… 
+[sync-qollab-data] fixtures/missions.json -> qollab/q11/data/missions.json: identical sha256=c40aa982f689d752… 
 [sync-qollab-data] OK: 2 files identical
 
 [verify:quantum] independent Python/Qiskit comparison: /Users/hatanakatomoya/Developer/App/Q11/.venv/bin/python quantum/verify.py
@@ -137,47 +90,53 @@ code invariants: {"rsc3": {"n": 9, "k": 1, "checks": 8, "rank": 8, "hxHzTzero": 
   verdicts-1000.json sample (every 5th, 200 cases) (qiskit StabilizerState, 6 eigenstates each)      200 compared    0 mismatches
   logical eigenstate preparation (Aer statevector, all generators +1)                                 24 compared    0 mismatches
   propagation missions (Aer statevector + Operator)                                                   42 compared    0 mismatches
-  mission circuits on AerSimulator (shots=2000, deterministic syndrome + logical readout)             45 compared    0 mismatches
+  mission circuits on AerSimulator (shots=2000, deterministic syndrome + logical readout)             42 compared    0 mismatches
   mission circuits serialize with qiskit-ionq (qis gateset, offline, no job)                          42 compared    0 mismatches
   mission circuits on qiskit BasicSimulator (Qollab built-in class, 200 shots)                         6 compared    0 mismatches
 
-TOTAL 4749 comparisons, 0 mismatches, 51 Aer mission runs, 21.5s -> PASS
+TOTAL 4746 comparisons, 0 mismatches, 48 Aer mission runs, 8.1s -> PASS
 reports: reports/quantum-verification.json, reports/QUANTUM_VERIFICATION.md
-[verify:quantum] PASS — 4749 comparisons, 0 mismatches, 51 Aer mission runs (qiskit 2.5.2, aer 0.17.2)
+[verify:quantum] PASS — 4746 comparisons, 0 mismatches, 48 Aer mission runs (qiskit 2.5.2, aer 0.17.2)
 
 [verify:release] verify:quantum: exit 0
 
 
-Running 26 tests using 6 workers
+Running 32 tests using 6 workers
 
-  ✓   3 [desktop-chromium] › e2e/keyboard.spec.ts:59:1 › Escape closes the stand-down dialog and the dialog traps initial focus (3.1s)
-  ✓   6 [desktop-chromium] › e2e/quality.spec.ts:38:1 › progress persists across reload; corrupt save is reset with a visible notice (6.2s)
-  ✓   2 [desktop-chromium] › e2e/quality.spec.ts:60:1 › settings: sound off by default, toggles persist, reset clears progress after confirmation (8.5s)
-  ✓   7 [desktop-chromium] › e2e/quality.spec.ts:85:1 › challenge never exposes the hidden fire in the DOM before confirm (mission 4) (6.0s)
-  ✓   1 [desktop-chromium] › e2e/keyboard.spec.ts:4:1 › mission 1 can be played with the keyboard only (13.8s)
-  ✓   5 [desktop-chromium] › e2e/mobile.spec.ts:8:1 › mission 5 tap flow: palette → blocks → sticky confirm → debrief (15.0s)
-  ✓   9 [desktop-chromium] › e2e/silent-failure.spec.ts:40:1 › mission 6: the lucky guess (blocks 1 and 2) succeeds with 2 stars and an honest debrief (6.9s)
-  ✓   8 [desktop-chromium] › e2e/silent-failure.spec.ts:4:1 › mission 6: the protocol dispatch silences every alarm but flips the logical qubit (silent failure) (11.7s)
-  ✓  11 [desktop-chromium] › e2e/smoke.spec.ts:73:1 › mission 4 challenge renders the full surface-code board (screenshot) (9.4s)
-  ✓  13 [desktop-chromium] › e2e/smoke.spec.ts:123:1 › standing down with no crews asks for confirmation, then shows fires still burning (8.6s)
-  ✓  12 [desktop-chromium] › e2e/smoke.spec.ts:89:1 › propagation missions 2 and 3: predict the end state, wrong colour fails, try again works (10.4s)
-  ✓   4 [desktop-chromium] › e2e/quality.spec.ts:4:1 › no horizontal overflow and no console errors across every screen (27.7s)
-  ✓  10 [desktop-chromium] › e2e/smoke.spec.ts:4:1 › smoke: title → play → mission 1 briefing → training → challenge → place crew → confirm → debrief → next (18.2s)
-  ✓  15 [mobile-chromium] › e2e/keyboard.spec.ts:59:1 › Escape closes the stand-down dialog and the dialog traps initial focus (1.9s)
-  ✓  14 [mobile-chromium] › e2e/keyboard.spec.ts:4:1 › mission 1 can be played with the keyboard only (4.5s)
-  ✓  18 [mobile-chromium] › e2e/quality.spec.ts:85:1 › challenge never exposes the hidden fire in the DOM before confirm (mission 4) (2.5s)
-  ✓  16 [mobile-chromium] › e2e/mobile.spec.ts:8:1 › mission 5 tap flow: palette → blocks → sticky confirm → debrief (5.8s)
-  ✓  19 [mobile-chromium] › e2e/silent-failure.spec.ts:4:1 › mission 6: the protocol dispatch silences every alarm but flips the logical qubit (silent failure) (4.9s)
-  ✓  22 [mobile-chromium] › e2e/silent-failure.spec.ts:40:1 › mission 6: the lucky guess (blocks 1 and 2) succeeds with 2 stars and an honest debrief (2.9s)
-  ✓  21 [mobile-chromium] › e2e/quality.spec.ts:38:1 › progress persists across reload; corrupt save is reset with a visible notice (4.6s)
-  ✓  20 [mobile-chromium] › e2e/quality.spec.ts:60:1 › settings: sound off by default, toggles persist, reset clears progress after confirmation (5.9s)
-  ✓  24 [mobile-chromium] › e2e/smoke.spec.ts:73:1 › mission 4 challenge renders the full surface-code board (screenshot) (4.6s)
-  ✓  26 [mobile-chromium] › e2e/smoke.spec.ts:123:1 › standing down with no crews asks for confirmation, then shows fires still burning (3.3s)
-  ✓  25 [mobile-chromium] › e2e/smoke.spec.ts:89:1 › propagation missions 2 and 3: predict the end state, wrong colour fails, try again works (5.0s)
-  ✓  17 [mobile-chromium] › e2e/quality.spec.ts:4:1 › no horizontal overflow and no console errors across every screen (12.5s)
-  ✓  23 [mobile-chromium] › e2e/smoke.spec.ts:4:1 › smoke: title → play → mission 1 briefing → training → challenge → place crew → confirm → debrief → next (11.6s)
+  ✓   6 [desktop-chromium] › e2e/keyboard.spec.ts:65:1 › the stand-down dialog is modal: inert app, Tab trapped, Escape closes, focus returns to the opener (3.3s)
+  ✓   1 [desktop-chromium] › e2e/quality.spec.ts:38:1 › progress persists across reload; corrupt save is reset with a visible notice (3.4s)
+  ✓   3 [desktop-chromium] › e2e/keyboard.spec.ts:4:1 › mission 1 can be played with the keyboard only (3.7s)
+  ✓   2 [desktop-chromium] › e2e/mobile.spec.ts:8:1 › mission 5 tap flow: palette → blocks → sticky confirm → debrief (3.7s)
+  ✓   4 [desktop-chromium] › e2e/quality.spec.ts:60:1 › settings: sound off by default, toggles persist, reset clears progress after confirmation (4.0s)
+  ✓   8 [desktop-chromium] › e2e/quality.spec.ts:109:1 › document.title follows the screen and the live region announces each screen (1.8s)
+  ✓   9 [desktop-chromium] › e2e/quality.spec.ts:127:1 › challenge never exposes the hidden fire in the DOM before confirm (mission 4) (2.1s)
+  ✓   7 [desktop-chromium] › e2e/quality.spec.ts:87:1 › cloud panel: mission 4 shows the recorded block-4 run only for that dispatch (2.7s)
+  ✓  11 [desktop-chromium] › e2e/silent-failure.spec.ts:49:1 › mission 6: the block-3 crew is the same call (stabilizer-equivalent) and the cloud card for block 0 still applies (2.4s)
+  ✓  10 [desktop-chromium] › e2e/silent-failure.spec.ts:4:1 › mission 6: the protocol dispatch silences every alarm but flips the logical qubit (silent failure) (4.1s)
+  ✓  12 [desktop-chromium] › e2e/silent-failure.spec.ts:63:1 › mission 6: the lucky guess (blocks 1 and 2) succeeds but is scored "lucky" — 1 star, no cloud card for that dispatch (3.7s)
+  ✓  14 [desktop-chromium] › e2e/smoke.spec.ts:77:1 › mission 4 challenge renders the full surface-code board (screenshot) (4.1s)
+  ✓   5 [desktop-chromium] › e2e/quality.spec.ts:4:1 › no horizontal overflow and no console errors across every screen (10.4s)
+  ✓  16 [desktop-chromium] › e2e/smoke.spec.ts:134:1 › standing down with no crews asks for confirmation, then shows fires still burning (2.5s)
+  ✓  15 [desktop-chromium] › e2e/smoke.spec.ts:93:1 › propagation missions 2 and 3: predict the end state, wrong colour fails, try again works (4.8s)
+  ✓  18 [mobile-chromium] › e2e/keyboard.spec.ts:65:1 › the stand-down dialog is modal: inert app, Tab trapped, Escape closes, focus returns to the opener (2.6s)
+  ✓  17 [mobile-chromium] › e2e/keyboard.spec.ts:4:1 › mission 1 can be played with the keyboard only (3.5s)
+  ✓  13 [desktop-chromium] › e2e/smoke.spec.ts:4:1 › smoke: title → play → mission 1 briefing → training → challenge → place crew → confirm → debrief → next (10.4s)
+  ✓  20 [mobile-chromium] › e2e/mobile.spec.ts:8:1 › mission 5 tap flow: palette → blocks → sticky confirm → debrief (4.0s)
+  ✓  21 [mobile-chromium] › e2e/quality.spec.ts:38:1 › progress persists across reload; corrupt save is reset with a visible notice (3.1s)
+  ✓  24 [mobile-chromium] › e2e/quality.spec.ts:127:1 › challenge never exposes the hidden fire in the DOM before confirm (mission 4) (1.2s)
+  ✓  23 [mobile-chromium] › e2e/quality.spec.ts:87:1 › cloud panel: mission 4 shows the recorded block-4 run only for that dispatch (2.8s)
+  ✓  22 [mobile-chromium] › e2e/quality.spec.ts:60:1 › settings: sound off by default, toggles persist, reset clears progress after confirmation (3.2s)
+  ✓  25 [mobile-chromium] › e2e/silent-failure.spec.ts:4:1 › mission 6: the protocol dispatch silences every alarm but flips the logical qubit (silent failure) (3.1s)
+  ✓  26 [mobile-chromium] › e2e/silent-failure.spec.ts:49:1 › mission 6: the block-3 crew is the same call (stabilizer-equivalent) and the cloud card for block 0 still applies (2.4s)
+  ✓  27 [mobile-chromium] › e2e/silent-failure.spec.ts:63:1 › mission 6: the lucky guess (blocks 1 and 2) succeeds but is scored "lucky" — 1 star, no cloud card for that dispatch (3.3s)
+  ✓  19 [mobile-chromium] › e2e/quality.spec.ts:4:1 › no horizontal overflow and no console errors across every screen (9.7s)
+  ✓  29 [mobile-chromium] › e2e/quality.spec.ts:109:1 › document.title follows the screen and the live region announces each screen (2.6s)
+  ✓  30 [mobile-chromium] › e2e/smoke.spec.ts:77:1 › mission 4 challenge renders the full surface-code board (screenshot) (2.7s)
+  ✓  32 [mobile-chromium] › e2e/smoke.spec.ts:134:1 › standing down with no crews asks for confirmation, then shows fires still burning (2.0s)
+  ✓  31 [mobile-chromium] › e2e/smoke.spec.ts:93:1 › propagation missions 2 and 3: predict the end state, wrong colour fails, try again works (4.1s)
+  ✓  28 [mobile-chromium] › e2e/smoke.spec.ts:4:1 › smoke: title → play → mission 1 briefing → training → challenge → place crew → confirm → debrief → next (9.5s)
 
-  26 passed (1.2m)
+  32 passed (57.0s)
 
 [verify:release] e2e: exit 0
 

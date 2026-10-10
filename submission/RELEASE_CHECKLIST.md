@@ -11,7 +11,7 @@ Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external).
 - ☑ Deployments are Git-triggered, so each carries `meta.githubCommitSha`; final pair recorded in STATUS.md A6
 - ☑ Qollab draft exists (private); 8 runs incl. 4 IonQ Aria 1 jobs with ids — `reports/qollab-runs.md`
 - ☑ Icons reviewed at 16/32/64/128 on dark and light — `reports/icons/REVIEW.md`
-- ☑ `submission/DEMO.mp4` recorded from the real app, 146 s, sha256 75a4dd7a… (`reports/demo-recording.json`); NOT uploaded
+- ☑ `submission/DEMO.mp4` recorded from the real app (final take 149 s, sha256 d3260716…, `reports/demo-recording.json`); NOT uploaded
 - ☑ MIT `LICENSE`; `ATTRIBUTION.md` complete; attribution line present in README, project page and the game's title screen
 - ☑ Secret-pattern scan 0 hits in tracked files (verify:release); `.env*`, `.vercel/` ignored
 - ☑ `submission/KNOWN_LIMITATIONS.md` current (updated after the review wave)

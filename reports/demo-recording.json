@@ -1,11 +1,11 @@
 {
-  "recordedAt": "2026-10-10T02:15:29.811Z",
+  "recordedAt": "2026-10-10T03:26:36.697Z",
   "base": "http://localhost:4173",
-  "shots": 98,
-  "scriptedSeconds": 185,
-  "durationSeconds": 146,
+  "shots": 96,
+  "scriptedSeconds": 146,
+  "durationSeconds": 149.4,
   "within120to180": true,
-  "bytes": 4063995,
-  "sha256": "75a4dd7af15b8f98279e9450390907723003f4d9f46fb95d803ba1c5c4d90765",
+  "bytes": 4390188,
+  "sha256": "d3260716e0b07397b63058ed4975f45c80df684b0fdaf4504378acfc8d5448b8",
   "output": "submission/DEMO.mp4"
 }
