@@ -35,6 +35,8 @@ export interface PublicMissionView {
   readonly allowed: readonly CrewLetter[];
   readonly budget: number;
   readonly briefing: string;
+  /** Highest star rating this mission can award (missions.json `maxStars`, default 3). Mission 6 declares 1. */
+  readonly maxStars: StarCount;
   readonly circuit: Circuit;
   /** Alarm bits of the hidden fire, in code.checks order (empty for codes without checks). */
   readonly syndrome: readonly number[];
@@ -55,13 +57,24 @@ export type Screen =
   | 'result'
   | 'summary';
 
-export type DecisionQuality = 'optimal' | 'valid' | 'unlucky' | 'off';
+/**
+ *  optimal  C ≡ D (stabilizer-equivalent to the min-weight dispatch) and success
+ *  valid    success with more crews than D
+ *  unlucky  C ≡ D but the outcome is a logical error (the alarms could not tell; mission 6)
+ *  lucky    success on a mission whose alarms did not justify the call (maxStars 1, C ≢ D; mission 6)
+ *  off      anything else
+ */
+export type DecisionQuality = 'optimal' | 'valid' | 'unlucky' | 'lucky' | 'off';
+
+export type StarCount = 0 | 1 | 2 | 3;
 
 export interface Score {
   readonly outcome: VerdictKind;
   readonly quality: DecisionQuality;
-  /** 0–3 */
-  readonly stars: 0 | 1 | 2 | 3;
+  /** 0–maxStars */
+  readonly stars: StarCount;
+  /** Highest rating the mission can award (default 3). */
+  readonly maxStars: StarCount;
   readonly crewsUsed: number;
   readonly minCrews: number;
   /** Mission counts as complete (success, or an optimal call that was unlucky). */
@@ -110,6 +123,8 @@ export interface Debrief {
   readonly syndromeOfFires: readonly number[];
   readonly syndromeOfResidual: readonly number[];
   readonly verdict: VerdictKind;
+  /** Verdict banner text for this mission's code (propagation missions have no stabilizers, so no "silent failure"). */
+  readonly verdictLabel: string;
   readonly logicalFlip: { readonly x: readonly boolean[]; readonly z: readonly boolean[] };
   readonly score: Score;
   readonly narrative: string;
@@ -118,7 +133,7 @@ export interface Debrief {
 }
 
 export interface MissionProgress {
-  readonly stars: 0 | 1 | 2 | 3;
+  readonly stars: StarCount;
   readonly attempts: number;
   readonly completed: boolean;
 }
@@ -176,9 +191,12 @@ export type Action =
   | { type: 'START_CHALLENGE' }
   | { type: 'SELECT_LETTER'; letter: CrewLetter }
   | { type: 'TOGGLE_BLOCK'; qubit: number }
+  /** Recall the crew on one block (Backspace on a focused block). No-op when the block is empty. */
+  | { type: 'RECALL_BLOCK'; qubit: number }
   | { type: 'CLEAR_CREWS' }
-  | { type: 'CONFIRM' }
-  | { type: 'STAND_DOWN_CONFIRM' }
+  /** `reducedMotion` (UI-supplied) decides whether the debrief replay auto-plays from step 1. */
+  | { type: 'CONFIRM'; reducedMotion?: boolean }
+  | { type: 'STAND_DOWN_CONFIRM'; reducedMotion?: boolean }
   | { type: 'STAND_DOWN_CANCEL' }
   | { type: 'REPLAY_GOTO'; index: number }
   | { type: 'REPLAY_PREV' }

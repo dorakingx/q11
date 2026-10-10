@@ -2,7 +2,7 @@
  * Non-play screens: title, how it works, mission list, settings, briefing, result, summary.
  */
 import { getCode } from '../quantum';
-import { listPublicMissions, OUTCOME_LABEL, QUALITY_LABEL, totalStars, type Action, type Debrief, type GameState, type PublicMissionView } from '../game';
+import { listPublicMissions, maxTotalStars, QUALITY_LABEL, resultHeading, totalStars, type Action, type Debrief, type GameState, type PublicMissionView } from '../game';
 import { Flame, GearIcon, Helmet, Q11Mark, StationGlyph } from './glyphs';
 import { Stars, TopBar } from './panels';
 
@@ -18,7 +18,7 @@ export function TitleScreen({ state, dispatch }: ScreenProps) {
     <main className="screen screen-title">
       <div className="title-card">
         <Q11Mark size={96} />
-        <h1 className="title-h">
+        <h1 className="title-h" tabIndex={-1} data-focus-target>
           Q11 <span className="title-dash">—</span> Quantum Emergency Response
         </h1>
         <p className="title-lead">Read the alarms, dispatch the firefighters, protect the logical qubit.</p>
@@ -35,7 +35,7 @@ export function TitleScreen({ state, dispatch }: ScreenProps) {
         </div>
         {stars > 0 ? (
           <p className="muted title-progress">
-            Progress: {stars} of 18 stars.
+            Progress: {stars} of {maxTotalStars()} stars.
           </p>
         ) : null}
         <p className="title-foot muted">Qollab × IonQ Global Quantum Hackathon 2026 entry. This effort is supported by Qollab &amp; IonQ.</p>
@@ -105,8 +105,13 @@ export function HowItWorks({ dispatch }: ScreenProps) {
         <ul className="plain-list">
           <li>Tap or click a block to send the selected crew; tap again to recall it.</li>
           <li>
-            Keyboard: <kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd> select X/Z/Y crews, arrows move between blocks, <kbd>Enter</kbd> or{' '}
-            <kbd>Space</kbd> toggles a crew, <kbd>Backspace</kbd> clears, <kbd>C</kbd> confirms.
+            Keyboard (while focus is inside the dispatch screen): <kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd> select X/Z/Y crews, arrows move between blocks and
+            between crew colours, <kbd>Enter</kbd> or <kbd>Space</kbd> toggles a crew, <kbd>Backspace</kbd> recalls the focused block’s crew (or every crew when no
+            block is focused), <kbd>C</kbd> confirms.
+          </li>
+          <li>
+            Stars: 3 for the minimum-weight dispatch that succeeds, 2 for a success with extra crews, 1 for the right call on a mission that could not be won (or a
+            near miss with at least one crew sent). Standing down while fires burn scores 0. Mission 6 awards at most 1 star, so the shift totals 16.
           </li>
           <li>Sound is off by default; motion follows your system setting and the manual toggle in Settings.</li>
         </ul>
@@ -137,7 +142,7 @@ export function MissionList({ state, dispatch }: ScreenProps) {
     <main className="screen screen-missions">
       <TopBar
         title="Missions"
-        subtitle={`${String(totalStars(state.progress))} of 18 stars`}
+        subtitle={`${String(totalStars(state.progress))} of ${String(maxTotalStars())} stars`}
         onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })}
         onTitle={() => dispatch({ type: 'OPEN_TITLE' })}
       />
@@ -160,7 +165,7 @@ export function MissionList({ state, dispatch }: ScreenProps) {
                   </span>
                 </span>
                 <span className="mission-stars">
-                  <Stars count={p?.stars ?? 0} size={18} label={p === undefined ? 'not played yet' : `${String(p.stars)} of 3 stars`} />
+                  <Stars count={p?.stars ?? 0} max={m.maxStars} size={18} label={p === undefined ? `not played yet, up to ${String(m.maxStars)} star${m.maxStars === 1 ? '' : 's'}` : `${String(p.stars)} of ${String(m.maxStars)} stars`} />
                   <span className="mission-status">{p === undefined ? 'New' : p.completed ? 'Complete' : `${String(p.attempts)} attempt${p.attempts === 1 ? '' : 's'}`}</span>
                 </span>
               </button>
@@ -175,7 +180,7 @@ export function MissionList({ state, dispatch }: ScreenProps) {
 export function SettingsScreen({ state, dispatch, storageLabel, onReset }: ScreenProps & { readonly onReset: () => void }) {
   return (
     <main className="screen screen-doc">
-      <TopBar title="Settings" onSettings={() => dispatch({ type: 'CLOSE_OVERLAY' })} onTitle={() => dispatch({ type: 'OPEN_TITLE' })} />
+      <TopBar title="Settings" onSettings={() => dispatch({ type: 'CLOSE_OVERLAY' })} settingsLabel="Close settings" onTitle={() => dispatch({ type: 'OPEN_TITLE' })} />
       <section className="doc">
         <div className="setting-row">
           <div>
@@ -270,7 +275,8 @@ export function BriefingScreen({ state, dispatch, mission }: ScreenProps & { rea
           <div>
             <dt>Previous best</dt>
             <dd>
-              <Stars count={state.progress[mission.id]?.stars ?? 0} size={18} />
+              <Stars count={state.progress[mission.id]?.stars ?? 0} max={mission.maxStars} size={18} />
+              {mission.maxStars < 3 ? <span className="muted small">(up to {mission.maxStars})</span> : null}
             </dd>
           </div>
         </dl>
@@ -296,8 +302,12 @@ export function ResultScreen({ state, dispatch, mission, debrief }: ScreenProps 
     <main className="screen screen-result">
       <TopBar title={`Mission ${String(mission.index)} · ${mission.title}`} subtitle="Result" onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} />
       <section className="result" data-testid="result">
-        <Stars count={s.stars} size={44} />
-        <h2 className="result-h">{s.stars === 3 ? 'Flawless dispatch' : s.stars === 2 ? 'Fires out' : s.stars === 1 ? (s.quality === 'unlucky' ? 'Right call, cruel luck' : 'Close') : 'Try again'}</h2>
+        <Stars count={s.stars} max={s.maxStars} size={44} />
+        <h2 className="result-h">{resultHeading(s)}</h2>
+        <p className="muted small">
+          {s.stars} of {s.maxStars} star{s.maxStars === 1 ? '' : 's'}
+          {s.maxStars < 3 ? ' · this mission awards at most one star: the alarms alone cannot win it' : ''}
+        </p>
         <dl className="result-facts">
           <div>
             <dt>Decision</dt>
@@ -305,7 +315,7 @@ export function ResultScreen({ state, dispatch, mission, debrief }: ScreenProps 
           </div>
           <div>
             <dt>Outcome</dt>
-            <dd className={`outcome outcome-${s.outcome}`}>{OUTCOME_LABEL[s.outcome]}</dd>
+            <dd className={`outcome outcome-${s.outcome}`}>{debrief.verdictLabel}</dd>
           </div>
           <div>
             <dt>Cost</dt>
@@ -339,7 +349,7 @@ export function SummaryScreen({ state, dispatch }: ScreenProps) {
   const total = totalStars(state.progress);
   return (
     <main className="screen screen-summary">
-      <TopBar title="Shift complete" subtitle={`${String(total)} of 18 stars`} onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} />
+      <TopBar title="Shift complete" subtitle={`${String(total)} of ${String(maxTotalStars())} stars`} onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} />
       <section className="summary" data-testid="summary">
         <p className="brief-text">
           Every mission is on record. Single fires are always caught in a distance-3 district; the lesson of Silent Failure is why
@@ -362,7 +372,7 @@ export function SummaryScreen({ state, dispatch }: ScreenProps) {
                     {m.index}. {m.title}
                   </th>
                   <td>
-                    <Stars count={p?.stars ?? 0} size={18} />
+                    <Stars count={p?.stars ?? 0} max={m.maxStars} size={18} />
                   </td>
                   <td>{p?.attempts ?? 0}</td>
                 </tr>

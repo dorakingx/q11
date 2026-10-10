@@ -6,6 +6,8 @@
  * Results are labelled by `source`: Local (Aer) / Cached cloud result / Live cloud result. Nothing is invented.
  */
 import cloudResultsJson from '../../fixtures/cloud-results.json';
+import { fromString, getCode, minWeightEquivalent } from '../quantum';
+import { getPublicMission } from './missions';
 
 export type CloudSource = 'local-simulator' | 'cached-cloud' | 'live-cloud';
 
@@ -48,8 +50,14 @@ export interface QuantumBridge {
   /** Remaining jobs allowed in this run (Qollab: one IonQ job per Run). */
   jobsRemaining?(): number;
   run?(request: CloudRequest): Promise<CloudResult>;
-  /** Previously recorded results for a mission (the web build reads fixtures/cloud-results.json). */
-  cached(missionId: string): readonly CloudResultOk[];
+  /**
+   * Previously recorded results for a mission (the web build reads fixtures/cloud-results.json).
+   * With `correction` (the player's crews) only results whose recorded correction equals it, or is
+   * stabilizer-equivalent to it on the mission's code, are returned — a card must never claim to verify a
+   * dispatch that was not the one run. Without `correction` every recorded result for the mission is returned
+   * (qollab/main.js calls it this way).
+   */
+  cached(missionId: string, correction?: string): readonly CloudResultOk[];
 }
 
 export const SOURCE_LABEL: Readonly<Record<CloudSource, string>> = {
@@ -117,10 +125,33 @@ export function parseCloudResults(raw: unknown): CloudResultOk[] {
   return out;
 }
 
-/** The web build's bridge: no live runs, only recorded results (none shipped yet). */
+/**
+ * True when `recorded` verifies the dispatch `correction` on the mission's code: identical strings, or two
+ * Paulis whose product is a stabilizer (the engine cannot tell them apart, so neither can the circuit run).
+ * Unknown missions or malformed strings never match.
+ */
+export function sameDispatch(missionId: string, correction: string, recorded: string): boolean {
+  if (correction === recorded) return true;
+  try {
+    const code = getCode(getPublicMission(missionId).code);
+    const a = fromString(correction);
+    const b = fromString(recorded);
+    if (a.n !== code.n || b.n !== code.n) return false;
+    return minWeightEquivalent(code, a, b);
+  } catch {
+    return false;
+  }
+}
+
+/** Keep only the results that verify this mission + dispatch (pure; also applied by the UI for bridges that ignore the argument). */
+export function filterByDispatch(results: readonly CloudResultOk[], missionId: string, correction?: string): CloudResultOk[] {
+  return results.filter((r) => r.missionId === missionId && (correction === undefined || sameDispatch(missionId, correction, r.correction)));
+}
+
+/** The web build's bridge: no live runs, only recorded results. */
 export function noneBridge(results: readonly CloudResultOk[] = parseCloudResults(cloudResultsJson)): QuantumBridge {
   return {
     kind: 'none',
-    cached: (missionId) => results.filter((r) => r.missionId === missionId),
+    cached: (missionId, correction) => filterByDispatch(results, missionId, correction),
   };
 }

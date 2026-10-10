@@ -21,8 +21,11 @@ import {
 import { getPublicMission, listPublicMissions, nextMissionId, revealMission } from './missions';
 import { DEFAULT_SETTINGS } from './persistence';
 import { buildReplay, buildWhatIf } from './replay';
-import { score } from './scoring';
-import type { Action, CrewLetter, Debrief, GameState, MissionProgress, PublicMissionView, SaveData, Screen } from './types';
+import { outcomeLabel, score } from './scoring';
+import type { Action, CrewLetter, Debrief, GameState, MissionProgress, PublicMissionView, SaveData, Screen, StarCount } from './types';
+
+/** Shown after "Reset progress"; cleared automatically on the next screen change (unlike the corrupt-save notice). */
+export const PROGRESS_RESET_NOTICE = 'Progress reset.';
 
 export function initialState(save?: SaveData, notice: string | null = null): GameState {
   return {
@@ -70,7 +73,7 @@ export function confirmDispatch(missionId: string, placements: Readonly<Record<n
   const decoderCrews = m.kind === 'dispatch' ? lookupDecoder(code).decode(syndromeFromArray(publicSyndrome)) : finalFire;
   const decoderVerdict = evaluate(code, finalFire, decoderCrews);
   const equivalent = minWeightEquivalent(code, crews, decoderCrews);
-  const sc = score({ code, outcome: verdict.kind, crews, decoderCrews });
+  const sc = score({ code, outcome: verdict.kind, crews, decoderCrews, maxStars: getPublicMission(missionId).maxStars });
   const steps = buildReplay({ kind: m.kind, code, start, circuit: m.challenge.circuit, crews, verdict });
   const whatIf = buildWhatIf({
     kind: m.kind,
@@ -92,6 +95,7 @@ export function confirmDispatch(missionId: string, placements: Readonly<Record<n
     syndromeOfFires: syndromeToArray(syndrome(code, finalFire)),
     syndromeOfResidual: syndromeToArray(verdict.syndrome),
     verdict: verdict.kind,
+    verdictLabel: outcomeLabel(verdict.kind, code.checks.length > 0),
     logicalFlip: { x: [...verdict.logicalFlip.x], z: [...verdict.logicalFlip.z] },
     score: sc,
     narrative: m.debrief[verdict.kind],
@@ -103,12 +107,12 @@ export function confirmDispatch(missionId: string, placements: Readonly<Record<n
 function mergeProgress(
   progress: Readonly<Record<string, MissionProgress>>,
   missionId: string,
-  stars: 0 | 1 | 2 | 3,
+  stars: StarCount,
   completed: boolean,
 ): Record<string, MissionProgress> {
   const prev = progress[missionId];
   const next: MissionProgress = {
-    stars: prev === undefined ? stars : (Math.max(prev.stars, stars) as 0 | 1 | 2 | 3),
+    stars: prev === undefined ? stars : (Math.max(prev.stars, stars) as StarCount),
     attempts: (prev?.attempts ?? 0) + 1,
     completed: (prev?.completed ?? false) || completed,
   };
@@ -149,6 +153,13 @@ function enterBriefing(state: GameState, id: string): GameState {
 const OVERLAYS: readonly Screen[] = ['how', 'settings'];
 
 export function reducer(state: GameState, action: Action): GameState {
+  const next = step(state, action);
+  // The "Progress reset." notice is transient: it disappears on the next screen change.
+  if (next.screen !== state.screen && next.notice === PROGRESS_RESET_NOTICE) return { ...next, notice: null };
+  return next;
+}
+
+function step(state: GameState, action: Action): GameState {
   switch (action.type) {
     case 'HYDRATE':
       return { ...state, progress: action.save.progress, settings: action.save.settings, notice: action.notice ?? state.notice };
@@ -233,21 +244,28 @@ export function reducer(state: GameState, action: Action): GameState {
       }
       return { ...state, placements: next };
     }
+    case 'RECALL_BLOCK': {
+      if (state.screen !== 'challenge' || state.standDownDialog) return state;
+      if (state.placements[action.qubit] === undefined) return state;
+      const next: Record<number, CrewLetter> = { ...state.placements };
+      delete next[action.qubit];
+      return { ...state, placements: next };
+    }
     case 'CLEAR_CREWS':
-      if (state.screen !== 'challenge') return state;
+      if (state.screen !== 'challenge' || state.standDownDialog) return state;
       return { ...state, placements: {} };
     case 'CONFIRM': {
       const m = currentMission(state);
-      if (m === null || state.screen !== 'challenge') return state;
+      if (m === null || state.screen !== 'challenge' || state.standDownDialog) return state;
       if (crewCount(state.placements) === 0) return { ...state, standDownDialog: true };
-      return commit(state, m);
+      return commit(state, m, action.reducedMotion ?? false);
     }
     case 'STAND_DOWN_CANCEL':
       return { ...state, standDownDialog: false };
     case 'STAND_DOWN_CONFIRM': {
       const m = currentMission(state);
       if (m === null || state.screen !== 'challenge' || !state.standDownDialog) return state;
-      return commit(state, m);
+      return commit(state, m, action.reducedMotion ?? false);
     }
     case 'REPLAY_GOTO': {
       if (state.debrief === null) return state;
@@ -288,7 +306,7 @@ export function reducer(state: GameState, action: Action): GameState {
     case 'SET_REDUCED_MOTION':
       return { ...state, settings: { ...state.settings, reducedMotion: action.on } };
     case 'RESET_PROGRESS':
-      return { ...state, progress: {}, notice: 'Progress reset.' };
+      return { ...state, progress: {}, notice: PROGRESS_RESET_NOTICE };
     case 'SHOW_NOTICE':
       return { ...state, notice: action.text };
     case 'DISMISS_NOTICE':
@@ -296,15 +314,19 @@ export function reducer(state: GameState, action: Action): GameState {
   }
 }
 
-function commit(state: GameState, m: PublicMissionView): GameState {
+/**
+ * Commit the dispatch and open the debrief on replay step 1. The verdict banner is always visible there; the
+ * replay auto-plays from the first step unless motion is reduced (then the player steps through by hand).
+ */
+function commit(state: GameState, m: PublicMissionView, reducedMotion: boolean): GameState {
   const debrief = confirmDispatch(m.id, state.placements);
   return {
     ...state,
     screen: 'debrief',
     standDownDialog: false,
     debrief,
-    replayIndex: debrief.steps.length - 1,
-    autoPlay: false,
+    replayIndex: 0,
+    autoPlay: !reducedMotion && debrief.steps.length > 1,
     progress: mergeProgress(state.progress, m.id, debrief.score.stars, debrief.score.completed),
   };
 }

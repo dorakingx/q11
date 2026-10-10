@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { evaluate, fromString, getCode, propagateFinal } from '../quantum';
-import { buildReplay, describeFires, describeGate } from './replay';
+import { buildReplay, describeBlocks, describeFires, describeGate } from './replay';
 
 describe('buildReplay', () => {
   it('orders steps E placed → gates → alarms → dispatch → residual → verdict (propagation mission)', () => {
@@ -51,7 +51,23 @@ describe('buildReplay', () => {
     expect(good[good.length - 2]?.caption).toMatch(/every pair cancels/);
   });
 
+  it('propagation miss: the verdict caption describes the leftover fires on the wires, not a silent failure', () => {
+    const code = getCode('trivial2');
+    const start = fromString('ZI');
+    const circuit = [{ kind: 'H', q: 0 } as const, { kind: 'CNOT', c: 0, t: 1 } as const, { kind: 'H', q: 1 } as const];
+    const final = propagateFinal(start, circuit); // XZ
+    const crews = fromString('XX');
+    const steps = buildReplay({ kind: 'propagation', code, start, circuit, crews, verdict: evaluate(code, final, crews) });
+    const last = steps[steps.length - 1]?.caption ?? '';
+    expect(last).toContain('leaves a red-and-blue fire (Y) on block 1');
+    expect(last).toContain('Bare wires have no stations');
+    expect(last).not.toMatch(/Silent failure/);
+  });
+
   it('describe helpers', () => {
+    expect(describeBlocks([])).toBe('no blocks');
+    expect(describeBlocks([3])).toBe('block 3');
+    expect(describeBlocks([0, 1, 2])).toBe('blocks 0, 1 and 2');
     expect(describeFires(fromString('III'))).toBe('no fires');
     expect(describeFires(fromString('YII'))).toBe('a red-and-blue fire (Y) on block 0');
     expect(describeGate({ kind: 'SWAP', a: 0, b: 1 })).toBe('SWAP of blocks 0 and 1');

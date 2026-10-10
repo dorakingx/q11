@@ -78,6 +78,9 @@ function verdictCaption(v: Verdict, code: StabilizerCode): string {
         ? 'Residual is the identity: every fire is out. Logical qubit safe.'
         : `Residual ${toString(v.residual)} is a stabilizer of the code (it acts trivially on the encoded qubit). Logical qubit safe.`;
     case 'logical-error': {
+      if (code.checks.length === 0) {
+        return `Residual ${toString(v.residual)} leaves ${describeFires(v.residual)}. Bare wires have no stations, so a missed prediction is never caught: every leftover component acts directly on the data.`;
+      }
       const flips: string[] = [];
       v.logicalFlip.x.forEach((f, i) => {
         if (f) flips.push(code.k === 1 ? 'logical X' : `logical X${String(i)}`);
@@ -197,30 +200,51 @@ export interface WhatIfInput {
   readonly decoderVerdict: Verdict;
 }
 
+/** "blocks 0, 1 and 2" */
+export function describeBlocks(qubits: readonly number[]): string {
+  if (qubits.length === 0) return 'no blocks';
+  if (qubits.length === 1) return `block ${String(qubits[0])}`;
+  return `blocks ${qubits.slice(0, -1).join(', ')} and ${String(qubits[qubits.length - 1])}`;
+}
+
 export function buildWhatIf(input: WhatIfInput): WhatIf {
   const { code, finalFire, crews, decoderCrews, decoderVerdict, equivalent, verdict } = input;
   const decStr = toString(decoderCrews);
+  const crewStr = toString(crews);
   const trueCrews = toString(finalFire);
-  const trueDiffers = trueCrews !== decStr;
+  // The counterfactual "crews on the true fires" is only interesting when it is neither the decoder's call
+  // nor what the player actually sent.
+  const trueDiffers = trueCrews !== decStr && trueCrews !== crewStr;
   let explanation: string;
   if (code.checks.length === 0) {
     explanation = equivalent
       ? `The fire ended as ${trueCrews}; your crews matched it exactly, so the prediction was right.`
-      : `The fire ended as ${trueCrews}. Crews ${toString(crews)} differ from it on ${String(weight(verdict.residual))} block(s); on bare wires every leftover component acts on the data.`;
+      : `The fire ended as ${trueCrews}. Your crews ${crewStr} leave ${describeFires(verdict.residual)} (${String(weight(verdict.residual))} block${weight(verdict.residual) === 1 ? '' : 's'}); on bare wires every leftover component acts on the data.`;
   } else if (equivalent && verdict.kind === 'success') {
     explanation =
-      toString(crews) === decStr
+      crewStr === decStr
         ? `Your dispatch is exactly the minimum-weight dispatch for these alarms.`
-        : `Your dispatch ${toString(crews)} and the minimum-weight dispatch ${decStr} differ by a stabilizer, so they are equivalent corrections: the code cannot tell them apart and both succeed.`;
-    if (trueDiffers) {
+        : `Your dispatch ${crewStr} and the minimum-weight dispatch ${decStr} differ by a stabilizer, so they are equivalent corrections: the code cannot tell them apart and both succeed.`;
+    if (crewStr === trueCrews) {
+      explanation += ' Your crews sat exactly on the true fires.';
+    } else if (trueCrews !== decStr) {
       explanation += ` The true fires were ${trueCrews}; crews there would differ from yours by a stabilizer as well, so the code treats both dispatches as the same correction.`;
     }
   } else if (equivalent && verdict.kind === 'logical-error') {
-    explanation = `The minimum-weight dispatch for these alarms is ${decStr}, and that is what you sent. The true fire was ${trueCrews}: two fires that look, to every station, exactly like one. Crews at ${toString(finalFire)} would have worked, but no alarm pattern justified them. Distance 3 means any single fire is always fixed and two fires can fool any dispatcher.`;
+    const fireBlocks = describeBlocks(support(finalFire));
+    const chainBlocks = describeBlocks(support(verdict.residual));
+    const call =
+      crewStr === decStr
+        ? `The minimum-weight dispatch for these alarms is ${decStr}, and that is what you sent.`
+        : `The minimum-weight dispatch for these alarms is ${decStr}; your ${crewStr} differs from it by a stabilizer, so it is the same call.`;
+    explanation = `${call} The true fire was ${trueCrews}, on ${fireBlocks}: ${String(weight(finalFire))} fires that look, to every station, exactly like one. Your crews plus those fires leave ${toString(verdict.residual)} on ${chainBlocks}, a logical operator that every station sees as an even count. Crews at ${trueCrews} would have worked, but no alarm pattern justified them. Distance 3 means any single fire is always fixed and two fires can fool any dispatcher.`;
   } else if (verdict.kind === 'success') {
     explanation = `You succeeded with ${String(weight(crews))} crew(s); the minimum-weight dispatch ${decStr} needs ${String(weight(decoderCrews))} and its verdict is ${OUTCOME_SHORT[decoderVerdict.kind]}.`;
+    if (decoderVerdict.kind === 'logical-error') {
+      explanation += ` The alarms alone could not justify your ${crewStr}: the same stations ring for ${decStr}, so protocol would still have sent that.`;
+    }
   } else {
-    explanation = `The minimum-weight dispatch for these alarms is ${decStr} (${OUTCOME_SHORT[decoderVerdict.kind]}). Compare it with your ${toString(crews)} step by step in the replay.`;
+    explanation = `The minimum-weight dispatch for these alarms is ${decStr} (${OUTCOME_SHORT[decoderVerdict.kind]}). Compare it with your ${crewStr} step by step in the replay.`;
   }
   return {
     decoderCrews: decStr,

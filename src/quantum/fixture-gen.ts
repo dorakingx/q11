@@ -249,6 +249,8 @@ export function fillMissions(rawMissions: unknown): MissionsFillResult {
   const expectedOut: { id: string; expected: JsonValue }[] = [];
   const filled: JsonValue[] = rawMissions.map((raw: unknown, i) => {
     const m = parseMission(raw, `missions[${String(i)}]`);
+    // Optional game-layer field (src/game reads it); carried through unchanged so regeneration stays idempotent.
+    const maxStars = typeof raw === 'object' && raw !== null && !Array.isArray(raw) ? (raw as Record<string, unknown>)['maxStars'] : undefined;
     const exp = computeExpected(m);
     const expJson: JsonValue = {
       syndrome: [...exp.syndrome],
@@ -270,6 +272,7 @@ export function fillMissions(rawMissions: unknown): MissionsFillResult {
       briefing: m.briefing,
       debrief: { ...m.debrief },
       expected: expJson,
+      ...(typeof maxStars === 'number' ? { maxStars } : {}),
     };
   });
   return { text: stableStringify(filled), expected: expectedOut };

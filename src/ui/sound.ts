@@ -2,7 +2,11 @@
  * Minimal Web Audio tones. The AudioContext is created lazily on a user gesture; nothing plays unless
  * the sound setting is on. Always mutable: the caller passes `enabled` on every call.
  */
-export type SoundName = 'select' | 'place' | 'remove' | 'confirm' | 'success' | 'failure' | 'alarm' | 'step';
+/** `blocked` = a tap that the rules refused (budget reached). Tones play only for actions the reducer accepted, plus this one refusal. */
+import { getCode } from '../quantum';
+import { crewCount, currentMission, type Action, type GameState } from '../game';
+
+export type SoundName = 'select' | 'place' | 'remove' | 'confirm' | 'success' | 'failure' | 'alarm' | 'step' | 'blocked';
 
 let ctx: AudioContext | null = null;
 
@@ -69,5 +73,46 @@ export function playSound(name: SoundName, enabled: boolean): void {
     case 'step':
       tone(ac, 587, t, 0.05, 0.05);
       break;
+    case 'blocked':
+      // Short, low, flat buzz: clearly not the rising "place" pair.
+      tone(ac, 196, t, 0.07, 0.06, 'square');
+      break;
+  }
+}
+
+/**
+ * Which tone (if any) an action deserves, decided by comparing the state before and after the reducer ran:
+ * only accepted actions make a sound, and a block tap refused by the budget gets its own "blocked" tone.
+ */
+export function soundFor(action: Action, before: GameState, after: GameState): SoundName | null {
+  switch (action.type) {
+    case 'SELECT_LETTER':
+      return after.selected !== before.selected ? 'select' : null;
+    case 'TOGGLE_BLOCK': {
+      const was = before.placements[action.qubit];
+      const now = after.placements[action.qubit];
+      if (was === now) {
+        if (after === before && before.screen === 'challenge' && !before.standDownDialog && was === undefined) {
+          const m = currentMission(before);
+          const validBlock = m !== null && action.qubit >= 0 && action.qubit < getCode(m.code).n;
+          if (m !== null && validBlock && crewCount(before.placements) >= m.budget) return 'blocked';
+        }
+        return null;
+      }
+      return now === undefined ? 'remove' : 'place';
+    }
+    case 'RECALL_BLOCK':
+      return after.placements !== before.placements ? 'remove' : null;
+    case 'CLEAR_CREWS':
+      return after.placements !== before.placements && crewCount(before.placements) > 0 ? 'remove' : null;
+    case 'CONFIRM':
+    case 'STAND_DOWN_CONFIRM':
+      return after.screen === 'debrief' && before.screen !== 'debrief' ? 'confirm' : null;
+    case 'REPLAY_NEXT':
+    case 'REPLAY_PREV':
+    case 'REPLAY_GOTO':
+      return after.replayIndex !== before.replayIndex ? 'step' : null;
+    default:
+      return null;
   }
 }

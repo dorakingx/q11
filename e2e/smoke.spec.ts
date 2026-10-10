@@ -15,7 +15,7 @@ test('smoke: title → play → mission 1 briefing → training → challenge �
   await expect(page.getByTestId('mission-6')).toBeVisible();
 
   await page.getByTestId('mission-1').click();
-  await expect(page.getByText('Briefing')).toBeVisible();
+  await expect(page.getByText('Briefing', { exact: true })).toBeVisible();
   await expect(page.getByText(/Welcome to dispatch/)).toBeVisible();
   await page.getByTestId('start-mission').click();
 
@@ -45,21 +45,25 @@ test('smoke: title → play → mission 1 briefing → training → challenge �
   await expect(page.getByTestId('block-2')).toHaveAttribute('aria-pressed', 'false');
 
   await page.getByTestId('confirm').click();
+  // The verdict banner is visible immediately (every replay step), focused, and the replay auto-plays from step 1.
   await expect(page.getByTestId('verdict')).toContainText('Logical qubit safe');
+  await expect(page.getByTestId('verdict')).toBeFocused();
   await expect(page.getByText('Debrief · everything revealed')).toBeVisible();
   await expect(page.getByTestId('narrative')).toContainText(/two red flames cancel/);
-  await expect(page.getByTestId('cloud-panel')).toContainText('No cloud result recorded yet');
+  await expect(page.getByTestId('cloud-panel')).toContainText('No cloud result recorded for this dispatch');
+  await expect(page.getByTestId('replay-auto')).toHaveAttribute('aria-pressed', 'true');
   await expectNoHorizontalOverflow(page);
 
-  // Replay: go to the first step, step forward, auto-play reaches the verdict.
-  await page.getByTestId('replay-prev').click();
-  await expect(page.getByTestId('replay-caption')).toContainText(/Residual/);
+  // Replay: pause, jump to the first step, step forward, auto-play reaches the verdict step.
+  await page.getByTestId('replay-auto').click();
+  await expect(page.getByTestId('replay-auto')).toHaveAttribute('aria-pressed', 'false');
   await page.getByRole('button', { name: 'Step 1: Fires placed' }).click();
   await expect(page.getByTestId('replay-caption')).toContainText('Noise lit a red fire (X) on block 1');
   await page.getByTestId('replay-next').click();
   await expect(page.getByTestId('replay-caption')).toContainText(/Alarms: Z0, Z1 ring/);
   await page.getByTestId('replay-auto').click();
-  await expect(page.getByTestId('verdict')).toContainText('Logical qubit safe', { timeout: 15_000 });
+  await expect(page.getByTestId('replay-caption')).toContainText(/Step 5 of 5 · Verdict/, { timeout: 15_000 });
+  await expect(page.getByTestId('replay-auto')).toHaveAttribute('aria-pressed', 'false');
 
   // Result → next mission briefing.
   await page.getByTestId('to-result').click();
@@ -67,7 +71,7 @@ test('smoke: title → play → mission 1 briefing → training → challenge �
   await expect(page.getByTestId('result')).toContainText('1 crew used · minimum 1');
   await page.getByTestId('next-mission').click();
   await expect(page.getByText(/Mission 2 · Red Forward/)).toBeVisible();
-  await expect(page.getByText('Briefing')).toBeVisible();
+  await expect(page.getByText('Briefing', { exact: true })).toBeVisible();
 });
 
 test('mission 4 challenge renders the full surface-code board (screenshot)', async ({ page }, info) => {
@@ -96,6 +100,9 @@ test('propagation missions 2 and 3: predict the end state, wrong colour fails, t
   await expect(page.getByTestId('budget')).toContainText('Crews: 2 / 2');
   await page.getByTestId('confirm').click();
   await expect(page.getByTestId('verdict')).toContainText('Logical qubit safe');
+  // Pause the auto-play and jump to the verdict step (6 steps: placed, gate, alarms, dispatch, residual, verdict).
+  await page.getByTestId('replay-auto').click();
+  await page.getByRole('button', { name: 'Step 6: Verdict' }).click();
   await expect(page.getByTestId('replay-caption')).toContainText(/every fire is out/);
   // Replay the gate step and check the propagation caption.
   await page.getByRole('button', { name: 'Step 2: Gate' }).click();
@@ -109,7 +116,11 @@ test('propagation missions 2 and 3: predict the end state, wrong colour fails, t
   await page.getByTestId('block-0').click();
   await page.getByTestId('block-1').click();
   await page.getByTestId('confirm').click();
-  await expect(page.getByTestId('verdict')).toContainText('Silent failure');
+  // Bare wires have no stabilizers: a miss is a missed prediction, never a "silent failure".
+  await expect(page.getByTestId('verdict')).toContainText('Prediction missed — fires left on the wires');
+  await expect(page.getByTestId('verdict')).not.toContainText('Silent failure');
+  await expect(page.getByTestId('residual')).toContainText('IY');
+  await expect(page.getByText('missed — fires left on block 1')).toBeVisible();
   await page.getByTestId('try-again').click();
   await expect(page.getByTestId('budget')).toContainText('Crews: 0 / 2');
   await page.getByTestId('palette-X').click();
@@ -130,4 +141,10 @@ test('standing down with no crews asks for confirmation, then shows fires still 
   await page.getByTestId('confirm').click();
   await page.getByRole('button', { name: 'Stand down' }).click();
   await expect(page.getByTestId('verdict')).toContainText('Fires still burning');
+  // Standing down with fires present is 0 stars, never "Close".
+  await page.getByTestId('to-result').click();
+  await expect(page.getByTestId('result')).toContainText('Stood down');
+  await expect(page.getByTestId('result')).toContainText('0 crews used');
+  await expect(page.getByRole('img', { name: '0 of 3 stars' })).toBeVisible();
+  await expect(page.getByTestId('result')).not.toContainText('Close');
 });

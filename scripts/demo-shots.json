@@ -147,10 +147,6 @@
     "ms": 3000
   },
   {
-    "type": "click",
-    "selector": "[data-testid=replay-auto]"
-  },
-  {
     "type": "wait",
     "ms": 6500
   },
@@ -354,10 +350,6 @@
     "type": "caption",
     "text": "Every alarm goes quiet\u2026 and the logical qubit flipped. Two fires can fool any dispatcher \u2014 that is distance 3.",
     "ms": 7000
-  },
-  {
-    "type": "click",
-    "selector": "[data-testid=replay-auto]"
   },
   {
     "type": "wait",

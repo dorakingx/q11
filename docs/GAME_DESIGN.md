@@ -56,13 +56,13 @@ Missions are listed in order; all are selectable (judges may jump). Completion s
   panel below; sticky bottom action bar for Confirm. No horizontal scroll at 390×844 or 1280×800.
 
 ## Visual language
-- Background #0b1a33 (navy), panel #12264a, lines #27416f, text #e8eefc, muted #9fb3d9. X red #ff5a3c, Z blue #3c8dff, Y purple #b86cff, alarm amber #ffc53d, success green #3ddc97.
+- Background #0b1a33 (navy), panel #12264a, decorative lines #27416f, block outlines / quiet watch lines #5a7fbf (≥3:1 non-text contrast on the board), text #e8eefc, muted #9fb3d9. X red #ff5a3c, Z blue #3c8dff, Y purple #b86cff, alarm amber #ffc53d, success green #3ddc97.
 - System font stack. No neon glow, no gradients beyond a subtle panel tint, no particle effects, no emoji-as-art. Original SVG glyphs only.
 - Title screen: Q11 icon (public/icon.svg), "Q11 — Quantum Emergency Response", one sentence, **Play**, "How it works", Settings gear.
 
 ## Accessibility & input
 - All controls are real `<button>`s with `aria-label`s; the board blocks are buttons inside a `role="group"` with `aria-describedby` live alarm summary (`aria-live="polite"`).
-- Keyboard: Tab order palette → blocks → actions; arrows move focus between blocks; `1/2/3` select X/Z/Y; `Enter/Space` toggles; `Backspace` recalls the focused block's crew (or clears when no block is focused); `C` confirms. Shortcuts are active only while focus is inside the dispatch screen.
+- Keyboard: Tab order palette → blocks → actions; arrows move focus between blocks; `1/2/3` select X/Z/Y; `Enter/Space` toggles; `Backspace` recalls the focused block's crew (or clears when no block is focused); `C` confirms. Shortcuts are active only while focus is inside the dispatch screen's main region (board, palette, actions, heading).
 - Touch: tap = click; no hover-only information. Sound: off by default; toggle enables simple Web Audio tones after a user gesture; always mutable. Motion: respects `prefers-reduced-motion` and a manual toggle.
 - Persistence: `localStorage["q11.save.v1"]` `{ version: 1, progress: {missionId: {stars, attempts, completed}}, settings: {sound, reducedMotion} }`. Corrupt/unknown data ⇒ reset with a visible notice. If storage is unavailable (Qollab sandbox) ⇒ in-memory only, silently.
 

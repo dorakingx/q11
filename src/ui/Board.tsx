@@ -9,6 +9,7 @@ import { useCallback, type KeyboardEvent } from 'react';
 import { getCode, getLayout, fromString, letterAt, type Circuit, type CodeId, type Gate, type PauliLetter } from '../quantum';
 import { Flame, Helmet, StationShape } from './glyphs';
 import { COLOURS, CREW_LABEL } from './theme';
+import { watchersOf } from './text';
 import type { CrewLetter } from '../game';
 
 export interface BoardProps {
@@ -74,17 +75,20 @@ interface BlockProps {
   readonly interactive: boolean;
   readonly selected: CrewLetter | undefined;
   readonly budgetReached: boolean;
+  /** Ids of the stations watching this block ("Z0, Z1, X0, X1"); empty on bare wires. */
+  readonly watchers: readonly string[];
   readonly onToggle: ((q: number) => void) | undefined;
   readonly onKeyDown: (e: KeyboardEvent<HTMLElement>, q: number) => void;
 }
 
-function Block({ q, center, r, W, H, fire, crew, residual, interactive, selected, budgetReached, onToggle, onKeyDown }: BlockProps) {
+function Block({ q, center, r, W, H, fire, crew, residual, interactive, selected, budgetReached, watchers, onToggle, onKeyDown }: BlockProps) {
   const style = {
     left: `${String((center.x / W) * 100)}%`,
     top: `${String((center.y / H) * 100)}%`,
     width: `${String(((2 * r) / W) * 100)}%`,
   };
   const parts: string[] = [`Block ${String(q)}`];
+  if (watchers.length > 0) parts.push(`watched by ${watchers.join(', ')}`);
   if (residual !== null) {
     if (residual !== 'I') parts.push(`residual ${CREW_LABEL[residual]} fire`);
     else if (fire !== 'I' || crew !== null) parts.push('fire out');
@@ -239,9 +243,9 @@ function GridBoard(props: BoardProps) {
                 y1={s2.y}
                 x2={b.x}
                 y2={b.y}
-                stroke={ringing(i) ? COLOURS.alarm : COLOURS.line}
+                stroke={ringing(i) ? COLOURS.alarm : COLOURS.lineStrong}
                 strokeWidth={ringing(i) ? 3 : 1.5}
-                strokeOpacity={ringing(i) ? 0.85 : 0.9}
+                strokeOpacity={ringing(i) ? 0.85 : 1}
                 strokeDasharray={ringing(i) ? undefined : '4 4'}
               />
             );
@@ -249,7 +253,7 @@ function GridBoard(props: BoardProps) {
         })}
         {/* block discs (the buttons sit on top; the disc gives the board its look even when printed) */}
         {centers.map((c, q) => (
-          <circle key={q} cx={c.x} cy={c.y} r={BLOCK_R} fill={COLOURS.panel} stroke={COLOURS.line} strokeWidth="2" />
+          <circle key={q} cx={c.x} cy={c.y} r={BLOCK_R} fill={COLOURS.panel} stroke={COLOURS.lineStrong} strokeWidth="2" />
         ))}
         {/* stations */}
         {code.checks.map((c, i) => {
@@ -275,6 +279,7 @@ function GridBoard(props: BoardProps) {
           interactive={props.interactive}
           selected={props.selected}
           budgetReached={props.budgetReached ?? false}
+          watchers={watchersOf(props.codeId, q)}
           onToggle={props.onToggle}
           onKeyDown={onKeyDown}
         />
@@ -405,7 +410,7 @@ function WiresBoard(props: BoardProps) {
         </defs>
         {Array.from({ length: n }, (_, q) => (
           <g key={q}>
-            <line x1={INPUT_X} y1={wireY(q)} x2={outX} y2={wireY(q)} stroke={COLOURS.line} strokeWidth="3" />
+            <line x1={INPUT_X} y1={wireY(q)} x2={outX} y2={wireY(q)} stroke={COLOURS.lineStrong} strokeWidth="3" />
             <text x={INPUT_X - 30} y={wireY(q) + 5} fontSize="14" fill={COLOURS.muted} fontFamily="system-ui, sans-serif" textAnchor="middle">
               q{q}
             </text>
@@ -434,7 +439,7 @@ function WiresBoard(props: BoardProps) {
             })
           : null}
         {centers.map((c, q) => (
-          <circle key={q} cx={c.x} cy={c.y} r={OUT_R} fill={COLOURS.panel} stroke={COLOURS.line} strokeWidth="2" />
+          <circle key={q} cx={c.x} cy={c.y} r={OUT_R} fill={COLOURS.panel} stroke={COLOURS.lineStrong} strokeWidth="2" />
         ))}
         <text x={INPUT_X} y={H - 8} fontSize="12" fill={COLOURS.muted} fontFamily="system-ui, sans-serif" textAnchor="middle">
           start
@@ -457,6 +462,7 @@ function WiresBoard(props: BoardProps) {
           interactive={props.interactive}
           selected={props.selected}
           budgetReached={props.budgetReached ?? false}
+          watchers={[]}
           onToggle={props.onToggle}
           onKeyDown={onKeyDown}
         />

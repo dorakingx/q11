@@ -5,6 +5,7 @@
   --panel: #12264a;
   --panel-2: #173059;
   --line: #27416f;
+  --line-strong: #5a7fbf; /* block outlines and quiet watch lines: 3.7:1 on the panel, 3.3:1 on the block fill (#3c5a94 would be 2.2:1) */
   --text: #e8eefc;
   --muted: #9fb3d9;
   --x: #ff5a3c;
@@ -26,6 +27,7 @@ html, body { margin: 0; padding: 0; }
 body { background: var(--navy); color: var(--text); min-height: 100vh; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 #root, .q11-root { min-height: 100vh; }
 .app { min-height: 100vh; display: flex; flex-direction: column; }
+.app-content { flex: 1; display: flex; flex-direction: column; }
 
 h1, h2, h3, p, ul, ol, dl { margin: 0; }
 ul, ol { padding: 0; list-style: none; }
@@ -66,6 +68,8 @@ kbd { font: 600 0.8em ui-monospace, SFMono-Regular, Menlo, monospace; background
 .topbar-text { min-width: 0; }
 .topbar-h { font-size: 1.15rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .topbar-sub { color: var(--muted); font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar-h:focus, .title-h:focus, .verdict:focus { outline: none; }
+.topbar-h:focus-visible, .title-h:focus-visible, .verdict:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .topbar-actions { display: flex; gap: 4px; flex-shrink: 0; }
 
 .notice { position: sticky; top: 0; z-index: 20; display: flex; justify-content: center; align-items: center; gap: 12px; padding: 8px 16px; background: var(--alarm); color: #1b1200; font-weight: 600; }
@@ -133,6 +137,11 @@ kbd { font: 600 0.8em ui-monospace, SFMono-Regular, Menlo, monospace; background
 
 /* ---------- play layout */
 .play-layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(300px, 2fr); gap: 20px; align-items: start; flex: 1; }
+/* Challenge: DOM order is palette → board → actions (Tab order); the grid keeps board left, panel right. */
+.play-layout-challenge { grid-template-areas: "board side1" "board side2"; grid-template-rows: auto 1fr; }
+.play-layout-challenge .board-col { grid-area: board; }
+.play-layout-challenge .panel-before { grid-area: side1; }
+.play-layout-challenge .panel-after { grid-area: side2; }
 .board-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .panel { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .panel-section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
@@ -147,7 +156,7 @@ kbd { font: 600 0.8em ui-monospace, SFMono-Regular, Menlo, monospace; background
 .board-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .block {
   position: absolute; transform: translate(-50%, -50%); aspect-ratio: 1; border-radius: 50%;
-  border: 2.5px solid var(--line); background: var(--panel-2); color: var(--text); cursor: default; padding: 0;
+  border: 2.5px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: default; padding: 0;
   display: grid; place-items: center; min-width: 44px; min-height: 44px;
 }
 button.block { cursor: pointer; }
@@ -178,7 +187,8 @@ button.block:hover { border-color: #5a7fbf; background: #1b3868; }
 .alarm.is-ringing .alarm-state { color: var(--alarm); }
 .alarm-list.is-compact { grid-template-columns: 1fr 1fr; gap: 4px; }
 .alarm-list.is-compact .alarm { padding: 3px 6px; min-height: 32px; }
-.alarm-list.is-compact .alarm-blocks { display: none; }
+/* Compact lists hide the "blocks 0, 1, 3, 4" text visually but keep it for screen readers. */
+.alarm-list.is-compact .alarm-blocks { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 /* ---------- palette */
 .palette { display: grid; gap: 6px; }
@@ -211,7 +221,8 @@ button.block:hover { border-color: #5a7fbf; background: #1b3868; }
 .whatif p + p { margin-top: 2px; }
 
 /* ---------- cloud */
-.cloud-empty { color: var(--muted); font-style: italic; }
+.cloud-empty { color: var(--muted); font-style: italic; overflow-wrap: anywhere; }
+.cloud-dispatch { color: var(--muted); overflow-wrap: anywhere; }
 .cloud-card { background: var(--navy); border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: grid; gap: 8px; }
 .cloud-source { font-size: 0.9rem; }
 .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); font-size: 0.8rem; font-weight: 700; margin-right: 6px; }
@@ -248,9 +259,19 @@ button.block:hover { border-color: #5a7fbf; background: #1b3868; }
   .actions-sticky { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(11, 26, 51, 0.96); border-top: 1px solid var(--line); margin: 0; }
   .actions-sticky .btn { flex: 1 1 auto; }
   .step-dots, .lesson-dots { margin-left: 0; width: 100%; }
-  .alarm-list.is-grid .alarm-blocks { display: none; }
+  .alarm-list.is-grid .alarm-blocks { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .topbar-h { white-space: normal; }
   .setting-row { align-items: flex-start; }
+  /* Touch targets: step / lesson dots and small buttons reach 44 px on phones. */
+  .dot { width: 44px; height: 44px; }
+  .btn-small { min-height: 44px; min-width: 44px; }
+  .play-layout-challenge { grid-template-areas: "board" "side1" "side2"; grid-template-rows: auto; }
+}
+@media (max-width: 1023px) {
+  .play-layout-challenge { grid-template-areas: "board" "side1" "side2"; grid-template-rows: auto; }
+}
+@media (max-width: 480px) {
+  .topbar-sub { white-space: normal; overflow: visible; text-overflow: clip; }
 }
 
 /* cloud verification facts: long labels wrap instead of overlapping */

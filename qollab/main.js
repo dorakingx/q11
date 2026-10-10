@@ -45,7 +45,7 @@ const bridge = {
   isLocalSimulator: isLocal,
   jobsRemaining: () => (isLocal ? Infinity : Math.max(0, 1 - jobsThisRun)),
   // Results recorded in this Run only (the sandbox has no storage between runs).
-  cached: (missionId) => recorded.filter((r) => r.missionId === missionId),
+  cached: (missionId, correction) => recorded.filter((r) => r.missionId === missionId && (correction === undefined || r.correction === correction)),
   /**
    * request: { missionId, correction, shots, prep: '0'|'+', readoutBasis: 'Z'|'X' }
    * returns: { status: 'ok', source: 'live-cloud'|'local-simulator', backendName, shots, counts, analysis, prediction, startedAt, finishedAt, jobId }

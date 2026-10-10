@@ -48,7 +48,7 @@ export async function openMissions(page: Page): Promise<void> {
 /** Mission list → briefing → (training) → challenge. */
 export async function openChallenge(page: Page, index: number, opts: { through?: 'training' | 'skip' } = {}): Promise<void> {
   await page.getByTestId(`mission-${String(index)}`).click();
-  await expect(page.getByText('Briefing')).toBeVisible();
+  await expect(page.getByText('Briefing', { exact: true })).toBeVisible();
   const start = page.getByTestId('start-mission');
   await start.click();
   if ((await page.getByTestId('start-challenge').count()) > 0) {

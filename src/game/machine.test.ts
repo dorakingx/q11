@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fromString, getCode, letterAt, getMission } from '../quantum';
-import { confirmDispatch, crewCount, initialState, placementsToPauli, reducer, toSave, totalStars } from './machine';
-import { listPublicMissions } from './missions';
+import { confirmDispatch, crewCount, initialState, placementsToPauli, PROGRESS_RESET_NOTICE, reducer, toSave, totalStars } from './machine';
+import { listPublicMissions, maxTotalStars, missionMaxStars } from './missions';
 import type { Action, CrewLetter, GameState } from './types';
 
 function run(state: GameState, ...actions: Action[]): GameState {
@@ -144,18 +144,25 @@ describe('full flow of every mission', () => {
       expect(d.crews).toBe(def.expected.minWeightCorrection);
       if (m.id === 'silent-failure') {
         expect(d.verdict).toBe('logical-error');
+        expect(d.verdictLabel).toBe('Silent failure — logical qubit flipped');
         expect(d.score.quality).toBe('unlucky');
         expect(d.score.stars).toBe(1);
+        expect(d.score.maxStars).toBe(1);
         expect(d.score.completed).toBe(true);
         expect(d.logicalFlip.x).toEqual([true]);
         expect(d.whatIf.trueFireCrews).toBe('IXXIIIIII');
       } else {
         expect(d.verdict).toBe('success');
+        expect(d.verdictLabel).toBe('Logical qubit safe');
         expect(d.score.quality).toBe('optimal');
         expect(d.score.stars).toBe(3);
+        expect(d.score.maxStars).toBe(3);
       }
       expect(d.narrative).toBe(def.debrief[d.verdict]);
       expect(d.steps[d.steps.length - 1]?.id).toBe('verdict');
+      // The debrief opens on step 1 and auto-plays (motion allowed); the banner is rendered regardless of the step.
+      expect(s.replayIndex).toBe(0);
+      expect(s.autoPlay).toBe(true);
       // Progress stored
       expect(s.progress[m.id]?.attempts).toBe(1);
       expect(s.progress[m.id]?.stars).toBe(d.score.stars);
@@ -195,18 +202,34 @@ describe('full flow of every mission', () => {
     });
   }
 
-  it('mission 6: crews on blocks 1 and 2 succeed with 2 stars (valid guess), decoder crew at block 3 is also unlucky', () => {
+  it('mission 6 (maxStars 1): crews on blocks 1 and 2 succeed but score "lucky" (1 star); the block-3 crew is the same optimal call', () => {
+    expect(missionMaxStars('silent-failure')).toBe(1);
+    expect(missionMaxStars('first-alarm')).toBe(3);
+    expect(missionMaxStars('no-such-mission')).toBe(3);
+    expect(missionMaxStars('x', [{ id: 'x', maxStars: 7 }])).toBe(3);
+    expect(missionMaxStars('x', [{ id: 'x', maxStars: 2 }])).toBe(2);
+    expect(maxTotalStars()).toBe(16);
     const a = confirmDispatch('silent-failure', { 1: 'X', 2: 'X' });
     expect(a.verdict).toBe('success');
-    expect(a.score.quality).toBe('valid');
-    expect(a.score.stars).toBe(2);
+    expect(a.score.quality).toBe('lucky');
+    expect(a.score.stars).toBe(1);
+    expect(a.score.maxStars).toBe(1);
+    expect(a.whatIf.trueFireCrews).toBeNull(); // the player sent exactly the true-fire crews: no counterfactual
+    expect(a.whatIf.explanation).toMatch(/could not justify/);
     const b = confirmDispatch('silent-failure', { 3: 'X' });
     expect(b.verdict).toBe('logical-error');
     expect(b.score.quality).toBe('unlucky');
+    expect(b.score.stars).toBe(1);
     expect(b.whatIf.equivalentToDecoder).toBe(true);
+    expect(b.whatIf.explanation).toContain('is XIIIIIIII; your IIIXIIIII differs from it by a stabilizer, so it is the same call');
+    expect(b.whatIf.explanation).toContain('leave IXXXIIIII on blocks 1, 2 and 3');
+    const c = confirmDispatch('silent-failure', { 0: 'X' });
+    expect(c.whatIf.explanation).toContain('is XIIIIIIII, and that is what you sent');
+    expect(c.whatIf.explanation).toContain('leave XXXIIIIII on blocks 0, 1 and 2');
+    expect(c.whatIf.explanation).toContain('on blocks 1 and 2: 2 fires');
   });
 
-  it('mission 5: Z on block 6 or 7 are equivalent corrections (stabilizer twins)', () => {
+  it('mission 5: Z on block 6 or 7 are equivalent corrections (stabilizer twins); no counterfactual when crews equal the true fires', () => {
     const a = confirmDispatch('two-kinds-of-trouble', { 1: 'X', 6: 'Z' });
     const b = confirmDispatch('two-kinds-of-trouble', { 1: 'X', 7: 'Z' });
     expect(a.verdict).toBe('success');
@@ -215,6 +238,60 @@ describe('full flow of every mission', () => {
     expect(b.score.stars).toBe(3);
     expect(b.whatIf.equivalentToDecoder).toBe(true);
     expect(b.whatIf.explanation).toMatch(/stabilizer/);
+    // a = decoder's dispatch (Z6); the true fire is on block 7, so the counterfactual is shown.
+    expect(a.whatIf.trueFireCrews).toBe('IXIIIIIZI');
+    // b = the true fires themselves: not shown "as if different".
+    expect(b.whatIf.trueFireCrews).toBeNull();
+    expect(b.whatIf.explanation).toContain('Your crews sat exactly on the true fires.');
+  });
+
+  it('propagation miss: the verdict label is a missed prediction, never a silent failure', () => {
+    const d = confirmDispatch('color-switch', { 0: 'X', 1: 'X' }); // true end state XZ
+    expect(d.verdict).toBe('logical-error');
+    expect(d.verdictLabel).toBe('Prediction missed — fires left on the wires');
+    expect(d.steps[d.steps.length - 1]?.caption).toMatch(/leaves a red-and-blue fire \(Y\) on block 1/);
+    expect(d.whatIf.explanation).toContain('leave a red-and-blue fire (Y) on block 1 (1 block)');
+    const ok = confirmDispatch('color-switch', { 0: 'X', 1: 'Z' });
+    expect(ok.verdictLabel).toBe('Logical qubit safe');
+  });
+
+  it('standing down with fires present scores 0 stars and is not "close"', () => {
+    const d = confirmDispatch('first-alarm', {});
+    expect(d.verdict).toBe('detectable');
+    expect(d.score.crewsUsed).toBe(0);
+    expect(d.score.stars).toBe(0);
+    expect(d.score.completed).toBe(false);
+  });
+
+  it('RECALL_BLOCK removes just that block; CLEAR_CREWS and CONFIRM are ignored while the stand-down dialog is open', () => {
+    let s = toChallenge('two-kinds-of-trouble');
+    s = place(s, { 1: 'X', 7: 'Z' });
+    s = reducer(s, { type: 'RECALL_BLOCK', qubit: 7 });
+    expect(s.placements).toEqual({ 1: 'X' });
+    const same = reducer(s, { type: 'RECALL_BLOCK', qubit: 4 }); // empty block → no change (same reference)
+    expect(same).toBe(s);
+    s = reducer(s, { type: 'RECALL_BLOCK', qubit: 1 });
+    expect(s.placements).toEqual({});
+    s = reducer(s, { type: 'CONFIRM' });
+    expect(s.standDownDialog).toBe(true);
+    expect(reducer(s, { type: 'TOGGLE_BLOCK', qubit: 1 })).toBe(s);
+    expect(reducer(s, { type: 'CLEAR_CREWS' })).toBe(s);
+    expect(reducer(s, { type: 'CONFIRM' })).toBe(s);
+  });
+
+  it('CONFIRM with reducedMotion opens the debrief on step 1 without auto-play', () => {
+    let s = toChallenge('first-alarm');
+    s = place(s, { 1: 'X' });
+    const reduced = reducer(s, { type: 'CONFIRM', reducedMotion: true });
+    expect(reduced.screen).toBe('debrief');
+    expect(reduced.replayIndex).toBe(0);
+    expect(reduced.autoPlay).toBe(false);
+    const full = reducer(s, { type: 'CONFIRM', reducedMotion: false });
+    expect(full.replayIndex).toBe(0);
+    expect(full.autoPlay).toBe(true);
+    const standDown = reducer(reducer(toChallenge('first-alarm'), { type: 'CONFIRM' }), { type: 'STAND_DOWN_CONFIRM', reducedMotion: true });
+    expect(standDown.screen).toBe('debrief');
+    expect(standDown.autoPlay).toBe(false);
   });
 
   it('progress keeps the best stars and counts attempts; totalStars sums over missions', () => {
@@ -231,6 +308,20 @@ describe('full flow of every mission', () => {
     s = reducer(s, { type: 'RESET_PROGRESS' });
     expect(s.progress).toEqual({});
   });
+
+  it('"Progress reset." clears on the next screen change; other notices persist until dismissed', () => {
+    let s = run(initialState(), { type: 'PLAY' }, { type: 'OPEN_SETTINGS' }, { type: 'RESET_PROGRESS' });
+    expect(s.notice).toBe(PROGRESS_RESET_NOTICE);
+    s = reducer(s, { type: 'SET_SOUND', on: true }); // same screen → notice stays
+    expect(s.notice).toBe(PROGRESS_RESET_NOTICE);
+    s = reducer(s, { type: 'CLOSE_OVERLAY' });
+    expect(s.screen).toBe('missions');
+    expect(s.notice).toBeNull();
+    let c = run(initialState(undefined, 'Saved progress was unreadable and has been reset.'), { type: 'PLAY' });
+    expect(c.notice).toBe('Saved progress was unreadable and has been reset.');
+    c = reducer(c, { type: 'DISMISS_NOTICE' });
+    expect(c.notice).toBeNull();
+  });
 });
 
 describe('replay controls', () => {
@@ -239,8 +330,11 @@ describe('replay controls', () => {
     s = place(s, { 0: 'Y', 1: 'Y' });
     s = reducer(s, { type: 'CONFIRM' });
     const last = (s.debrief?.steps.length ?? 0) - 1;
-    expect(s.replayIndex).toBe(last);
-    s = reducer(s, { type: 'REPLAY_AUTO', on: true });
+    expect(s.replayIndex).toBe(0);
+    expect(s.autoPlay).toBe(true);
+    s = reducer(s, { type: 'REPLAY_GOTO', index: last });
+    expect(s.autoPlay).toBe(false);
+    s = reducer(s, { type: 'REPLAY_AUTO', on: true }); // from the end: restarts
     expect(s.replayIndex).toBe(0);
     expect(s.autoPlay).toBe(true);
     for (let i = 0; i < last; i++) s = reducer(s, { type: 'REPLAY_NEXT' });
