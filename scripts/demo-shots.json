@@ -6,7 +6,7 @@
   {
     "type": "caption",
     "text": "Q11 — Quantum Emergency Response. A toy city where fires are quantum errors and alarms are parity checks.",
-    "ms": 7000
+    "ms": 8000
   },
   {
     "type": "click",
@@ -41,7 +41,7 @@
   {
     "type": "caption",
     "text": "Answer check: the truck arrives, the crew runs, one hose = one exact Pauli correction.",
-    "ms": 5500
+    "ms": 6500
   },
   {
     "type": "caption",
@@ -55,7 +55,7 @@
   {
     "type": "caption",
     "text": "The city map. Districts unlock in order; the smoke clears and a badge is earned.",
-    "ms": 5000
+    "ms": 6000
   },
   {
     "type": "click",
@@ -123,7 +123,7 @@
   {
     "type": "caption",
     "text": "Challenge: X on house 0 and Z on house 1 — where do the fires end up? Both become Y.",
-    "ms": 4000
+    "ms": 5000
   },
   {
     "type": "click",
@@ -147,7 +147,7 @@
   },
   {
     "type": "wait",
-    "ms": 5000
+    "ms": 6000
   },
   {
     "type": "click",
@@ -156,6 +156,31 @@
   {
     "type": "wait",
     "ms": 2500
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=settings]"
+  },
+  {
+    "type": "wait",
+    "ms": 600
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=switch-free-roam]"
+  },
+  {
+    "type": "caption",
+    "text": "Free selection (for judges): with this switch every district opens from the map.",
+    "ms": 3000
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=back]"
+  },
+  {
+    "type": "wait",
+    "ms": 800
   },
   {
     "type": "click",
@@ -189,7 +214,7 @@
   {
     "type": "caption",
     "text": "Fires are hidden behind fog. Tap a station to see the houses it watches.",
-    "ms": 4000
+    "ms": 5000
   },
   {
     "type": "click",
@@ -206,7 +231,7 @@
   {
     "type": "caption",
     "text": "Z0 and Z1 both ring — only house 4 is watched by both. Plan a red crew there and spray.",
-    "ms": 4500
+    "ms": 5500
   },
   {
     "type": "click",
@@ -215,7 +240,7 @@
   {
     "type": "caption",
     "text": "The hose reveals the true fire, puts it out, every station goes quiet.",
-    "ms": 5500
+    "ms": 6500
   },
   {
     "type": "wait",
@@ -226,28 +251,9 @@
     "selector": "[data-testid=result-next]"
   },
   {
-    "type": "wait",
-    "ms": 2500
-  },
-  {
-    "type": "click",
-    "selector": "[data-testid=topbar-settings]"
-  },
-  {
-    "type": "wait",
-    "ms": 600
-  },
-  {
-    "type": "click",
-    "selector": "[data-testid=switch-free-roam]"
-  },
-  {
-    "type": "click",
-    "selector": "[data-testid=back]"
-  },
-  {
-    "type": "wait",
-    "ms": 800
+    "type": "caption",
+    "text": "Central District restored and a new badge earned. With free selection, Old Town is already open.",
+    "ms": 4500
   },
   {
     "type": "click",
@@ -268,7 +274,7 @@
   },
   {
     "type": "click",
-    "selector": "[data-testid=briefing-skip]"
+    "selector": "[data-testid=start-mission]"
   },
   {
     "type": "wait",
@@ -293,7 +299,7 @@
   {
     "type": "caption",
     "text": "Every alarm goes quiet… yet the memory tower flips: two fires fooled the alarms. That is distance 3.",
-    "ms": 7000
+    "ms": 8000
   },
   {
     "type": "click",
@@ -302,12 +308,12 @@
   {
     "type": "caption",
     "text": "Why? Your spray and the alternative side by side. Investigation complete — nobody could have known from the alarms alone.",
-    "ms": 7000
+    "ms": 8000
   },
   {
     "type": "caption",
     "text": "The same missions run as Qiskit circuits on Qollab: built-in simulator (exact) and IonQ Aria 1 (logical bit 1 in 97% of shots).",
-    "ms": 6500
+    "ms": 8000
   },
   {
     "type": "viewport",
@@ -329,6 +335,6 @@
   {
     "type": "caption",
     "text": "日本語でも遊べます。タッチだけで操作。 Open source, MIT. This effort is supported by Qollab & IonQ.",
-    "ms": 7000
+    "ms": 8000
   }
 ]

@@ -1,0 +1,107 @@
+
+Running 65 tests using 6 workers
+
+[1/65] [desktop-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[2/65] [desktop-chromium] › e2e/city.spec.ts:100:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[3/65] [desktop-chromium] › e2e/city.spec.ts:69:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[4/65] [desktop-chromium] › e2e/missions.spec.ts:5:1 › all six districts are playable end to end in order, with tap-to-predict in the propagation lessons
+[5/65] [desktop-chromium] › e2e/city.spec.ts:125:1 › summary after the old town: badges, stars and the free-roam hint
+[6/65] [desktop-chromium] › e2e/city.spec.ts:59:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[7/65] [desktop-chromium] › e2e/missions.spec.ts:130:1 › mission 6 lucky guess (houses 1 and 2): success scored lucky, 1 star, no cloud card for that dispatch
+[8/65] [desktop-chromium] › e2e/missions.spec.ts:149:1 › How it works: kid copy with the art legend and the jargon under Details; Japanese switch
+[9/65] [desktop-chromium] › e2e/spray.spec.ts:8:1 › result 1 — blind dispatch X on house 4: restored (fires out, houses restored, alarms quiet)
+[10/65] [desktop-chromium] › e2e/spray.spec.ts:36:1 › result 3 — blind dispatch X on house 0: still burning (new red fire, true fire revealed, alarms ring)
+[11/65] [desktop-chromium] › e2e/spray.spec.ts:56:1 › prediction miss — Harbor Bridge, red crew on house 0 only: no alarms, no beacon, Try again is the primary action
+[12/65] [desktop-chromium] › e2e/spray.spec.ts:78:1 › result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details)
+[13/65] [desktop-chromium] › e2e/spray.spec.ts:100:1 › result 4 — silent failure X on house 0: alarms quiet, the memory beacon shows the logical X flip and the chain 0-1-2
+[14/65] [desktop-chromium] › e2e/spray.spec.ts:139:1 › secrecy: in Challenge every house button is identical (index stripped) and nothing names the fire before Spray!
+[15/65] [desktop-chromium] › e2e/spray.spec.ts:158:1 › rapid taps: triple Spray!, double Skip, Try again mid-spray — attempts increase by exactly one each time
+[16/65] [desktop-chromium] › e2e/spray.spec.ts:183:1 › reduced motion: the spray is a stepper with static frames; Why? steps both boards together
+[17/65] [desktop-chromium] › e2e/spray.spec.ts:214:1 › stand down with no crews asks first; confirming shows the fire still burning (0 stars)
+[18/65] [mobile-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[19/65] [mobile-chromium] › e2e/city.spec.ts:59:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[20/65] [mobile-chromium] › e2e/city.spec.ts:69:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[21/65] [mobile-chromium] › e2e/city.spec.ts:100:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[22/65] [mobile-chromium] › e2e/city.spec.ts:125:1 › summary after the old town: badges, stars and the free-roam hint
+[23/65] [mobile-chromium] › e2e/missions.spec.ts:130:1 › mission 6 lucky guess (houses 1 and 2): success scored lucky, 1 star, no cloud card for that dispatch
+[24/65] [mobile-chromium] › e2e/missions.spec.ts:149:1 › How it works: kid copy with the art legend and the jargon under Details; Japanese switch
+[25/65] [mobile-chromium] › e2e/spray.spec.ts:8:1 › result 1 — blind dispatch X on house 4: restored (fires out, houses restored, alarms quiet)
+[26/65] [mobile-chromium] › e2e/spray.spec.ts:36:1 › result 3 — blind dispatch X on house 0: still burning (new red fire, true fire revealed, alarms ring)
+[27/65] [mobile-chromium] › e2e/spray.spec.ts:56:1 › prediction miss — Harbor Bridge, red crew on house 0 only: no alarms, no beacon, Try again is the primary action
+[28/65] [mobile-chromium] › e2e/spray.spec.ts:78:1 › result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details)
+[29/65] [mobile-chromium] › e2e/missions.spec.ts:5:1 › all six districts are playable end to end in order, with tap-to-predict in the propagation lessons
+[30/65] [mobile-chromium] › e2e/spray.spec.ts:100:1 › result 4 — silent failure X on house 0: alarms quiet, the memory beacon shows the logical X flip and the chain 0-1-2
+[31/65] [mobile-chromium] › e2e/spray.spec.ts:139:1 › secrecy: in Challenge every house button is identical (index stripped) and nothing names the fire before Spray!
+[32/65] [mobile-chromium] › e2e/spray.spec.ts:158:1 › rapid taps: triple Spray!, double Skip, Try again mid-spray — attempts increase by exactly one each time
+[33/65] [mobile-chromium] › e2e/spray.spec.ts:183:1 › reduced motion: the spray is a stepper with static frames; Why? steps both boards together
+[34/65] [mobile-chromium] › e2e/spray.spec.ts:214:1 › stand down with no crews asks first; confirming shows the fire still burning (0 stars)
+[35/65] [tablet-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[36/65] [tablet-chromium] › e2e/city.spec.ts:59:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[37/65] [tablet-chromium] › e2e/city.spec.ts:69:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[38/65] [tablet-chromium] › e2e/city.spec.ts:100:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[39/65] [tablet-chromium] › e2e/city.spec.ts:125:1 › summary after the old town: badges, stars and the free-roam hint
+[40/65] [tablet-chromium] › e2e/missions.spec.ts:5:1 › all six districts are playable end to end in order, with tap-to-predict in the propagation lessons
+[41/65] [tablet-chromium] › e2e/missions.spec.ts:130:1 › mission 6 lucky guess (houses 1 and 2): success scored lucky, 1 star, no cloud card for that dispatch
+[42/65] [tablet-chromium] › e2e/missions.spec.ts:149:1 › How it works: kid copy with the art legend and the jargon under Details; Japanese switch
+[43/65] [tablet-chromium] › e2e/spray.spec.ts:8:1 › result 1 — blind dispatch X on house 4: restored (fires out, houses restored, alarms quiet)
+[44/65] [tablet-chromium] › e2e/spray.spec.ts:36:1 › result 3 — blind dispatch X on house 0: still burning (new red fire, true fire revealed, alarms ring)
+[45/65] [tablet-chromium] › e2e/spray.spec.ts:56:1 › prediction miss — Harbor Bridge, red crew on house 0 only: no alarms, no beacon, Try again is the primary action
+[46/65] [tablet-chromium] › e2e/spray.spec.ts:78:1 › result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details)
+[47/65] [tablet-chromium] › e2e/spray.spec.ts:100:1 › result 4 — silent failure X on house 0: alarms quiet, the memory beacon shows the logical X flip and the chain 0-1-2
+[48/65] [tablet-chromium] › e2e/spray.spec.ts:139:1 › secrecy: in Challenge every house button is identical (index stripped) and nothing names the fire before Spray!
+[49/65] [tablet-chromium] › e2e/spray.spec.ts:183:1 › reduced motion: the spray is a stepper with static frames; Why? steps both boards together
+[50/65] [tablet-chromium] › e2e/spray.spec.ts:214:1 › stand down with no crews asks first; confirming shows the fire still burning (0 stars)
+[51/65] [tablet-chromium] › e2e/spray.spec.ts:158:1 › rapid taps: triple Spray!, double Skip, Try again mid-spray — attempts increase by exactly one each time
+[52/65] [desktop-webkit] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[53/65] [desktop-webkit] › e2e/city.spec.ts:59:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[54/65] [desktop-webkit] › e2e/city.spec.ts:69:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[55/65] [desktop-webkit] › e2e/city.spec.ts:100:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[56/65] [desktop-webkit] › e2e/spray.spec.ts:8:1 › result 1 — blind dispatch X on house 4: restored (fires out, houses restored, alarms quiet)
+[57/65] [desktop-webkit] › e2e/spray.spec.ts:56:1 › prediction miss — Harbor Bridge, red crew on house 0 only: no alarms, no beacon, Try again is the primary action
+[58/65] [desktop-webkit] › e2e/city.spec.ts:125:1 › summary after the old town: badges, stars and the free-roam hint
+[59/65] [desktop-webkit] › e2e/spray.spec.ts:78:1 › result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details)
+[60/65] [desktop-webkit] › e2e/spray.spec.ts:100:1 › result 4 — silent failure X on house 0: alarms quiet, the memory beacon shows the logical X flip and the chain 0-1-2
+[61/65] [desktop-webkit] › e2e/spray.spec.ts:36:1 › result 3 — blind dispatch X on house 0: still burning (new red fire, true fire revealed, alarms ring)
+[62/65] [desktop-webkit] › e2e/spray.spec.ts:139:1 › secrecy: in Challenge every house button is identical (index stripped) and nothing names the fire before Spray!
+[63/65] [desktop-webkit] › e2e/spray.spec.ts:158:1 › rapid taps: triple Spray!, double Skip, Try again mid-spray — attempts increase by exactly one each time
+[64/65] [desktop-webkit] › e2e/spray.spec.ts:183:1 › reduced motion: the spray is a stepper with static frames; Why? steps both boards together
+[65/65] [desktop-webkit] › e2e/spray.spec.ts:214:1 › stand down with no crews asks first; confirming shows the fire still burning (0 stars)
+  1) [desktop-webkit] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district 
+
+    Test timeout of 120000ms exceeded.
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  getByTestId('briefing')
+    Expected: visible
+    Received: undefined
+
+
+      42 |   const skip = page.getByTestId('travel-skip');
+      43 |   if (await skip.isVisible().catch(() => false)) await skip.click({ force: true }).catch(() => undefined);
+    > 44 |   await expect(page.getByTestId('briefing')).toBeVisible();
+         |                                              ^
+      45 |   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Harbor Bridge');
+      46 |   await expectNoHorizontalOverflow(page);
+      47 |   // Free roam from Settings opens the old town directly.
+        at /Users/hatanakatomoya/Developer/App/Q11/e2e/city.spec.ts:44:46
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/city-city-locked-districts-a8991-e-roam-opens-every-district-desktop-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/city-city-locked-districts-a8991-e-roam-opens-every-district-desktop-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/city-city-locked-districts-a8991-e-roam-opens-every-district-desktop-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/city-city-locked-districts-a8991-e-roam-opens-every-district-desktop-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  1 failed
+    [desktop-webkit] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district 
+  64 passed (4.3m)
+exit=1

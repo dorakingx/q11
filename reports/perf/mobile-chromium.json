@@ -1,0 +1,18 @@
+{
+  "project": "mobile-chromium",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "samplesMs": [
+    3.3,
+    2.5,
+    2.2,
+    1.6,
+    2.2,
+    1.7
+  ],
+  "maxMs": 3.3,
+  "meanMs": 2.25,
+  "measuredAt": "2026-10-10T13:39:48.949Z"
+}

@@ -10,13 +10,13 @@ Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external).
 - ☑ Real-browser screenshots: 62 "after" screenshots at 1440×900 / 768×1024 / 390×844 / 375×812 (`reports/screenshots/after/`), reviewed; "before" set kept in `reports/screenshots/before/`
 - ☑ GitHub `dorakingx/q11` private (`isPrivate: true`), `main` pushed at every milestone; final redesign SHA recorded in STATUS.md at the end
 - ☑ Vercel `q11`: Vercel Authentication = All Deployments since creation (never changed); anonymous/authenticated checks re-run on the final redesign deployment: pending
-- ☑ Qollab draft exists (private); 10 runs incl. 4 IonQ Aria 1 jobs with ids; redesigned page uploaded and self-tested on the built-in simulator (run 10, job cdeaf054…) — `reports/qollab-runs.md`
+- ☑ Qollab draft exists (private); 12 runs incl. 4 IonQ Aria 1 jobs with ids; the final redesigned page (commit c3581f9 bundle) uploaded and self-tested on the built-in simulator (run 12, job 601a8c4d…, exact) — `reports/qollab-runs.md`
 - ☑ Icons reviewed at 16/32/64/128 on dark and light — `reports/icons/REVIEW.md` (brand mark unchanged by the redesign)
-- ☐ `submission/DEMO.mp4` re-recorded from the redesigned app (city map, truck, spray, four results, Why?, JA) 120–180 s, sha256 recorded; NOT uploaded — pending
+- ☑ `submission/DEMO.mp4` re-recorded from the redesigned app (city map, truck, spray, four results, Why?, JA) — 138.4 s, sha256 3596c11d… (`reports/demo-recording.json`, 2026-10-10 13:36 UTC); NOT uploaded
 - ☑ MIT `LICENSE`; `ATTRIBUTION.md` updated for the redesign art + JA copy; attribution line present in README, project page and the game's title screen
 - ☑ Secret-pattern scan 0 hits in tracked files (verify:release); `.env*`, `.vercel/` ignored
 - ☑ `submission/KNOWN_LIMITATIONS.md` updated for the redesign
-- ☐ Project Card on the Qollab draft re-pasted from the redesigned `submission/PROJECT_PAGE.md` — pending
+- ☑ Project Card on the Qollab draft re-pasted from the redesigned `submission/PROJECT_PAGE.md`; About set from `SHORT_DESCRIPTION.md` (222 chars); tags + thumbnail kept (2026-10-10 23:10 JST)
 - ☐ Final redesign commit pushed; working tree clean; protected deployment of that SHA checked (anon blocked / auth works) — pending
 
 ## ────────── APPROVAL REQUIRED BELOW THIS LINE ──────────

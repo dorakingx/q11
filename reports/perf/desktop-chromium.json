@@ -1,0 +1,18 @@
+{
+  "project": "desktop-chromium",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "samplesMs": [
+    3.8,
+    2.9,
+    2.3,
+    1.7,
+    1.7,
+    1.7
+  ],
+  "maxMs": 3.8,
+  "meanMs": 2.35,
+  "measuredAt": "2026-10-10T13:39:24.420Z"
+}

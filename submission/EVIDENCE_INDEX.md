@@ -12,9 +12,10 @@
 | Screenshots | before (6, pre-redesign) / after (62: title, settings, how, city, briefing, training, challenge, spray-mid, four results, result screen, why, summary × 1440×900/768×1024/390×844/375×812 + tutorial/city-panel at 1280×800) | `reports/screenshots/before/`, `reports/screenshots/after/` |
 | Art | SVG parts gallery + previews | `reports/art/gallery.png`, `reports/city/*.png`, `reports/scene/*.png` with REVIEW.md each |
 | Quantum verification | unchanged mechanics | 4,746 comparisons / 0 mismatches (`reports/quantum-verification.json`) |
-| Qollab | redesigned page uploaded (zip → Unpack → Keep and add) | run 10: built-in simulator self-test exact, job cdeaf054-507d-4424-b67e-a2eda678404c (`reports/qollab-runs.md`); IonQ runs 1–8 remain valid (circuits unchanged) |
+| Qollab | final redesigned page uploaded (zip → Unpack → Keep and add) after commit c3581f9 | run 12: built-in simulator self-test exact, job 601a8c4d-c67b-4c78-a09b-ea4433446a44, verdict success, 10.0 s (`reports/qollab-runs.md`, raw counts `reports/qollab-runs/blind-dispatch-builtin-601a8c4d.json`); earlier redesign runs 10–11 also exact; IonQ Aria 1 runs 4–6 and 8 remain valid (circuits unchanged). Project Card write-up, About (222 chars), tags and thumbnail re-pasted from the redesign texts; Publish not pressed |
 | Review | 4 read-only reviewers (play-test, science/secrecy, a11y, docs): 19 major / 30 minor / 10 nit | fix wave in progress; see docs/STATUS.md |
-| verify:release, demo video, final deployment check | *pending* | — |
+| Demo video | `BASE_URL=http://localhost:4173 node scripts/record-demo.mjs` with `scripts/demo-shots.json` (79 shots) on the redesigned build (commit c3581f9 sources) | `submission/DEMO.mp4` (git-ignored, local only, NOT uploaded): 138.4 s, 4,127,795 bytes, sha256 `3596c11ddf55a736337cde08080b71df9e16caa2f07b109923a0a79509fec3a7`, recorded 2026-10-10 13:36 UTC (`reports/demo-recording.json`); frames reviewed via contact sheets (title → three-tap first call → city map + badge → Harbor Bridge truck/training/challenge → free selection → Central District fog/detector/spray → Old Town silent failure + memory beacon → Why? → verification caption → JA phone insert) |
+| verify:release, final deployment check | *pending* | — |
 
 ## Pre-redesign build (commit 2cfae98) — superseded
 

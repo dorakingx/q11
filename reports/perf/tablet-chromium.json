@@ -1,0 +1,18 @@
+{
+  "project": "tablet-chromium",
+  "viewport": {
+    "width": 768,
+    "height": 1024
+  },
+  "samplesMs": [
+    3.4,
+    2.5,
+    2.4,
+    1.8,
+    2.2,
+    1.9
+  ],
+  "maxMs": 3.4,
+  "meanMs": 2.37,
+  "measuredAt": "2026-10-10T13:40:07.057Z"
+}
