@@ -1,0 +1,63 @@
+# Q11 shared fixtures
+
+These JSON files are the single source of truth shared by the TypeScript engine (`src/quantum`, `src/game`),
+the Python/Qiskit reference implementation (`quantum/`) and the Qollab project (`qollab/`).
+Nothing here is secret. All Pauli strings are **qubit-0-first** ("XIZ" = X on q0, I on q1, Z on q2) — the
+opposite of Qiskit's label order; converters must reverse when building `qiskit.quantum_info.Pauli`.
+
+## `codes.json`
+```json
+{
+  "rsc3": {
+    "name": "Distance-3 rotated surface code",
+    "n": 9, "k": 1, "distance": 3,
+    "checks": [ {"id": "Z0", "type": "Z", "qubits": [0,1,3,4]}, ... ],
+    "logicalX": ["XXXIIIIII"], "logicalZ": ["ZIIZIIZII"],
+    "layout": { "kind": "grid", "rows": 3, "cols": 3,
+                "checkPositions": { "Z0": {"row": 0.5, "col": 0.5}, "Z2": {"row": -0.5, "col": 1.5}, ... } },
+    "noiseNote": "X, Z and Y errors; perfect syndrome"
+  },
+  "rep3": { "n": 3, "k": 1, "distance": 3, "checks": [ {"id":"Z0","type":"Z","qubits":[0,1]}, {"id":"Z1","type":"Z","qubits":[1,2]} ],
+            "logicalX": ["XXX"], "logicalZ": ["ZII"], "layout": {"kind":"line"}, "noiseNote": "X noise only" },
+  "trivial2": { "n": 2, "k": 2, "distance": 1, "checks": [], "logicalX": ["XI","IX"], "logicalZ": ["ZI","IZ"], "layout": {"kind":"wires"}, "noiseNote": "no code; propagation lessons" },
+  "trivial3": { ... n: 3 ... }
+}
+```
+Check order in `checks` is the syndrome bit order everywhere (Z checks first, then X checks).
+
+## `missions.json`
+Array of 6 missions, in play order.
+```json
+{
+  "id": "first-alarm",            // slug, stable
+  "index": 1,
+  "title": "First Alarm",
+  "code": "rep3",
+  "kind": "dispatch" | "propagation",
+  "mode": { "training": true/false },    // training = true errors may be shown before commit
+  "circuit": [ {"kind":"CNOT","c":0,"t":1}, {"kind":"H","q":1} ],   // propagation missions only; [] otherwise
+  "error": "IXI",                 // TRUE error E (hidden in dispatch missions until commit). Applied BEFORE the circuit in propagation missions.
+  "seed": 11,                     // for any randomised variant; hand-made missions use fixed "error"
+  "allowed": ["X","Z","Y"],       // Pauli letters the player may dispatch
+  "budget": 2,                    // max number of qubits that may receive a firefighter (one letter per qubit; Y counts as one)
+  "briefing": "...", "debrief": { "success": "...", "logical-error": "...", "detectable": "..." },
+  "expected": {                   // filled by scripts/gen-fixtures (TS) and cross-checked by Python
+    "syndrome": [1,0],            // of E, in code.checks order (dispatch missions)
+    "propagated": "IXI",          // E propagated through circuit (propagation missions; equals E when circuit is empty)
+    "minWeightCorrection": "IXI", // lookup decoder output for the syndrome (dispatch missions)
+    "minWeightVerdict": "success" // verdict of that correction
+  }
+}
+```
+Verdict rule (all missions): R = C ⊕ E' where E' = propagated error; `success` iff R ∈ stabilizer group;
+`logical-error` iff R commutes with all checks but ∉ group; else `detectable`. For trivial codes the group is {I}.
+
+## `cases/*.json` — seeded verification cases produced by TS, replayed by Python
+```json
+{ "generator": "scripts/gen-fixtures.ts", "engineVersion": "1", "seed": 20261010, "count": 1000,
+  "cases": [ { "id": 0, "kind": "propagation", "n": 3, "circuit": [...], "input": "XIZ", "output": "ZIX" },
+             { "id": 1, "kind": "verdict", "code": "rsc3", "error": "IXIIIIIII", "correction": "XIIIIIIII",
+               "syndromeE": [1,0,0,0,0,0,0,0], "verdict": "logical-error", "logicalFlip": {"x":[true],"z":[false]}, "residualWeight": 3 } ] }
+```
+Files: `cases/propagation-1000.json`, `cases/rsc3-single.json` (all 27 weight-1 + identity), `cases/rsc3-logical.json`,
+`cases/verdicts-1000.json`, `cases/gates-exhaustive.json` (all 1q Paulis through H,S; all 2q Paulis through CNOT, CZ, SWAP).
