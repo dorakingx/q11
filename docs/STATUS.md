@@ -1,6 +1,6 @@
 # Q11 Status
 
-_Last updated: 2026-10-10 20:50 JST_
+_Last updated: 2026-10-10 23:05 JST_
 
 Overall: **UX REDESIGN IN PROGRESS** (started 2026-10-10 18:15 JST on top of the 2cfae98 READY build; acceptance criteria R1–R15 in `docs/UX_REDESIGN.md`). The earlier READY_FOR_RELEASE_APPROVAL report applies to 2cfae98 only; the redesign must pass all gates again before any release. Nothing has been published or submitted.
 
@@ -26,7 +26,8 @@ Overall: **UX REDESIGN IN PROGRESS** (started 2026-10-10 18:15 JST on top of the
 - [x] Wave A (18:25–19:00 JST, commit 5751ebb): game core — 'dispatch' screen, save v2 + migration, city unlock rules, deterministic effect timeline, undo/redo, tutorial flag (98 tests); i18n EN/JA (447 keys, mission copy, 57 tests); SVG art library + gallery (105 tests, `reports/art/gallery.png`).
 - [x] Wave B (19:25–20:05 JST, commit 1cd8dc6): city map screen (18 tests) ∥ scene + spray player + four results + Why comparison (36 tests); previews reviewed at 4 sizes.
 - [x] Wave C (20:05–21:10 JST, commit 36c00d5): integration — warm theme, city as mission screen, scene everywhere, spray answer-check, result overlay, Why?, tutorial first run, EN/JA, settings (language, free roam), mobile bottom bar; Board retired. Orchestrator re-run: lint 0 · typecheck 0 · unit 404/404 (24 files) · build 0 · Python 4746/0 · e2e 86 passed / 1 WebKit timing flake (test made robust, re-run 10/10) / 9 skipped-by-design · input latency ≤3.9 ms (reports/perf.json). Qollab draft re-uploaded (redesigned page renders, self-test exact, job cdeaf054…).
-- [ ] Review/fix wave, Qollab bundle + run, demo re-record, verify:release, protected deploy check, final report.
+- [x] Review wave (21:00–21:35 JST): 4 read-only reviewers → 19 major / 30 minor / 10 nit. Fix wave (21:40–22:55 JST, commit 7675f81): Next district → city with restoration + badge and the next district pre-selected; no locked briefings; failed results make Try again primary; Debrief.alternative from the engine (UI never reads the true error — scan test); prediction-miss result on bare wires; spray lifts the fog at spray-start, alarms visible, captions held ≥400 ms; Why? undecidable logic fixed; contrast (two-tone focus ring, primary #c93a22, borders ≥3:1); city button styling + focusable h1 + toast under the HUD; mobile tutorial 1→2→3; 48px secondary targets; EN/JA copy fixes; fixtures 'block'→'house'. Orchestrator re-run: lint 0 · typecheck 0 · unit 435/435 (25 files) · fixtures idempotent · build 0 · Python 4746/0; manual play check of the fixed flows in the browser pane (spray reveal, Still burning → Try again primary, Next district → city with 'Blind Dispatcher earned!' + Market Square pre-selected).
+- [ ] Final: full e2e (4 projects) after the fix wave, Qollab final bundle run, demo re-record, verify:release, protected deploy check, Project Card re-paste, final report.
 
 ## P0 items
 - [x] Scaffold Vite/React/TS + vitest + playwright + eslint, pinned, lockfile
