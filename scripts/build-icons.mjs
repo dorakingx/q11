@@ -26,13 +26,14 @@ const TILE = '#d4ecf8'; // ART.sky
 const CREAM = '#f6efe0';
 const TRUCK = '#d8352b'; // ART.truck
 const FLAME = '#e8432f'; // ART.fireX
+const FLAME_Z = '#2f7fe6'; // ART.fireZ
 const TEXT = '#2b2420';
 const MUTED = '#6b5f52';
 const TITLE = 'Q11 Emergency — Quantum Emergency Response';
 const FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 
 // Bounding box of the drawn content inside icon.svg (viewBox units) = BRAND_MARK_BBOX in src/ui/art/brandMark.tsx.
-const ICON_BBOX = { x0: 21, y0: 100, x1: 462, y1: 438 };
+const ICON_BBOX = { x0: 40, y0: 108, x1: 496, y1: 448 };
 
 const png = { compressionLevel: 9, adaptiveFiltering: true };
 
@@ -65,20 +66,23 @@ function near(rgb, hex, tol = 24) {
 
 async function sanityCheck(transparent512) {
   // Guard against a silent renderer change (e.g. librsvg ignoring a colour): sample known points of the mark.
-  const body = await pixelAt(transparent512, 150, 385); // truck body under the Q11 plate
+  const body = await pixelAt(transparent512, 154, 368); // truck body under the Q11 lettering (between the wheels' tops)
   const corner = await pixelAt(transparent512, 8, 8); // outside everything
-  const gap = await pixelAt(transparent512, 490, 330); // right of the cab, below the flame
+  const gap = await pixelAt(transparent512, 470, 160); // above the cab, right of the flames
   const problems = [];
-  if (!(body[3] > 240 && near(body, TRUCK))) problems.push(`truck pixel at (150,385) is ${body}, expected ${TRUCK}`);
-  // the flame: at least one sample in a small window around its body must be the X-fire red (the core is amber)
-  let flameHit = false;
-  for (const [x, y] of [[372, 212], [380, 222], [366, 232], [404, 222], [410, 236]]) {
-    const px = await pixelAt(transparent512, x, y);
-    if (px[3] > 240 && near(px, FLAME)) flameHit = true;
-  }
-  if (!flameHit) problems.push('no X-fire red pixel found around the flame body');
+  if (!(body[3] > 240 && near(body, TRUCK))) problems.push(`truck pixel at (154,368) is ${body}, expected ${TRUCK}`);
+  // the flames: at least one sample in a small window around each flame body must carry its fire colour (the cores are lighter)
+  const hit = async (points, hex) => {
+    for (const [x, y] of points) {
+      const px = await pixelAt(transparent512, x, y);
+      if (px[3] > 240 && near(px, hex)) return true;
+    }
+    return false;
+  };
+  if (!(await hit([[154, 128], [154, 140], [160, 140], [142, 146], [154, 146]], FLAME))) problems.push('no X-fire red pixel found around the X flame');
+  if (!(await hit([[266, 128], [266, 140], [272, 140], [254, 146], [266, 146]], FLAME_Z))) problems.push('no Z-fire blue pixel found around the Z flame');
   if (corner[3] !== 0) problems.push(`corner pixel at (8,8) is not transparent: ${corner}`);
-  if (gap[3] !== 0) problems.push(`pixel at (490,330) is not transparent: ${gap}`);
+  if (gap[3] !== 0) problems.push(`pixel at (470,160) is not transparent: ${gap}`);
   if (problems.length) throw new Error('sanity check failed:\n  ' + problems.join('\n  '));
 }
 
@@ -127,7 +131,7 @@ export function readIco(buffer) {
 
 function maskableSvg(iconInner) {
   // Content must stay inside the central 80 % safe zone (radius 0.4 * 512 = 204.8 px).
-  // The farthest drawn point from the bbox centre is the truck's front-bottom corner (~277 units) -> scale 0.70 keeps it at ~194 px.
+  // The farthest drawn point from the bbox centre (268, 278) is a bottom corner of the truck (~280 units) -> scale 0.70 keeps it at ~196 px.
   const cx = (ICON_BBOX.x0 + ICON_BBOX.x1) / 2;
   const cy = (ICON_BBOX.y0 + ICON_BBOX.y1) / 2;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
