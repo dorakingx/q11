@@ -2,10 +2,10 @@
 
 Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external). Nothing below the "APPROVAL REQUIRED" line is executed without the user's explicit, written approval naming the target and time.
 
-> All pre-publication gates below are ☑ for the redesigned build (commit b0a6f5f, web sources verified at c3581f9, 2026-10-10 13:45 UTC). Nothing below the approval line has been done.
+> All pre-publication gates below are ☑ for the final "Q11 Emergency" build (commit c1760e1, web sources verified at aed04f3, 2026-10-10 18:44 UTC). Nothing below the approval line has been done.
 
 ## Pre-publication gates (all must be ☑ before asking for approval)
-- ☑ `npm run verify:release` exits 0 on the redesigned build at SHA c3581f9 (2026-10-10 13:40 UTC): lint 0 · typecheck 0 · unit 435/435 (25 files) · build 0 · verify:quantum 4746/0 · e2e 91 passed / 9 skipped-by-design / 0 failed on 4 browser projects · demo 138 s · secret-like lines 0 — `reports/release-verification.json`
+- ☑ `verify:release` exits 0 on the final Q11 Emergency build (sources aed04f3, 2026-10-10 18:42 UTC; `Q11_E2E_WORKERS=2 Q11_E2E_TIMEOUT=360000` under external load): lint 0 · typecheck 0 · unit 459/459 (25 files) · build 0 · verify:quantum 4746/0 · e2e 101 passed / 13 skipped-by-design / 0 failed on 4 browser projects · demo 163 s · secret-like lines 0 — `reports/release-verification.json`
 - ☑ Quantum verification: 4,746 comparisons, 0 mismatches (`reports/QUANTUM_VERIFICATION.md`) — unchanged by the redesign (engine/fixtures mechanics untouched)
 - ☑ Real-browser screenshots: 62 "after" screenshots at 1440×900 / 768×1024 / 390×844 / 375×812 (`reports/screenshots/after/`), reviewed; "before" set kept in `reports/screenshots/before/`
 - ☑ GitHub `dorakingx/q11` private (`isPrivate: true`), `main` pushed at every milestone; final redesign SHA recorded in STATUS.md at the end
@@ -17,12 +17,12 @@ Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external).
 - ☑ Secret-pattern scan 0 hits in tracked files (verify:release); `.env*`, `.vercel/` ignored
 - ☑ `submission/KNOWN_LIMITATIONS.md` updated for the redesign
 - ☑ Project Card on the Qollab draft re-pasted from the renamed `submission/PROJECT_PAGE.md` (2026-10-11 02:55 JST); title "Q11 Emergency — Quantum Emergency Response"; About (222 chars); thumbnail = the new truck og-image; tags kept
-- ☑ Final redesign commit pushed (b0a6f5f; web sources verified at c3581f9); working tree clean; protected deployment dpl_DtPwF1mnrNuL7S1VKcVNqVeGdCLP (q11-pou4pz35d-doraking.vercel.app + 3 aliases) checked 2026-10-10 13:43–13:45 UTC: 16/16 anonymous blocked, authenticated fetch returns the app, bypass secret revoked (0)
+- ☑ Final commit pushed (c1760e1; web sources verified at aed04f3); working tree clean; protected deployment dpl_BWqmaeXbaLoodQxXA1viGhkRe546 (q11-cajyyk4k1-doraking.vercel.app, domain q11-emergency.vercel.app + 2 auto aliases) checked 2026-10-10 18:44 UTC: 16/16 anonymous blocked, authenticated fetch returns the app, bypass secret revoked (0)
 
 ## ────────── APPROVAL REQUIRED BELOW THIS LINE ──────────
 The user must explicitly approve *which* of the following to perform and *when*. Each step is independent.
 
-1. **Qollab publish** (user, in browser): open the Q11 draft → Project Card (write-up, thumbnail and tags are already filled from `submission/PROJECT_PAGE.md`) → **substitute the real links**: in the write-up replace the line "source repository: link on this page once public" with the GitHub URL (after step 3) and fill the "Demo video" section with the public video URL (after step 2); optionally fill *Project Website* (protected Vercel URL only after step 4) and *Repository* → Code tab: press Run on the built-in simulator once more → **Publish** (choose the MIT licence if asked). Record the public URL `qollab.xyz/u/doraking/q11-quantum-emergency-response`.
+1. **Qollab publish** (user, in browser): open the Q11 draft → Project Card (write-up, thumbnail and tags are already filled from `submission/PROJECT_PAGE.md`) → **substitute the real links**: in the write-up replace the line "source repository: link on this page once public" with the GitHub URL (after step 3) and fill the "Demo video" section with the public video URL (after step 2); optionally fill *Project Website* (`https://q11-emergency.vercel.app`, only after step 4) and *Repository* → Code tab: press Run on the built-in simulator once more → **Publish** (choose the MIT licence if asked). Record the public URL `qollab.xyz/u/doraking/q11-quantum-emergency-response`.
 2. **Demo video public link** (user): upload `submission/DEMO.mp4` to a host viewable without sign-in (e.g. YouTube unlisted). Record the URL. Test in a logged-out/private window.
 3. **GitHub public** (optional for the hackathon; only if the user wants source public): `gh repo edit dorakingx/q11 --visibility public --accept-visibility-change-consequences`. Before that: re-run the secret scan and confirm the history is clean.
 4. **Vercel protection removal** (optional; only if the user wants a public web demo): Vercel dashboard → q11 → Settings → Deployment Protection → Vercel Authentication: *Only Preview Deployments* or Off. Alternatively keep the Vercel site private and rely on Qollab as the public runnable.
