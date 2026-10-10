@@ -50,3 +50,6 @@ submission/raw/
 reports/screenshots/*.png
 !reports/screenshots/.gitkeep
 .vercel
+
+# TypeScript incremental build info
+*.tsbuildinfo
