@@ -83,3 +83,19 @@ def main(shots: int = 200, mission: str = "blind-dispatch", correction: str = "I
               analysis.get("predictedSyndromeShare"), analysis.get("predictedLogicalShare")))
     print("Model: Clifford+Pauli educational simulation, perfect syndrome extraction. Counts are statistics;",
           "the GF(2) verdict above is the proof. Simulator result, not hardware.")
+    record = {
+        "schema": 1, "mission": mission, "correction": correction, "prep": prep, "readoutBasis": readout_basis,
+        "backend": str(name), "shots": shots, "jobId": str(job_id) if job_id else None, "seconds": round(elapsed, 2),
+        "counts": {str(k): int(v) for k, v in counts.items()},
+        "syndromeHistogram": analysis["syndromeHistogram"], "logicalHistograms": analysis["logicalHistograms"],
+        "dominantMatches": analysis.get("dominantMatches"), "exactMatches": analysis.get("matches"),
+        "predictedSyndromeShare": analysis.get("predictedSyndromeShare"), "predictedLogicalShare": analysis.get("predictedLogicalShare"),
+        "prediction": {k: prediction[k] for k in ("syndrome", "residual", "verdict", "logicalFlip", "referenceCorrection", "referenceVerdict", "equivalentToReference")},
+        "finishedAtUnix": int(time.time()),
+    }
+    print("raw counts:", json.dumps(record["counts"], sort_keys=True))
+    try:
+        from js import sendFile  # Qollab runtime only: offers the record as a downloadable JSON in the console
+        sendFile("q11-run-%s.json" % mission, "application/json", json.dumps(record, indent=1, sort_keys=True))
+    except Exception:
+        pass

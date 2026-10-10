@@ -37,12 +37,15 @@ backendLine.textContent = `Backend selected in the Run dialog: ${backendName}`;
 // except the local simulators, where more are allowed; the UI explains this.
 const isLocal = /basic|aer|braket|local|fake/i.test(backendName) && !/ionq/i.test(backendName);
 let jobsThisRun = 0;
+const recorded = [];
 
 const bridge = {
   kind: 'qollab',
   backendName,
   isLocalSimulator: isLocal,
   jobsRemaining: () => (isLocal ? Infinity : Math.max(0, 1 - jobsThisRun)),
+  // Results recorded in this Run only (the sandbox has no storage between runs).
+  cached: (missionId) => recorded.filter((r) => r.missionId === missionId),
   /**
    * request: { missionId, correction, shots, prep: '0'|'+', readoutBasis: 'Z'|'X' }
    * returns: { status: 'ok', source: 'live-cloud'|'local-simulator', backendName, shots, counts, analysis, prediction, startedAt, finishedAt, jobId }
@@ -79,10 +82,12 @@ const bridge = {
         prep: request.prep ?? '0',
         readout_basis: request.readoutBasis ?? 'Z',
       }));
-      return {
+      const ok = {
         status: 'ok',
         source: isLocal ? 'local-simulator' : 'live-cloud',
         backendName,
+        missionId: request.missionId,
+        correction: request.correction,
         shots: request.shots,
         counts,
         analysis,
@@ -91,6 +96,9 @@ const bridge = {
         startedAt,
         finishedAt: new Date().toISOString(),
       };
+      recorded.push(ok);
+      console.log('Q11 verification ' + JSON.stringify({ backend: backendName, missionId: request.missionId, correction: request.correction, shots: request.shots, jobId, dominantMatches: analysis && analysis.dominantMatches }));
+      return ok;
     } catch (err) {
       console.log('Q11 verification failed: ' + (err && err.message ? err.message : String(err)));
       return { status: 'error', message: err && err.message ? err.message : String(err) };
