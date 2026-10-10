@@ -53,6 +53,8 @@ export type Screen =
   | 'briefing'
   | 'training'
   | 'challenge'
+  /** Spray / answer-check phase right after Confirm: the effect timeline plays, then the result overlay. */
+  | 'dispatch'
   | 'debrief'
   | 'result'
   | 'summary';
@@ -138,18 +140,30 @@ export interface MissionProgress {
   readonly completed: boolean;
 }
 
+export type Language = 'en' | 'ja';
+
 export interface Settings {
   readonly sound: boolean;
   readonly reducedMotion: boolean;
+  /** UI language (default 'en'). */
+  readonly language: Language;
+  /** Judges / review: every district selectable regardless of progress (default false). */
+  readonly freeRoam: boolean;
 }
 
-export const SAVE_VERSION = 1 as const;
+export const SAVE_VERSION = 2 as const;
 
+/** Save data v2. v1 saves ({ version: 1, progress, settings{sound, reducedMotion} }) are migrated by `parseSave`. */
 export interface SaveData {
   readonly version: typeof SAVE_VERSION;
   readonly progress: Readonly<Record<string, MissionProgress>>;
   readonly settings: Settings;
+  /** The guided first run (first-alarm) has been completed or skipped. */
+  readonly tutorialDone: boolean;
 }
+
+/** Placement history depth for undo/redo in the planning stage. */
+export const PLACEMENT_HISTORY_LIMIT = 20;
 
 export interface GameState {
   readonly screen: Screen;
@@ -159,9 +173,14 @@ export interface GameState {
   /** Training: lesson index and gate cursor (-1 = before the circuit). */
   readonly lesson: number;
   readonly lessonCursor: number;
-  /** Challenge: crews placed per qubit index. */
+  /** Challenge: crews placed per qubit index (the plan; nothing is applied until Confirm). */
   readonly placements: Readonly<Record<number, CrewLetter>>;
+  /** Undo / redo history of `placements` snapshots (oldest first, at most PLACEMENT_HISTORY_LIMIT each). */
+  readonly undoStack: readonly Readonly<Record<number, CrewLetter>>[];
+  readonly redoStack: readonly Readonly<Record<number, CrewLetter>>[];
   readonly selected: CrewLetter;
+  /** Challenge UI: index (in code.checks order) of the detector whose houses are highlighted; null = none. Cleared on screen change. */
+  readonly highlightedCheck: number | null;
   /** "Stand down with no crews?" dialog open. */
   readonly standDownDialog: boolean;
   /** Debrief: current replay step and auto-play flag. */
@@ -169,6 +188,12 @@ export interface GameState {
   readonly autoPlay: boolean;
   /** Null until the player confirms. */
   readonly debrief: Debrief | null;
+  /** 'dispatch' screen: the spray timeline has finished (or was skipped) and the result overlay may show. */
+  readonly dispatchDone: boolean;
+  /** The guided first run is in progress (PLAY on a fresh save jumps straight into first-alarm). */
+  readonly tutorialActive: boolean;
+  /** Persisted: the guided first run was completed (success) or skipped. */
+  readonly tutorialDone: boolean;
   readonly progress: Readonly<Record<string, MissionProgress>>;
   readonly settings: Settings;
   /** One-line notice (e.g. save reset). */
@@ -194,10 +219,22 @@ export type Action =
   /** Recall the crew on one block (Backspace on a focused block). No-op when the block is empty. */
   | { type: 'RECALL_BLOCK'; qubit: number }
   | { type: 'CLEAR_CREWS' }
+  | { type: 'UNDO_PLACEMENT' }
+  | { type: 'REDO_PLACEMENT' }
+  /** Tap a detector to highlight the houses it watches; the same index again (or null) clears it. */
+  | { type: 'TOGGLE_DETECTOR_HIGHLIGHT'; checkIndex: number | null }
   /** `reducedMotion` (UI-supplied) decides whether the debrief replay auto-plays from step 1. */
   | { type: 'CONFIRM'; reducedMotion?: boolean }
   | { type: 'STAND_DOWN_CONFIRM'; reducedMotion?: boolean }
   | { type: 'STAND_DOWN_CANCEL' }
+  /** The spray timeline finished playing (idempotent; 'dispatch' screen only). */
+  | { type: 'DISPATCH_DONE' }
+  /** The player skipped the spray timeline (same effect as DISPATCH_DONE). */
+  | { type: 'DISPATCH_SKIP' }
+  /** Open the "Why?" replay (debrief) from the finished dispatch or from the result screen. */
+  | { type: 'OPEN_WHY'; reducedMotion?: boolean }
+  /** Skip the guided first run and go to the city. */
+  | { type: 'TUTORIAL_SKIP' }
   | { type: 'REPLAY_GOTO'; index: number }
   | { type: 'REPLAY_PREV' }
   | { type: 'REPLAY_NEXT' }
@@ -207,6 +244,8 @@ export type Action =
   | { type: 'NEXT_MISSION' }
   | { type: 'SET_SOUND'; on: boolean }
   | { type: 'SET_REDUCED_MOTION'; on: boolean }
+  | { type: 'SET_LANGUAGE'; language: Language }
+  | { type: 'SET_FREE_ROAM'; on: boolean }
   | { type: 'RESET_PROGRESS' }
   | { type: 'SHOW_NOTICE'; text: string }
   | { type: 'DISMISS_NOTICE' }

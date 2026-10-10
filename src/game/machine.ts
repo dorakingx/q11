@@ -2,6 +2,10 @@
  * Pure game state machine. Screens are explicit; the true error enters the state only through
  * `confirmDispatch`, which builds the Debrief when the player commits. Everything before that works
  * from `PublicMissionView` alone.
+ *
+ * Flow: title → PLAY → city ('missions'; a fresh save goes straight into the guided first run instead) → briefing →
+ * training → challenge (planning: undo/redo/clear) → CONFIRM → 'dispatch' (spray + answer check, progress merged
+ * exactly once here) → DISPATCH_DONE/SKIP → OPEN_WHY → 'debrief' (replay) → result → next district / city.
  */
 import {
   evaluate,
@@ -18,11 +22,15 @@ import {
   toString,
   type Pauli,
 } from '../quantum';
+import { DISTRICTS, missionStatus } from './city';
 import { getPublicMission, listPublicMissions, nextMissionId, revealMission } from './missions';
 import { DEFAULT_SETTINGS } from './persistence';
 import { buildReplay, buildWhatIf } from './replay';
 import { outcomeLabel, score } from './scoring';
-import type { Action, CrewLetter, Debrief, GameState, MissionProgress, PublicMissionView, SaveData, Screen, StarCount } from './types';
+import { PLACEMENT_HISTORY_LIMIT, SAVE_VERSION, type Action, type CrewLetter, type Debrief, type GameState, type MissionProgress, type PublicMissionView, type SaveData, type Screen, type StarCount } from './types';
+
+/** The guided first run uses the first district's mission. */
+export const TUTORIAL_MISSION_ID = DISTRICTS[0]?.missionId ?? 'first-alarm';
 
 /** Shown after "Reset progress"; cleared automatically on the next screen change (unlike the corrupt-save notice). */
 export const PROGRESS_RESET_NOTICE = 'Progress reset.';
@@ -35,11 +43,17 @@ export function initialState(save?: SaveData, notice: string | null = null): Gam
     lesson: 0,
     lessonCursor: -1,
     placements: {},
+    undoStack: [],
+    redoStack: [],
     selected: 'X',
+    highlightedCheck: null,
     standDownDialog: false,
     replayIndex: 0,
     autoPlay: false,
     debrief: null,
+    dispatchDone: false,
+    tutorialActive: false,
+    tutorialDone: save?.tutorialDone ?? false,
     progress: save?.progress ?? {},
     settings: save?.settings ?? DEFAULT_SETTINGS,
     notice,
@@ -125,9 +139,13 @@ function enterChallenge(state: GameState, m: PublicMissionView): GameState {
     ...state,
     screen: 'challenge',
     placements: {},
+    undoStack: [],
+    redoStack: [],
     selected: m.allowed.includes(state.selected) ? state.selected : first,
+    highlightedCheck: null,
     standDownDialog: false,
     debrief: null,
+    dispatchDone: false,
     replayIndex: 0,
     autoPlay: false,
   };
@@ -142,29 +160,58 @@ function enterBriefing(state: GameState, id: string): GameState {
     lesson: 0,
     lessonCursor: -1,
     placements: {},
+    undoStack: [],
+    redoStack: [],
     selected: m.allowed[0] ?? 'X',
+    highlightedCheck: null,
     standDownDialog: false,
     debrief: null,
+    dispatchDone: false,
     replayIndex: 0,
     autoPlay: false,
   };
 }
 
+/** Leave the guided first run for the city: the tutorial counts as done (completed or skipped). */
+function enterCity(state: GameState): GameState {
+  return { ...state, screen: 'missions', standDownDialog: false, autoPlay: false, tutorialActive: false, tutorialDone: true };
+}
+
+/** A placement change in the planning stage: remember the previous plan (bounded), forget the redo branch. */
+function withPlacements(state: GameState, placements: Readonly<Record<number, CrewLetter>>): GameState {
+  const undoStack = [...state.undoStack, state.placements].slice(-PLACEMENT_HISTORY_LIMIT);
+  return { ...state, placements, undoStack, redoStack: [] };
+}
+
 const OVERLAYS: readonly Screen[] = ['how', 'settings'];
 
 export function reducer(state: GameState, action: Action): GameState {
-  const next = step(state, action);
-  // The "Progress reset." notice is transient: it disappears on the next screen change.
-  if (next.screen !== state.screen && next.notice === PROGRESS_RESET_NOTICE) return { ...next, notice: null };
+  let next = step(state, action);
+  if (next.screen !== state.screen) {
+    // The "Progress reset." notice is transient: it disappears on the next screen change.
+    if (next.notice === PROGRESS_RESET_NOTICE) next = { ...next, notice: null };
+    // The detector highlight is per-screen UI state.
+    if (next.highlightedCheck !== null) next = { ...next, highlightedCheck: null };
+  }
   return next;
 }
 
 function step(state: GameState, action: Action): GameState {
   switch (action.type) {
     case 'HYDRATE':
-      return { ...state, progress: action.save.progress, settings: action.save.settings, notice: action.notice ?? state.notice };
+      return {
+        ...state,
+        progress: action.save.progress,
+        settings: action.save.settings,
+        tutorialDone: action.save.tutorialDone,
+        notice: action.notice ?? state.notice,
+      };
     case 'PLAY':
-      return { ...state, screen: 'missions', notice: state.notice };
+      // First run: skip the city and go straight into the guided first scene (pick a crew → tap a house → spray).
+      if (!state.tutorialDone) return { ...enterBriefing(state, TUTORIAL_MISSION_ID), tutorialActive: true };
+      return { ...state, screen: 'missions', tutorialActive: false };
+    case 'TUTORIAL_SKIP':
+      return state.tutorialActive ? enterCity(state) : { ...state, tutorialDone: true };
     case 'OPEN_HOW':
       return OVERLAYS.includes(state.screen) ? { ...state, screen: 'how' } : { ...state, screen: 'how', returnTo: state.screen };
     case 'OPEN_SETTINGS':
@@ -172,11 +219,15 @@ function step(state: GameState, action: Action): GameState {
     case 'CLOSE_OVERLAY':
       return OVERLAYS.includes(state.screen) ? { ...state, screen: state.returnTo } : state;
     case 'OPEN_MISSIONS':
-      return { ...state, screen: 'missions', standDownDialog: false, autoPlay: false };
+      return enterCity(state);
     case 'OPEN_TITLE':
-      return { ...state, screen: 'title', standDownDialog: false, autoPlay: false };
-    case 'SELECT_MISSION':
-      return enterBriefing(state, action.id);
+      return { ...state, screen: 'title', standDownDialog: false, autoPlay: false, tutorialActive: false };
+    case 'SELECT_MISSION': {
+      // Districts open in order; locked ones are not selectable (unless Free roam is on). Unknown ids are ignored.
+      const status = missionStatus(action.id, state.progress, state.settings.freeRoam);
+      if (status === undefined || status === 'locked') return state;
+      return { ...enterBriefing(state, action.id), tutorialActive: false };
+    }
     case 'START_MISSION': {
       const m = currentMission(state);
       if (m === null || state.screen !== 'briefing') return state;
@@ -242,18 +293,49 @@ function step(state: GameState, action: Action): GameState {
         if (crewCount(state.placements) >= m.budget) return state; // budget enforced
         next[action.qubit] = state.selected;
       }
-      return { ...state, placements: next };
+      return withPlacements(state, next);
     }
     case 'RECALL_BLOCK': {
       if (state.screen !== 'challenge' || state.standDownDialog) return state;
       if (state.placements[action.qubit] === undefined) return state;
       const next: Record<number, CrewLetter> = { ...state.placements };
       delete next[action.qubit];
-      return { ...state, placements: next };
+      return withPlacements(state, next);
     }
     case 'CLEAR_CREWS':
       if (state.screen !== 'challenge' || state.standDownDialog) return state;
-      return { ...state, placements: {} };
+      if (crewCount(state.placements) === 0) return state;
+      return withPlacements(state, {});
+    case 'UNDO_PLACEMENT': {
+      if (state.screen !== 'challenge' || state.standDownDialog) return state;
+      const prev = state.undoStack[state.undoStack.length - 1];
+      if (prev === undefined) return state;
+      return {
+        ...state,
+        placements: prev,
+        undoStack: state.undoStack.slice(0, -1),
+        redoStack: [...state.redoStack, state.placements].slice(-PLACEMENT_HISTORY_LIMIT),
+      };
+    }
+    case 'REDO_PLACEMENT': {
+      if (state.screen !== 'challenge' || state.standDownDialog) return state;
+      const next = state.redoStack[state.redoStack.length - 1];
+      if (next === undefined) return state;
+      return {
+        ...state,
+        placements: next,
+        redoStack: state.redoStack.slice(0, -1),
+        undoStack: [...state.undoStack, state.placements].slice(-PLACEMENT_HISTORY_LIMIT),
+      };
+    }
+    case 'TOGGLE_DETECTOR_HIGHLIGHT': {
+      const m = currentMission(state);
+      if (m === null) return state;
+      if (action.checkIndex === null) return state.highlightedCheck === null ? state : { ...state, highlightedCheck: null };
+      const checks = getCode(m.code).checks.length;
+      if (!Number.isInteger(action.checkIndex) || action.checkIndex < 0 || action.checkIndex >= checks) return state;
+      return { ...state, highlightedCheck: state.highlightedCheck === action.checkIndex ? null : action.checkIndex };
+    }
     case 'CONFIRM': {
       const m = currentMission(state);
       if (m === null || state.screen !== 'challenge' || state.standDownDialog) return state;
@@ -266,6 +348,18 @@ function step(state: GameState, action: Action): GameState {
       const m = currentMission(state);
       if (m === null || state.screen !== 'challenge' || !state.standDownDialog) return state;
       return commit(state, m, action.reducedMotion ?? false);
+    }
+    case 'DISPATCH_DONE':
+    case 'DISPATCH_SKIP':
+      // Idempotent: the timeline finishing, a skip tap and a second (rapid) tap all land on the same state.
+      if (state.screen !== 'dispatch' || state.debrief === null || state.dispatchDone) return state;
+      return { ...state, dispatchDone: true };
+    case 'OPEN_WHY': {
+      if (state.debrief === null) return state;
+      const fromDispatch = state.screen === 'dispatch' && state.dispatchDone;
+      if (!fromDispatch && state.screen !== 'result') return state;
+      const reduced = action.reducedMotion ?? state.settings.reducedMotion;
+      return { ...state, screen: 'debrief', replayIndex: 0, autoPlay: !reduced && state.debrief.steps.length > 1 };
     }
     case 'REPLAY_GOTO': {
       if (state.debrief === null) return state;
@@ -287,16 +381,23 @@ function step(state: GameState, action: Action): GameState {
       // Starting auto-play from the end restarts the replay.
       return { ...state, autoPlay: action.on, replayIndex: action.on && state.replayIndex >= last ? 0 : state.replayIndex };
     }
-    case 'SHOW_RESULT':
-      if (state.debrief === null || state.screen !== 'debrief') return state;
+    case 'SHOW_RESULT': {
+      if (state.debrief === null) return state;
+      const fromDispatch = state.screen === 'dispatch' && state.dispatchDone;
+      if (!fromDispatch && state.screen !== 'debrief') return state;
       return { ...state, screen: 'result', autoPlay: false };
+    }
     case 'TRY_AGAIN': {
       const m = currentMission(state);
-      if (m === null || (state.screen !== 'debrief' && state.screen !== 'result')) return state;
+      if (m === null || (state.screen !== 'dispatch' && state.screen !== 'debrief' && state.screen !== 'result')) return state;
       return enterChallenge(state, m);
     }
     case 'NEXT_MISSION': {
       if (state.missionId === null) return state;
+      if (state.screen !== 'dispatch' && state.screen !== 'debrief' && state.screen !== 'result') return state;
+      if (state.screen === 'dispatch' && !state.dispatchDone) return state;
+      // The guided first run ends by revealing the city (the player's first look at the map).
+      if (state.tutorialActive) return enterCity(state);
       const next = nextMissionId(state.missionId);
       if (next === null) return { ...state, screen: 'summary', autoPlay: false };
       return enterBriefing(state, next);
@@ -305,6 +406,10 @@ function step(state: GameState, action: Action): GameState {
       return { ...state, settings: { ...state.settings, sound: action.on } };
     case 'SET_REDUCED_MOTION':
       return { ...state, settings: { ...state.settings, reducedMotion: action.on } };
+    case 'SET_LANGUAGE':
+      return state.settings.language === action.language ? state : { ...state, settings: { ...state.settings, language: action.language } };
+    case 'SET_FREE_ROAM':
+      return state.settings.freeRoam === action.on ? state : { ...state, settings: { ...state.settings, freeRoam: action.on } };
     case 'RESET_PROGRESS':
       return { ...state, progress: {}, notice: PROGRESS_RESET_NOTICE };
     case 'SHOW_NOTICE':
@@ -315,24 +420,28 @@ function step(state: GameState, action: Action): GameState {
 }
 
 /**
- * Commit the dispatch and open the debrief on replay step 1. The verdict banner is always visible there; the
- * replay auto-plays from the first step unless motion is reduced (then the player steps through by hand).
+ * Commit the dispatch: build the Debrief (the only read of the true error), merge progress exactly once and open
+ * the 'dispatch' screen where the spray timeline plays. The later "Why?" replay (debrief) auto-plays unless motion
+ * is reduced (then the player steps through by hand). Only reachable from 'challenge', so a second CONFIRM is a no-op.
  */
 function commit(state: GameState, m: PublicMissionView, reducedMotion: boolean): GameState {
   const debrief = confirmDispatch(m.id, state.placements);
+  const tutorialSolved = state.tutorialActive && debrief.verdict === 'success';
   return {
     ...state,
-    screen: 'debrief',
+    screen: 'dispatch',
     standDownDialog: false,
     debrief,
+    dispatchDone: false,
     replayIndex: 0,
     autoPlay: !reducedMotion && debrief.steps.length > 1,
     progress: mergeProgress(state.progress, m.id, debrief.score.stars, debrief.score.completed),
+    tutorialDone: state.tutorialDone || tutorialSolved,
   };
 }
 
 export function toSave(state: GameState): SaveData {
-  return { version: 1, progress: state.progress, settings: state.settings };
+  return { version: SAVE_VERSION, progress: state.progress, settings: state.settings, tutorialDone: state.tutorialDone };
 }
 
 export function totalStars(progress: Readonly<Record<string, MissionProgress>>): number {

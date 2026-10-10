@@ -1,44 +1,27 @@
 import { describe, expect, it } from 'vitest';
-import { fromString, getCode, letterAt, getMission } from '../quantum';
-import { confirmDispatch, crewCount, initialState, placementsToPauli, PROGRESS_RESET_NOTICE, reducer, toSave, totalStars } from './machine';
+import { fromString, getCode, getMission, letterAt } from '../quantum';
+import { DISTRICTS } from './city';
+import { confirmDispatch, crewCount, initialState, placementsToPauli, PROGRESS_RESET_NOTICE, reducer, toSave, totalStars, TUTORIAL_MISSION_ID } from './machine';
 import { listPublicMissions, maxTotalStars, missionMaxStars } from './missions';
-import type { Action, CrewLetter, GameState } from './types';
+import { DEFAULT_SETTINGS } from './persistence';
+import { openSave, openState, place, placementsOf, run, toChallenge } from './test-utils';
+import type { CrewLetter, GameState } from './types';
 
-function run(state: GameState, ...actions: Action[]): GameState {
-  return actions.reduce(reducer, state);
+/** Fresh install: nothing saved, tutorial not done, free roam off. */
+function fresh(): GameState {
+  return initialState();
 }
 
-/** Placements that reproduce a Pauli string. */
-function placementsOf(s: string): Record<number, CrewLetter> {
-  const p = fromString(s);
-  const out: Record<number, CrewLetter> = {};
-  for (let q = 0; q < p.n; q++) {
-    const l = letterAt(p, q);
-    if (l !== 'I') out[q] = l;
-  }
-  return out;
-}
-
-function toChallenge(id: string): GameState {
-  let s = run(initialState(), { type: 'PLAY' }, { type: 'SELECT_MISSION', id }, { type: 'START_MISSION' });
-  // Walk through every training lesson/gate until the challenge starts.
-  for (let guard = 0; guard < 50 && s.screen === 'training'; guard++) s = reducer(s, { type: 'LESSON_NEXT' });
-  expect(s.screen).toBe('challenge');
-  return s;
-}
-
-function place(state: GameState, placements: Record<number, CrewLetter>): GameState {
-  let s = state;
-  for (const [q, letter] of Object.entries(placements)) {
-    s = reducer(s, { type: 'SELECT_LETTER', letter });
-    s = reducer(s, { type: 'TOGGLE_BLOCK', qubit: Number(q) });
-  }
-  return s;
+/** Confirm and play the spray through to the finished dispatch screen. */
+function confirmAndFinish(state: GameState): GameState {
+  const s = reducer(state, { type: 'CONFIRM' });
+  expect(s.screen).toBe('dispatch');
+  return reducer(s, { type: 'DISPATCH_DONE' });
 }
 
 describe('navigation', () => {
-  it('title → missions → briefing → training/challenge; overlays return where they came from', () => {
-    let s = initialState();
+  it('title → city → briefing → training/challenge; overlays return where they came from', () => {
+    let s = initialState(openSave());
     expect(s.screen).toBe('title');
     s = reducer(s, { type: 'OPEN_HOW' });
     expect(s.screen).toBe('how');
@@ -58,12 +41,12 @@ describe('navigation', () => {
     s = reducer(s, { type: 'START_CHALLENGE' });
     expect(s.screen).toBe('challenge');
     // Mission 5 has no training: START_MISSION goes straight to the challenge.
-    const m5 = run(initialState(), { type: 'SELECT_MISSION', id: 'two-kinds-of-trouble' }, { type: 'START_MISSION' });
+    const m5 = run(openState(), { type: 'SELECT_MISSION', id: 'two-kinds-of-trouble' }, { type: 'START_MISSION' });
     expect(m5.screen).toBe('challenge');
   });
 
   it('training cursor walks every gate of every lesson before the challenge', () => {
-    let s = run(initialState(), { type: 'SELECT_MISSION', id: 'color-switch' }, { type: 'START_MISSION' });
+    let s = run(openState(), { type: 'SELECT_MISSION', id: 'color-switch' }, { type: 'START_MISSION' });
     expect(s.screen).toBe('training');
     expect([s.lesson, s.lessonCursor]).toEqual([0, -1]);
     s = reducer(s, { type: 'LESSON_NEXT' });
@@ -80,6 +63,115 @@ describe('navigation', () => {
     expect([s.lesson, s.lessonCursor]).toEqual([0, 0]);
     s = run(s, { type: 'LESSON_NEXT' }, { type: 'LESSON_NEXT' }, { type: 'LESSON_NEXT' }, { type: 'LESSON_NEXT' });
     expect(s.screen).toBe('challenge');
+  });
+});
+
+describe('guided first run (tutorial)', () => {
+  it('PLAY on a fresh save skips the city and opens the first district briefing with the tutorial active', () => {
+    const s = reducer(fresh(), { type: 'PLAY' });
+    expect(TUTORIAL_MISSION_ID).toBe('first-alarm');
+    expect(s.screen).toBe('briefing');
+    expect(s.missionId).toBe('first-alarm');
+    expect(s.tutorialActive).toBe(true);
+    expect(s.tutorialDone).toBe(false);
+  });
+
+  it('success in the tutorial marks it done; Next then reveals the city; PLAY afterwards goes to the city', () => {
+    let s = run(fresh(), { type: 'PLAY' }, { type: 'START_MISSION' }, { type: 'START_CHALLENGE' });
+    expect(s.screen).toBe('challenge');
+    s = place(s, { 1: 'X' });
+    s = confirmAndFinish(s);
+    expect(s.debrief?.verdict).toBe('success');
+    expect(s.tutorialDone).toBe(true);
+    expect(s.tutorialActive).toBe(true);
+    s = reducer(s, { type: 'NEXT_MISSION' });
+    expect(s.screen).toBe('missions');
+    expect(s.tutorialActive).toBe(false);
+    expect(toSave(s).tutorialDone).toBe(true);
+    const again = run(initialState(toSave(s)), { type: 'PLAY' });
+    expect(again.screen).toBe('missions');
+    expect(again.tutorialActive).toBe(false);
+  });
+
+  it('a failed tutorial attempt keeps the tutorial active and not done; Try again stays in the guided scene', () => {
+    let s = run(fresh(), { type: 'PLAY' }, { type: 'START_MISSION' }, { type: 'START_CHALLENGE' });
+    s = place(s, { 0: 'X' });
+    s = confirmAndFinish(s);
+    expect(s.debrief?.verdict).toBe('detectable');
+    expect(s.tutorialDone).toBe(false);
+    expect(s.tutorialActive).toBe(true);
+    s = reducer(s, { type: 'TRY_AGAIN' });
+    expect(s.screen).toBe('challenge');
+    expect(s.tutorialActive).toBe(true);
+    // Replaying the saved state: PLAY would still enter the tutorial.
+    expect(run(initialState(toSave(s)), { type: 'PLAY' }).screen).toBe('briefing');
+  });
+
+  it('TUTORIAL_SKIP and OPEN_MISSIONS end the tutorial and open the city with tutorialDone = true', () => {
+    const inTutorial = run(fresh(), { type: 'PLAY' });
+    const skipped = reducer(inTutorial, { type: 'TUTORIAL_SKIP' });
+    expect(skipped.screen).toBe('missions');
+    expect(skipped.tutorialDone).toBe(true);
+    expect(skipped.tutorialActive).toBe(false);
+    const left = reducer(inTutorial, { type: 'OPEN_MISSIONS' });
+    expect(left.screen).toBe('missions');
+    expect(left.tutorialDone).toBe(true);
+    expect(left.tutorialActive).toBe(false);
+    // Skipping outside the tutorial only flips the flag.
+    const idle = reducer(fresh(), { type: 'TUTORIAL_SKIP' });
+    expect(idle.screen).toBe('title');
+    expect(idle.tutorialDone).toBe(true);
+  });
+
+  it('HYDRATE restores tutorialDone', () => {
+    const s = reducer(fresh(), { type: 'HYDRATE', save: openSave({ tutorialDone: true }), notice: null });
+    expect(s.tutorialDone).toBe(true);
+    expect(reducer(s, { type: 'PLAY' }).screen).toBe('missions');
+  });
+});
+
+describe('district progression', () => {
+  it('only the first unsolved district is selectable; solving it unlocks the next; solved ones stay replayable', () => {
+    let s = run(initialState(openSave({ settings: DEFAULT_SETTINGS })), { type: 'PLAY' });
+    expect(s.screen).toBe('missions');
+    expect(reducer(s, { type: 'SELECT_MISSION', id: 'red-forward-blue-backward' })).toBe(s); // locked → no-op
+    expect(reducer(s, { type: 'SELECT_MISSION', id: 'silent-failure' })).toBe(s);
+    expect(reducer(s, { type: 'SELECT_MISSION', id: 'no-such-mission' })).toBe(s);
+    s = reducer(s, { type: 'SELECT_MISSION', id: 'first-alarm' });
+    expect(s.screen).toBe('briefing');
+    s = toChallenge('first-alarm', run(s, { type: 'OPEN_MISSIONS' }));
+    s = place(s, { 1: 'X' });
+    s = confirmAndFinish(s);
+    s = reducer(s, { type: 'OPEN_MISSIONS' });
+    expect(reducer(s, { type: 'SELECT_MISSION', id: 'red-forward-blue-backward' }).screen).toBe('briefing');
+    expect(reducer(s, { type: 'SELECT_MISSION', id: 'first-alarm' }).screen).toBe('briefing'); // replayable
+    expect(reducer(s, { type: 'SELECT_MISSION', id: 'color-switch' })).toBe(s); // still locked
+  });
+
+  it('Free roam opens every district; turning it off locks them again', () => {
+    let s = run(initialState(openSave({ settings: DEFAULT_SETTINGS })), { type: 'PLAY' });
+    s = reducer(s, { type: 'SET_FREE_ROAM', on: true });
+    expect(s.settings.freeRoam).toBe(true);
+    for (const d of DISTRICTS) expect(reducer(s, { type: 'SELECT_MISSION', id: d.missionId }).screen).toBe('briefing');
+    s = reducer(s, { type: 'SET_FREE_ROAM', on: false });
+    expect(reducer(s, { type: 'SELECT_MISSION', id: 'old-town-nope' })).toBe(s);
+    expect(reducer(s, { type: 'SELECT_MISSION', id: 'silent-failure' })).toBe(s);
+    expect(reducer(s, { type: 'SET_FREE_ROAM', on: false })).toBe(s); // unchanged → same reference
+  });
+
+  it('NEXT_MISSION walks the districts in order and ends on the summary', () => {
+    let s = toChallenge('two-kinds-of-trouble');
+    s = place(s, { 1: 'X', 6: 'Z' });
+    s = confirmAndFinish(s);
+    s = reducer(s, { type: 'NEXT_MISSION' });
+    expect(s.screen).toBe('briefing');
+    expect(s.missionId).toBe('silent-failure');
+    s = run(s, { type: 'START_MISSION' });
+    s = place(s, { 0: 'X' });
+    s = confirmAndFinish(s);
+    s = reducer(s, { type: 'SHOW_RESULT' });
+    s = reducer(s, { type: 'NEXT_MISSION' });
+    expect(s.screen).toBe('summary');
   });
 });
 
@@ -105,7 +197,64 @@ describe('challenge placement rules', () => {
     expect(crewCount(s.placements)).toBe(0);
   });
 
-  it('confirming with no crews asks first; stand down commits the identity', () => {
+  it('undo/redo walk the placement history; a new placement drops the redo branch; history is bounded', () => {
+    let s = toChallenge('two-kinds-of-trouble'); // budget 2
+    expect(reducer(s, { type: 'UNDO_PLACEMENT' })).toBe(s);
+    expect(reducer(s, { type: 'REDO_PLACEMENT' })).toBe(s);
+    s = place(s, { 1: 'X' });
+    s = place(s, { 7: 'Z' });
+    expect(s.undoStack).toEqual([{}, { 1: 'X' }]);
+    s = reducer(s, { type: 'UNDO_PLACEMENT' });
+    expect(s.placements).toEqual({ 1: 'X' });
+    expect(s.redoStack).toEqual([{ 1: 'X', 7: 'Z' }]);
+    s = reducer(s, { type: 'UNDO_PLACEMENT' });
+    expect(s.placements).toEqual({});
+    expect(reducer(s, { type: 'UNDO_PLACEMENT' })).toBe(s); // nothing left
+    s = reducer(s, { type: 'REDO_PLACEMENT' });
+    expect(s.placements).toEqual({ 1: 'X' });
+    s = reducer(s, { type: 'REDO_PLACEMENT' });
+    expect(s.placements).toEqual({ 1: 'X', 7: 'Z' });
+    expect(reducer(s, { type: 'REDO_PLACEMENT' })).toBe(s);
+    s = reducer(s, { type: 'UNDO_PLACEMENT' });
+    s = reducer(s, { type: 'RECALL_BLOCK', qubit: 1 }); // new change → redo branch gone
+    expect(s.placements).toEqual({});
+    expect(s.redoStack).toEqual([]);
+    s = reducer(s, { type: 'CLEAR_CREWS' }); // nothing to clear → no history entry
+    expect(s.undoStack).toEqual([{}, { 1: 'X' }]);
+    // Bounded history: 30 toggles keep only the last 20 snapshots.
+    let t = toChallenge('blind-dispatch');
+    for (let i = 0; i < 30; i++) t = reducer(t, { type: 'TOGGLE_BLOCK', qubit: 4 });
+    expect(t.undoStack).toHaveLength(20);
+    expect(t.placements).toEqual({});
+    // Undo/redo are planning-stage only.
+    const d = reducer(place(toChallenge('first-alarm'), { 1: 'X' }), { type: 'CONFIRM' });
+    expect(reducer(d, { type: 'UNDO_PLACEMENT' })).toBe(d);
+  });
+
+  it('tapping a detector highlights its houses; same detector again clears; invalid index ignored; cleared on screen change', () => {
+    let s = toChallenge('blind-dispatch');
+    expect(s.highlightedCheck).toBeNull();
+    s = reducer(s, { type: 'TOGGLE_DETECTOR_HIGHLIGHT', checkIndex: 3 });
+    expect(s.highlightedCheck).toBe(3);
+    s = reducer(s, { type: 'TOGGLE_DETECTOR_HIGHLIGHT', checkIndex: 5 });
+    expect(s.highlightedCheck).toBe(5);
+    expect(reducer(s, { type: 'TOGGLE_DETECTOR_HIGHLIGHT', checkIndex: 8 })).toBe(s); // rsc3 has checks 0..7
+    expect(reducer(s, { type: 'TOGGLE_DETECTOR_HIGHLIGHT', checkIndex: -1 })).toBe(s);
+    expect(reducer(s, { type: 'TOGGLE_DETECTOR_HIGHLIGHT', checkIndex: 1.5 })).toBe(s);
+    s = reducer(s, { type: 'TOGGLE_DETECTOR_HIGHLIGHT', checkIndex: 5 });
+    expect(s.highlightedCheck).toBeNull();
+    s = reducer(s, { type: 'TOGGLE_DETECTOR_HIGHLIGHT', checkIndex: 0 });
+    expect(reducer(s, { type: 'TOGGLE_DETECTOR_HIGHLIGHT', checkIndex: null }).highlightedCheck).toBeNull();
+    s = place(s, { 4: 'X' });
+    s = reducer(s, { type: 'CONFIRM' });
+    expect(s.screen).toBe('dispatch');
+    expect(s.highlightedCheck).toBeNull();
+    // No mission (title) → ignored.
+    const title = fresh();
+    expect(reducer(title, { type: 'TOGGLE_DETECTOR_HIGHLIGHT', checkIndex: 0 })).toBe(title);
+  });
+
+  it('confirming with no crews asks first; stand down commits the identity and opens the dispatch screen', () => {
     let s = toChallenge('first-alarm');
     s = reducer(s, { type: 'CONFIRM' });
     expect(s.screen).toBe('challenge');
@@ -114,7 +263,8 @@ describe('challenge placement rules', () => {
     expect(cancelled.standDownDialog).toBe(false);
     expect(cancelled.screen).toBe('challenge');
     s = reducer(s, { type: 'STAND_DOWN_CONFIRM' });
-    expect(s.screen).toBe('debrief');
+    expect(s.screen).toBe('dispatch');
+    expect(s.dispatchDone).toBe(false);
     expect(s.debrief?.crews).toBe('III');
     expect(s.debrief?.verdict).toBe('detectable');
   });
@@ -122,6 +272,81 @@ describe('challenge placement rules', () => {
   it('placementsToPauli round-trips', () => {
     expect(placementsToPauli(9, placementsOf('IXIIIIZII')).x[1]).toBe(1);
     expect(placementsToPauli(9, placementsOf('IXIIIIZII')).z[6]).toBe(1);
+  });
+});
+
+describe('dispatch (spray) screen', () => {
+  it('CONFIRM → dispatch; DISPATCH_DONE/SKIP are idempotent; OPEN_WHY / SHOW_RESULT only once the spray is done', () => {
+    let s = toChallenge('blind-dispatch');
+    s = place(s, { 4: 'X' });
+    s = reducer(s, { type: 'CONFIRM' });
+    expect(s.screen).toBe('dispatch');
+    expect(s.dispatchDone).toBe(false);
+    expect(s.debrief).not.toBeNull();
+    expect(s.progress['blind-dispatch']?.attempts).toBe(1);
+    // Not yet: the player must watch (or skip) the spray first.
+    expect(reducer(s, { type: 'OPEN_WHY' })).toBe(s);
+    expect(reducer(s, { type: 'SHOW_RESULT' })).toBe(s);
+    expect(reducer(s, { type: 'NEXT_MISSION' })).toBe(s);
+    // Second CONFIRM on the dispatch screen: no-op, progress not double counted.
+    expect(reducer(s, { type: 'CONFIRM' })).toBe(s);
+    expect(reducer(s, { type: 'STAND_DOWN_CONFIRM' })).toBe(s);
+    const done = reducer(s, { type: 'DISPATCH_DONE' });
+    expect(done.dispatchDone).toBe(true);
+    expect(done.screen).toBe('dispatch');
+    expect(reducer(done, { type: 'DISPATCH_DONE' })).toBe(done);
+    expect(reducer(done, { type: 'DISPATCH_SKIP' })).toBe(done);
+    expect(reducer(s, { type: 'DISPATCH_SKIP' })).toEqual(done);
+    expect(done.progress['blind-dispatch']?.attempts).toBe(1);
+    // Rapid taps: CONFIRM / DISPATCH_DONE / CONFIRM again never add an attempt or change the debrief.
+    const hammered = run(done, { type: 'CONFIRM' }, { type: 'DISPATCH_DONE' }, { type: 'CONFIRM' }, { type: 'DISPATCH_SKIP' });
+    expect(hammered).toBe(done);
+    // From the finished dispatch: Why? (debrief replay) or straight to the result.
+    const why = reducer(done, { type: 'OPEN_WHY' });
+    expect(why.screen).toBe('debrief');
+    expect(why.replayIndex).toBe(0);
+    expect(why.autoPlay).toBe(true);
+    const result = reducer(done, { type: 'SHOW_RESULT' });
+    expect(result.screen).toBe('result');
+    // Result → Why? works too; debrief → result works; TRY_AGAIN works from all three.
+    expect(reducer(result, { type: 'OPEN_WHY' }).screen).toBe('debrief');
+    expect(reducer(why, { type: 'SHOW_RESULT' }).screen).toBe('result');
+    for (const st of [done, why, result]) {
+      const again = reducer(st, { type: 'TRY_AGAIN' });
+      expect(again.screen).toBe('challenge');
+      expect(again.placements).toEqual({});
+      expect(again.undoStack).toEqual([]);
+      expect(again.redoStack).toEqual([]);
+      expect(again.debrief).toBeNull();
+      expect(again.dispatchDone).toBe(false);
+    }
+    // DISPATCH_DONE outside the dispatch screen is ignored.
+    expect(reducer(why, { type: 'DISPATCH_DONE' })).toBe(why);
+    expect(reducer(toChallenge('first-alarm'), { type: 'DISPATCH_DONE' }).dispatchDone).toBe(false);
+  });
+
+  it('OPEN_WHY respects reduced motion (no auto-play) and the setting when the flag is omitted', () => {
+    let s = toChallenge('first-alarm');
+    s = place(s, { 1: 'X' });
+    const done = confirmAndFinish(s);
+    expect(reducer(done, { type: 'OPEN_WHY', reducedMotion: true }).autoPlay).toBe(false);
+    expect(reducer(done, { type: 'OPEN_WHY', reducedMotion: false }).autoPlay).toBe(true);
+    const reducedSetting = { ...done, settings: { ...done.settings, reducedMotion: true } };
+    expect(reducer(reducedSetting, { type: 'OPEN_WHY' }).autoPlay).toBe(false);
+  });
+
+  it('CONFIRM with reducedMotion prepares the later replay without auto-play', () => {
+    let s = toChallenge('first-alarm');
+    s = place(s, { 1: 'X' });
+    const reduced = reducer(s, { type: 'CONFIRM', reducedMotion: true });
+    expect(reduced.screen).toBe('dispatch');
+    expect(reduced.replayIndex).toBe(0);
+    expect(reduced.autoPlay).toBe(false);
+    const full = reducer(s, { type: 'CONFIRM', reducedMotion: false });
+    expect(full.autoPlay).toBe(true);
+    const standDown = reducer(reducer(toChallenge('first-alarm'), { type: 'CONFIRM' }), { type: 'STAND_DOWN_CONFIRM', reducedMotion: true });
+    expect(standDown.screen).toBe('dispatch');
+    expect(standDown.autoPlay).toBe(false);
   });
 });
 
@@ -135,7 +360,7 @@ describe('full flow of every mission', () => {
       s = place(s, placementsOf(def.expected.minWeightCorrection));
       expect(crewCount(s.placements)).toBeLessThanOrEqual(m.budget);
       s = reducer(s, { type: 'CONFIRM' });
-      expect(s.screen).toBe('debrief');
+      expect(s.screen).toBe('dispatch');
       const d = s.debrief;
       expect(d).not.toBeNull();
       if (d === null) return;
@@ -160,15 +385,18 @@ describe('full flow of every mission', () => {
       }
       expect(d.narrative).toBe(def.debrief[d.verdict]);
       expect(d.steps[d.steps.length - 1]?.id).toBe('verdict');
-      // The debrief opens on step 1 and auto-plays (motion allowed); the banner is rendered regardless of the step.
-      expect(s.replayIndex).toBe(0);
-      expect(s.autoPlay).toBe(true);
-      // Progress stored
+      // Progress stored once, at confirm.
       expect(s.progress[m.id]?.attempts).toBe(1);
       expect(s.progress[m.id]?.stars).toBe(d.score.stars);
-      // Debrief → result → next mission
+      // Spray → Why? replay (opens on step 1, auto-plays) → result → next district
+      s = reducer(s, { type: 'DISPATCH_DONE' });
+      s = reducer(s, { type: 'OPEN_WHY' });
+      expect(s.screen).toBe('debrief');
+      expect(s.replayIndex).toBe(0);
+      expect(s.autoPlay).toBe(true);
       s = reducer(s, { type: 'SHOW_RESULT' });
       expect(s.screen).toBe('result');
+      expect(s.progress[m.id]?.attempts).toBe(1);
       s = reducer(s, { type: 'NEXT_MISSION' });
       expect(s.screen).toBe(m.index === 6 ? 'summary' : 'briefing');
     });
@@ -191,7 +419,7 @@ describe('full flow of every mission', () => {
       let s = toChallenge(m.id);
       s = place(s, wrong);
       s = reducer(s, { type: 'CONFIRM' });
-      expect(s.screen).toBe('debrief');
+      expect(s.screen).toBe('dispatch');
       expect(s.debrief?.verdict).not.toBe('success');
       expect(s.debrief?.score.stars).toBeLessThanOrEqual(1);
       s = reducer(s, { type: 'TRY_AGAIN' });
@@ -276,48 +504,36 @@ describe('full flow of every mission', () => {
     expect(s.standDownDialog).toBe(true);
     expect(reducer(s, { type: 'TOGGLE_BLOCK', qubit: 1 })).toBe(s);
     expect(reducer(s, { type: 'CLEAR_CREWS' })).toBe(s);
+    expect(reducer(s, { type: 'UNDO_PLACEMENT' })).toBe(s);
     expect(reducer(s, { type: 'CONFIRM' })).toBe(s);
   });
 
-  it('CONFIRM with reducedMotion opens the debrief on step 1 without auto-play', () => {
-    let s = toChallenge('first-alarm');
-    s = place(s, { 1: 'X' });
-    const reduced = reducer(s, { type: 'CONFIRM', reducedMotion: true });
-    expect(reduced.screen).toBe('debrief');
-    expect(reduced.replayIndex).toBe(0);
-    expect(reduced.autoPlay).toBe(false);
-    const full = reducer(s, { type: 'CONFIRM', reducedMotion: false });
-    expect(full.replayIndex).toBe(0);
-    expect(full.autoPlay).toBe(true);
-    const standDown = reducer(reducer(toChallenge('first-alarm'), { type: 'CONFIRM' }), { type: 'STAND_DOWN_CONFIRM', reducedMotion: true });
-    expect(standDown.screen).toBe('debrief');
-    expect(standDown.autoPlay).toBe(false);
-  });
-
-  it('progress keeps the best stars and counts attempts; totalStars sums over missions', () => {
+  it('progress keeps the best stars and counts attempts exactly once per confirm; totalStars sums over missions', () => {
     let s = toChallenge('first-alarm');
     s = place(s, { 0: 'X' });
-    s = reducer(s, { type: 'CONFIRM' });
+    s = confirmAndFinish(s);
     expect(s.progress['first-alarm']).toEqual({ stars: 0, attempts: 1, completed: false });
+    s = run(s, { type: 'OPEN_WHY' }, { type: 'SHOW_RESULT' });
+    expect(s.progress['first-alarm']?.attempts).toBe(1);
     s = reducer(s, { type: 'TRY_AGAIN' });
     s = place(s, { 1: 'X' });
-    s = reducer(s, { type: 'CONFIRM' });
+    s = confirmAndFinish(s);
     expect(s.progress['first-alarm']).toEqual({ stars: 3, attempts: 2, completed: true });
     expect(totalStars(s.progress)).toBe(3);
-    expect(toSave(s)).toEqual({ version: 1, progress: s.progress, settings: s.settings });
+    expect(toSave(s)).toEqual({ version: 2, progress: s.progress, settings: s.settings, tutorialDone: true });
     s = reducer(s, { type: 'RESET_PROGRESS' });
     expect(s.progress).toEqual({});
   });
 
   it('"Progress reset." clears on the next screen change; other notices persist until dismissed', () => {
-    let s = run(initialState(), { type: 'PLAY' }, { type: 'OPEN_SETTINGS' }, { type: 'RESET_PROGRESS' });
+    let s = run(openState(), { type: 'OPEN_SETTINGS' }, { type: 'RESET_PROGRESS' });
     expect(s.notice).toBe(PROGRESS_RESET_NOTICE);
     s = reducer(s, { type: 'SET_SOUND', on: true }); // same screen → notice stays
     expect(s.notice).toBe(PROGRESS_RESET_NOTICE);
     s = reducer(s, { type: 'CLOSE_OVERLAY' });
     expect(s.screen).toBe('missions');
     expect(s.notice).toBeNull();
-    let c = run(initialState(undefined, 'Saved progress was unreadable and has been reset.'), { type: 'PLAY' });
+    let c = run(initialState(openSave(), 'Saved progress was unreadable and has been reset.'), { type: 'PLAY' });
     expect(c.notice).toBe('Saved progress was unreadable and has been reset.');
     c = reducer(c, { type: 'DISMISS_NOTICE' });
     expect(c.notice).toBeNull();
@@ -328,7 +544,7 @@ describe('replay controls', () => {
   it('prev/next/goto clamp and auto-play stops at the end', () => {
     let s = toChallenge('red-forward-blue-backward');
     s = place(s, { 0: 'Y', 1: 'Y' });
-    s = reducer(s, { type: 'CONFIRM' });
+    s = run(s, { type: 'CONFIRM' }, { type: 'DISPATCH_DONE' }, { type: 'OPEN_WHY' });
     const last = (s.debrief?.steps.length ?? 0) - 1;
     expect(s.replayIndex).toBe(0);
     expect(s.autoPlay).toBe(true);
@@ -350,14 +566,18 @@ describe('replay controls', () => {
 });
 
 describe('settings', () => {
-  it('sound is off by default and toggles persist in the save', () => {
+  it('sound is off by default; language en; free roam off; toggles persist in the save', () => {
     let s = initialState();
-    expect(s.settings).toEqual({ sound: false, reducedMotion: false });
+    expect(s.settings).toEqual({ sound: false, reducedMotion: false, language: 'en', freeRoam: false });
     s = reducer(s, { type: 'SET_SOUND', on: true });
     s = reducer(s, { type: 'SET_REDUCED_MOTION', on: true });
-    expect(toSave(s).settings).toEqual({ sound: true, reducedMotion: true });
-    s = reducer(s, { type: 'HYDRATE', save: { version: 1, progress: {}, settings: { sound: false, reducedMotion: false } }, notice: 'x' });
+    s = reducer(s, { type: 'SET_LANGUAGE', language: 'ja' });
+    expect(reducer(s, { type: 'SET_LANGUAGE', language: 'ja' })).toBe(s); // unchanged → same reference
+    s = reducer(s, { type: 'SET_FREE_ROAM', on: true });
+    expect(toSave(s).settings).toEqual({ sound: true, reducedMotion: true, language: 'ja', freeRoam: true });
+    s = reducer(s, { type: 'HYDRATE', save: openSave({ settings: DEFAULT_SETTINGS }), notice: 'x' });
     expect(s.settings.sound).toBe(false);
+    expect(s.settings.language).toBe('en');
     expect(s.notice).toBe('x');
     expect(reducer(s, { type: 'DISMISS_NOTICE' }).notice).toBeNull();
   });

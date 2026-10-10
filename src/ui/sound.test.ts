@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { initialState, reducer, type Action, type GameState } from '../game';
+import { DEFAULT_SETTINGS, initialState, reducer, type Action, type GameState } from '../game';
 import { soundFor } from './sound';
 
+/** Districts unlock in order; the tests pick any mission, so start with Free roam on and the tutorial done. */
 function toChallenge(id: string): GameState {
-  let s = reducer(reducer(initialState(), { type: 'SELECT_MISSION', id }), { type: 'START_MISSION' });
+  const start = initialState({ version: 2, progress: {}, settings: { ...DEFAULT_SETTINGS, freeRoam: true }, tutorialDone: true });
+  let s = reducer(reducer(start, { type: 'SELECT_MISSION', id }), { type: 'START_MISSION' });
   for (let guard = 0; guard < 50 && s.screen === 'training'; guard++) s = reducer(s, { type: 'LESSON_NEXT' });
   return s;
 }

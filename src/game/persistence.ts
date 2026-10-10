@@ -1,10 +1,12 @@
 /**
- * Versioned save data in localStorage["q11.save.v1"]. Corrupt or unknown data ⇒ reset with a visible notice.
+ * Versioned save data in localStorage["q11.save.v1"] (the key is kept across versions so no existing save is stranded).
+ * v1 saves are migrated to v2 on read; corrupt or unknown data ⇒ reset with a visible notice.
  * Storage unavailable (Qollab sandbox, private mode) ⇒ in-memory only, silently.
  */
-import type { MissionProgress, SaveData, Settings } from './types';
+import type { Language, MissionProgress, SaveData, Settings } from './types';
 import { SAVE_VERSION } from './types';
 
+/** Storage key. Deliberately unchanged in v2: `parseSave` migrates v1 data found under it. */
 export const SAVE_KEY = 'q11.save.v1';
 
 export interface StorageLike {
@@ -13,10 +15,10 @@ export interface StorageLike {
   removeItem(key: string): void;
 }
 
-export const DEFAULT_SETTINGS: Settings = { sound: false, reducedMotion: false };
+export const DEFAULT_SETTINGS: Settings = { sound: false, reducedMotion: false, language: 'en', freeRoam: false };
 
 export function defaultSave(): SaveData {
-  return { version: SAVE_VERSION, progress: {}, settings: DEFAULT_SETTINGS };
+  return { version: SAVE_VERSION, progress: {}, settings: DEFAULT_SETTINGS, tutorialDone: false };
 }
 
 export const RESET_NOTICE = 'Saved progress was unreadable and has been reset.';
@@ -41,15 +43,33 @@ function parseProgress(v: unknown): Record<string, MissionProgress> | null {
   return out;
 }
 
-function parseSettings(v: unknown): Settings | null {
+function isLanguage(v: unknown): v is Language {
+  return v === 'en' || v === 'ja';
+}
+
+/** v1 settings: { sound, reducedMotion }. Missing v2 fields get their defaults. */
+function parseSettingsV1(v: unknown): Settings | null {
   if (!isRecord(v)) return null;
   const sound = v['sound'];
   const reducedMotion = v['reducedMotion'];
   if (typeof sound !== 'boolean' || typeof reducedMotion !== 'boolean') return null;
-  return { sound, reducedMotion };
+  return { sound, reducedMotion, language: DEFAULT_SETTINGS.language, freeRoam: DEFAULT_SETTINGS.freeRoam };
 }
 
-/** Strict parser: returns null for anything that is not a well-formed v1 save. */
+/** v2 settings: every field present and well-typed. */
+function parseSettingsV2(v: unknown): Settings | null {
+  const base = parseSettingsV1(v);
+  if (base === null || !isRecord(v)) return null;
+  const language = v['language'];
+  const freeRoam = v['freeRoam'];
+  if (!isLanguage(language) || typeof freeRoam !== 'boolean') return null;
+  return { sound: base.sound, reducedMotion: base.reducedMotion, language, freeRoam };
+}
+
+/**
+ * Strict parser: accepts a well-formed v1 or v2 save and always returns v2; anything else → null.
+ * v1 → v2: progress and settings kept, language 'en', freeRoam false, tutorialDone = any progress recorded.
+ */
 export function parseSave(text: string | null): SaveData | null {
   if (text === null) return null;
   let raw: unknown;
@@ -59,11 +79,21 @@ export function parseSave(text: string | null): SaveData | null {
     return null;
   }
   if (!isRecord(raw)) return null;
-  if (raw['version'] !== SAVE_VERSION) return null;
-  const progress = parseProgress(raw['progress']);
-  const settings = parseSettings(raw['settings']);
-  if (progress === null || settings === null) return null;
-  return { version: SAVE_VERSION, progress, settings };
+  const version = raw['version'];
+  if (version === 1) {
+    const progress = parseProgress(raw['progress']);
+    const settings = parseSettingsV1(raw['settings']);
+    if (progress === null || settings === null) return null;
+    return { version: SAVE_VERSION, progress, settings, tutorialDone: Object.keys(progress).length > 0 };
+  }
+  if (version === SAVE_VERSION) {
+    const progress = parseProgress(raw['progress']);
+    const settings = parseSettingsV2(raw['settings']);
+    const tutorialDone = raw['tutorialDone'];
+    if (progress === null || settings === null || typeof tutorialDone !== 'boolean') return null;
+    return { version: SAVE_VERSION, progress, settings, tutorialDone };
+  }
+  return null;
 }
 
 export interface LoadResult {

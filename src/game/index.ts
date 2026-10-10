@@ -4,4 +4,6 @@ export * from './scoring';
 export * from './replay';
 export * from './persistence';
 export * from './bridge';
+export * from './city';
+export * from './effects';
 export * from './machine';

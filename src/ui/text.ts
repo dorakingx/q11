@@ -46,6 +46,7 @@ export function documentTitle(state: GameState, mission: PublicMissionView | nul
     case 'briefing':
     case 'training':
     case 'challenge':
+    case 'dispatch':
     case 'debrief':
     case 'result':
       return missionPart === null ? `${APP_NAME} — Missions` : `${APP_NAME} — ${missionPart}`;
@@ -75,6 +76,8 @@ export function screenAnnouncement(state: GameState, mission: PublicMissionView 
       return mission.kind === 'propagation'
         ? `${m} dispatch. Predict where the fires end up; ${String(mission.budget)} crew${mission.budget === 1 ? '' : 's'} available.`
         : `${m} dispatch. ${alarmSummary(mission.code, mission.syndrome)}`;
+    case 'dispatch':
+      return debrief === null ? `${m} training replay: answer check.` : `${m} training replay: answer check. ${debrief.verdictLabel}.`;
     case 'debrief':
       return debrief === null ? `${m} debrief.` : `${m} debrief. ${debrief.verdictLabel}.`;
     case 'result':

@@ -105,9 +105,17 @@ export function soundFor(action: Action, before: GameState, after: GameState): S
       return after.placements !== before.placements ? 'remove' : null;
     case 'CLEAR_CREWS':
       return after.placements !== before.placements && crewCount(before.placements) > 0 ? 'remove' : null;
+    case 'UNDO_PLACEMENT':
+      return after.placements !== before.placements ? 'remove' : null;
+    case 'REDO_PLACEMENT':
+      return after.placements !== before.placements ? 'place' : null;
     case 'CONFIRM':
     case 'STAND_DOWN_CONFIRM':
-      return after.screen === 'debrief' && before.screen !== 'debrief' ? 'confirm' : null;
+      // Commit opens the 'dispatch' (spray) screen; the spray/extinguish tones are played by the effect player.
+      return after.screen === 'dispatch' && before.screen !== 'dispatch' ? 'confirm' : null;
+    case 'DISPATCH_DONE':
+    case 'DISPATCH_SKIP':
+      return null;
     case 'REPLAY_NEXT':
     case 'REPLAY_PREV':
     case 'REPLAY_GOTO':

@@ -1,0 +1,29 @@
+/* Q11 warm daytime theme tokens (docs/UX_SCREENS.md). Every screen, the city and the scene use these variables. */
+:root {
+  color-scheme: light;
+  --sky: #dff0ff;
+  --sky-deep: #bfe0ff;
+  --ground: #f6efe0;
+  --ground-2: #efe3cc;
+  --panel: #fffaf0;
+  --panel-2: #fff3dc;
+  --ink: #2b2420;
+  --ink-soft: #4a3f39;
+  --muted: #6b5f58;
+  --outline: #3a2f2a;
+  --line: #d9cdb8;
+  --x: #e8432a;
+  --z: #2f6fdd;
+  --y: #8a4fd6;
+  --alarm: #f2b200;
+  --ok: #2bb673;
+  --water: #7fd3ff;
+  --water-deep: #3fb6f5;
+  --focus: #ff9b2f;
+  --shadow: rgba(58, 47, 42, 0.18);
+  --radius: 14px;
+  --radius-lg: 20px;
+  --gap: 16px;
+  --tap: 48px;
+  --font: "Nunito", "Avenir Next", "Segoe UI", system-ui, -apple-system, Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+}
