@@ -49,6 +49,7 @@ Overall: **READY_FOR_RELEASE_APPROVAL (Q11 Emergency)** — all A1–A9 and R1�
 
 ## Verification log
 (appended as commands run — command, exit code, counts)
+- 2026-10-11 04:05 `gh repo edit dorakingx/q11 --homepage https://q11-emergency.vercel.app --description "Q11 Emergency — …"` → GitHub About now points at the new domain and name (repo still private)
 - 2026-10-11 03:44 `node scripts/check-protection.mjs` on q11-cajyyk4k1 (SHA c1760e1) + q11-emergency.vercel.app + 2 auto aliases → 16/16 blocked, sso all, bypass 0; `npx vercel@latest curl / --deployment …` → app HTML (title Q11 Emergency, assets index-B_uo7grW.js = local build); bypass secret revoked → 0
 - 2026-10-11 03:42 `Q11_E2E_WORKERS=2 Q11_E2E_TIMEOUT=360000 node scripts/verify-release.mjs` exit 0 at aed04f3 (lint 0 · typecheck 0 · unit 459 · build 0 · verify:quantum 4746/0 · e2e 101 passed / 13 skipped · demo 163 s · secrets 0); the default-worker run 20 min earlier failed 7 e2e tests on wall-clock timeouts under load ≈30
 - 2026-10-11 03:23 Qollab draft: final bundle uploaded (Unpack → Keep and add) → Run on Built-in simulator: self-test exact, job e7ec00e7… (run 13)
