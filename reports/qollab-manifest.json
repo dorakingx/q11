@@ -1,8 +1,18 @@
 {
-  "generatedAt": "2026-10-10T22:54:22.341Z",
-  "fileCount": 17,
-  "totalBytes": 700153,
+  "generatedAt": "2026-10-10T23:13:21.082Z",
+  "fileCount": 19,
+  "totalBytes": 703172,
   "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1072,
+      "sha256": "21f9e8f16963b87ace755bf8b963f2f1bc4287f3264a809ca4e02b121de7997c"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1947,
+      "sha256": "a1168c976d1688bae37979e2fb8640b7a6ef4351c7995d52f620f714df40318d"
+    },
     {
       "path": "game/q11-game.js",
       "bytes": 588117,
