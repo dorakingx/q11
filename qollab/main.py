@@ -76,6 +76,10 @@ def main(shots: int = 200, mission: str = "blind-dispatch", correction: str = "I
     print("  logical readout histogram:", json.dumps(analysis["logicalHistograms"]),
           "| predicted bits:", prediction["expected"]["logicalBits"] if prediction["expected"]["logicalDeterministic"] else "not deterministic for this prep/basis")
     print("  data-derived check parities (odd fraction):", json.dumps(analysis["dataCheckOddFraction"]))
-    print("  matches prediction:", json.dumps(analysis.get("matches")))
+    print("  exact match with the ideal (noiseless) model:", json.dumps(analysis.get("matches")),
+          "-> expected True only on ideal simulators")
+    print("  dominant-outcome agreement (noise-tolerant):", json.dumps(analysis.get("dominantMatches")),
+          "| share of shots with the predicted alarms: %s | share with the predicted logical bit: %s" % (
+              analysis.get("predictedSyndromeShare"), analysis.get("predictedLogicalShare")))
     print("Model: Clifford+Pauli educational simulation, perfect syndrome extraction. Counts are statistics;",
           "the GF(2) verdict above is the proof. Simulator result, not hardware.")

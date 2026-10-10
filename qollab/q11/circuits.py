@@ -366,4 +366,22 @@ def analyze_counts(counts, mission_id, correction: str = None, readout_basis: st
         result["prediction"] = pred
         result["matches"] = {"syndrome": syn_ok, "logical": logical_ok, "dataChecks": checks_ok}
         result["matchesPrediction"] = syn_ok and checks_ok and (logical_ok is not False)
+        # Noise-tolerant view (for noise-model simulators / hardware): compare the DOMINANT outcomes only.
+        pred_syn = _verdict.syndrome_string(exp["ancillaSyndrome"])
+        dom_syn_ok = result["dominantSyndrome"] == exp["ancillaSyndrome"]
+        if exp["logicalDeterministic"]:
+            dom_logical_ok = [int(b) for b in result["logicalBits"]] == exp["logicalBits"]
+            logical_share = [
+                (h.get(str(b), 0) / shots if shots else None) for h, b in zip(logical_hist, exp["logicalBits"])
+            ]
+        else:
+            dom_logical_ok = None
+            logical_share = None
+        dom_checks_ok = all(
+            (result["dataCheckOddFraction"][cid] > 0.5) == bool(bit) for cid, bit in exp["dataCheckParities"].items()
+        )
+        result["dominantMatches"] = {"syndrome": dom_syn_ok, "logical": dom_logical_ok, "dataChecks": dom_checks_ok}
+        result["dominantAgrees"] = dom_syn_ok and dom_checks_ok and (dom_logical_ok is not False)
+        result["predictedSyndromeShare"] = (syn_hist.get(pred_syn, 0) / shots) if shots else None
+        result["predictedLogicalShare"] = logical_share
     return result
