@@ -1,37 +1,137 @@
 
-Running 32 tests using 6 workers
+Running 96 tests using 6 workers
 
-  ✓   5 [desktop-chromium] › e2e/quality.spec.ts:38:1 › progress persists across reload; corrupt save is reset with a visible notice (2.6s)
-  ✓   3 [desktop-chromium] › e2e/keyboard.spec.ts:65:1 › the stand-down dialog is modal: inert app, Tab trapped, Escape closes, focus returns to the opener (3.0s)
-  ✓   6 [desktop-chromium] › e2e/quality.spec.ts:60:1 › settings: sound off by default, toggles persist, reset clears progress after confirmation (4.0s)
-  ✓   1 [desktop-chromium] › e2e/mobile.spec.ts:8:1 › mission 5 tap flow: palette → blocks → sticky confirm → debrief (4.2s)
-  ✓   4 [desktop-chromium] › e2e/keyboard.spec.ts:4:1 › mission 1 can be played with the keyboard only (4.3s)
-  ✓   8 [desktop-chromium] › e2e/quality.spec.ts:109:1 › document.title follows the screen and the live region announces each screen (1.6s)
-  ✓   9 [desktop-chromium] › e2e/quality.spec.ts:127:1 › challenge never exposes the hidden fire in the DOM before confirm (mission 4) (1.7s)
-  ✓   7 [desktop-chromium] › e2e/quality.spec.ts:87:1 › cloud panel: mission 4 shows the recorded block-4 run only for that dispatch (3.3s)
-  ✓  11 [desktop-chromium] › e2e/silent-failure.spec.ts:49:1 › mission 6: the block-3 crew is the same call (stabilizer-equivalent) and the cloud card for block 0 still applies (2.1s)
-  ✓  12 [desktop-chromium] › e2e/silent-failure.spec.ts:63:1 › mission 6: the lucky guess (blocks 1 and 2) succeeds but is scored "lucky" — 1 star, no cloud card for that dispatch (3.4s)
-  ✓  10 [desktop-chromium] › e2e/silent-failure.spec.ts:4:1 › mission 6: the protocol dispatch silences every alarm but flips the logical qubit (silent failure) (4.9s)
-  ✓  14 [desktop-chromium] › e2e/smoke.spec.ts:77:1 › mission 4 challenge renders the full surface-code board (screenshot) (4.2s)
-  ✓  16 [desktop-chromium] › e2e/smoke.spec.ts:134:1 › standing down with no crews asks for confirmation, then shows fires still burning (2.7s)
-  ✓   2 [desktop-chromium] › e2e/quality.spec.ts:4:1 › no horizontal overflow and no console errors across every screen (11.5s)
-  ✓  15 [desktop-chromium] › e2e/smoke.spec.ts:93:1 › propagation missions 2 and 3: predict the end state, wrong colour fails, try again works (5.7s)
-  ✓  17 [mobile-chromium] › e2e/keyboard.spec.ts:65:1 › the stand-down dialog is modal: inert app, Tab trapped, Escape closes, focus returns to the opener (2.9s)
-  ✓  13 [desktop-chromium] › e2e/smoke.spec.ts:4:1 › smoke: title → play → mission 1 briefing → training → challenge → place crew → confirm → debrief → next (10.4s)
-  ✓  18 [mobile-chromium] › e2e/keyboard.spec.ts:4:1 › mission 1 can be played with the keyboard only (3.7s)
-  ✓  19 [mobile-chromium] › e2e/mobile.spec.ts:8:1 › mission 5 tap flow: palette → blocks → sticky confirm → debrief (4.0s)
-  ✓  23 [mobile-chromium] › e2e/quality.spec.ts:109:1 › document.title follows the screen and the live region announces each screen (1.3s)
-  ✓  21 [mobile-chromium] › e2e/quality.spec.ts:60:1 › settings: sound off by default, toggles persist, reset clears progress after confirmation (2.8s)
-  ✓  22 [mobile-chromium] › e2e/quality.spec.ts:38:1 › progress persists across reload; corrupt save is reset with a visible notice (2.3s)
-  ✓  24 [mobile-chromium] › e2e/quality.spec.ts:127:1 › challenge never exposes the hidden fire in the DOM before confirm (mission 4) (1.2s)
-  ✓  26 [mobile-chromium] › e2e/silent-failure.spec.ts:49:1 › mission 6: the block-3 crew is the same call (stabilizer-equivalent) and the cloud card for block 0 still applies (2.3s)
-  ✓  25 [mobile-chromium] › e2e/silent-failure.spec.ts:4:1 › mission 6: the protocol dispatch silences every alarm but flips the logical qubit (silent failure) (3.1s)
-  ✓  27 [mobile-chromium] › e2e/silent-failure.spec.ts:63:1 › mission 6: the lucky guess (blocks 1 and 2) succeeds but is scored "lucky" — 1 star, no cloud card for that dispatch (2.8s)
-  ✓  29 [mobile-chromium] › e2e/quality.spec.ts:87:1 › cloud panel: mission 4 shows the recorded block-4 run only for that dispatch (3.4s)
-  ✓  30 [mobile-chromium] › e2e/smoke.spec.ts:77:1 › mission 4 challenge renders the full surface-code board (screenshot) (2.8s)
-  ✓  32 [mobile-chromium] › e2e/smoke.spec.ts:134:1 › standing down with no crews asks for confirmation, then shows fires still burning (2.3s)
-  ✓  20 [mobile-chromium] › e2e/quality.spec.ts:4:1 › no horizontal overflow and no console errors across every screen (9.9s)
-  ✓  31 [mobile-chromium] › e2e/smoke.spec.ts:93:1 › propagation missions 2 and 3: predict the end state, wrong colour fails, try again works (3.9s)
-  ✓  28 [mobile-chromium] › e2e/smoke.spec.ts:4:1 › smoke: title → play → mission 1 briefing → training → challenge → place crew → confirm → debrief → next (9.4s)
+  ✓   3 [desktop-chromium] › e2e/city.spec.ts:50:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice (3.6s)
+  ✓   6 [desktop-chromium] › e2e/city.spec.ts:40:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once (4.0s)
+  ✓   2 [desktop-chromium] › e2e/city.spec.ts:81:1 › settings: toggles persist across reload; reset clears progress after confirmation (4.3s)
+  ✓   1 [desktop-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district (5.1s)
+  ✓   4 [desktop-chromium] › e2e/city.spec.ts:106:1 › summary after the old town: badges, stars and the free-roam hint (6.3s)
+  ✓   8 [desktop-chromium] › e2e/missions.spec.ts:132:1 › How it works: kid copy with the art legend and the jargon under Details; Japanese switch (3.1s)
+  ✓   9 [desktop-chromium] › e2e/perf.spec.ts:11:1 › a house tap updates the DOM in under 100 ms (4.2s)
+  ✓  11 [desktop-chromium] › e2e/smoke.spec.ts:58:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial (2.5s)
+  ✓   7 [desktop-chromium] › e2e/missions.spec.ts:113:1 › mission 6 lucky guess (houses 1 and 2): success scored lucky, 1 star, no cloud card for that dispatch (5.9s)
+  ✓  10 [desktop-chromium] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge (6.2s)
+  ✓  13 [desktop-chromium] › e2e/smoke.spec.ts:138:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists (3.3s)
+  ✓  14 [desktop-chromium] › e2e/smoke.spec.ts:158:1 › document.title follows the screen and the live region announces each screen (3.3s)
+  ✓  12 [desktop-chromium] › e2e/smoke.spec.ts:69:1 › mission 1 can be played with the keyboard only (9.2s)
+  ✓  15 [desktop-chromium] › e2e/spray.spec.ts:8:1 › result 1 — blind dispatch X on house 4: restored (fires out, houses restored, alarms quiet) (7.7s)
+  ✓  16 [desktop-chromium] › e2e/spray.spec.ts:34:1 › result 3 — blind dispatch X on house 0: still burning (new red fire, true fire revealed, alarms ring) (5.7s)
+  ✓  17 [desktop-chromium] › e2e/spray.spec.ts:52:1 › result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details) (5.5s)
+  ✓  19 [desktop-chromium] › e2e/spray.spec.ts:112:1 › secrecy: in Challenge every house button is identical (index stripped) and nothing names the fire before Spray! (3.7s)
+  ✓  18 [desktop-chromium] › e2e/spray.spec.ts:74:1 › result 4 — silent failure X on house 0: alarms quiet, the memory beacon shows the logical X flip and the chain 0-1-2 (7.9s)
+  ✓   5 [desktop-chromium] › e2e/missions.spec.ts:5:1 › all six districts are playable end to end in order, with tap-to-predict in the propagation lessons (21.6s)
+  ✓  22 [desktop-chromium] › e2e/spray.spec.ts:184:1 › stand down with no crews asks first; confirming shows the fire still burning (0 stars) (4.3s)
+  ✓  20 [desktop-chromium] › e2e/spray.spec.ts:131:1 › rapid taps: triple Spray!, double Skip, Try again mid-spray — attempts increase by exactly one each time (5.3s)
+  ✓  21 [desktop-chromium] › e2e/spray.spec.ts:156:1 › reduced motion: the spray is a stepper with static frames; Why? steps both boards together (7.1s)
+  ✓  28 [mobile-chromium] › e2e/city.spec.ts:40:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once (4.9s)
+  ✓  23 [desktop-chromium] › e2e/viewports.spec.ts:17:3 › viewport 768×1024: every screen fits, screenshots written (16.8s)
+  ✓  27 [mobile-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district (6.6s)
+  ✓  26 [desktop-chromium] › e2e/viewports.spec.ts:17:3 › viewport 375×812: every screen fits, screenshots written (16.1s)
+  ✓  25 [desktop-chromium] › e2e/viewports.spec.ts:17:3 › viewport 390×844: every screen fits, screenshots written (17.5s)
+  ✓  24 [desktop-chromium] › e2e/viewports.spec.ts:17:3 › viewport 1440×900: every screen fits, screenshots written (18.2s)
+  ✓  29 [mobile-chromium] › e2e/city.spec.ts:50:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice (2.8s)
+  ✓  30 [mobile-chromium] › e2e/city.spec.ts:106:1 › summary after the old town: badges, stars and the free-roam hint (3.4s)
+  ✓  31 [mobile-chromium] › e2e/perf.spec.ts:11:1 › a house tap updates the DOM in under 100 ms (2.4s)
+  ✓  33 [mobile-chromium] › e2e/smoke.spec.ts:58:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial (2.0s)
+  ✓  32 [mobile-chromium] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge (3.6s)
+  ✓  39 [mobile-chromium] › e2e/smoke.spec.ts:138:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists (3.1s)
+  ✓  35 [mobile-chromium] › e2e/city.spec.ts:81:1 › settings: toggles persist across reload; reset clears progress after confirmation (4.8s)
+  ✓  36 [mobile-chromium] › e2e/missions.spec.ts:132:1 › How it works: kid copy with the art legend and the jargon under Details; Japanese switch (3.8s)
+  ✓  40 [mobile-chromium] › e2e/smoke.spec.ts:158:1 › document.title follows the screen and the live region announces each screen (2.8s)
+  ✓  37 [mobile-chromium] › e2e/missions.spec.ts:113:1 › mission 6 lucky guess (houses 1 and 2): success scored lucky, 1 star, no cloud card for that dispatch (6.3s)
+  ✓  38 [mobile-chromium] › e2e/smoke.spec.ts:69:1 › mission 1 can be played with the keyboard only (8.2s)
+  ✓  42 [mobile-chromium] › e2e/spray.spec.ts:34:1 › result 3 — blind dispatch X on house 0: still burning (new red fire, true fire revealed, alarms ring) (6.1s)
+  ✓  45 [mobile-chromium] › e2e/spray.spec.ts:112:1 › secrecy: in Challenge every house button is identical (index stripped) and nothing names the fire before Spray! (2.8s)
+  ✓  43 [mobile-chromium] › e2e/spray.spec.ts:52:1 › result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details) (4.5s)
+  ✓  41 [mobile-chromium] › e2e/spray.spec.ts:8:1 › result 1 — blind dispatch X on house 4: restored (fires out, houses restored, alarms quiet) (7.8s)
+  -  49 [mobile-chromium] › e2e/viewports.spec.ts:17:3 › viewport 1440×900: every screen fits, screenshots written
+  -  50 [mobile-chromium] › e2e/viewports.spec.ts:17:3 › viewport 768×1024: every screen fits, screenshots written
+  -  51 [mobile-chromium] › e2e/viewports.spec.ts:17:3 › viewport 390×844: every screen fits, screenshots written
+  ✓  44 [mobile-chromium] › e2e/spray.spec.ts:74:1 › result 4 — silent failure X on house 0: alarms quiet, the memory beacon shows the logical X flip and the chain 0-1-2 (7.5s)
+  ✓  48 [mobile-chromium] › e2e/spray.spec.ts:184:1 › stand down with no crews asks first; confirming shows the fire still burning (0 stars) (3.9s)
+  -  52 [mobile-chromium] › e2e/viewports.spec.ts:17:3 › viewport 375×812: every screen fits, screenshots written
+  ✓  46 [mobile-chromium] › e2e/spray.spec.ts:131:1 › rapid taps: triple Spray!, double Skip, Try again mid-spray — attempts increase by exactly one each time (5.1s)
+  ✓  47 [mobile-chromium] › e2e/spray.spec.ts:156:1 › reduced motion: the spray is a stepper with static frames; Why? steps both boards together (5.6s)
+  ✓  34 [mobile-chromium] › e2e/missions.spec.ts:5:1 › all six districts are playable end to end in order, with tap-to-predict in the propagation lessons (18.9s)
+  ✓  54 [tablet-chromium] › e2e/city.spec.ts:50:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice (2.4s)
+  ✓  53 [tablet-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district (4.3s)
+  ✓  55 [tablet-chromium] › e2e/city.spec.ts:81:1 › settings: toggles persist across reload; reset clears progress after confirmation (4.1s)
+  ✓  56 [tablet-chromium] › e2e/city.spec.ts:40:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once (3.9s)
+  ✓  60 [tablet-chromium] › e2e/missions.spec.ts:132:1 › How it works: kid copy with the art legend and the jargon under Details; Japanese switch (2.2s)
+  ✓  57 [tablet-chromium] › e2e/city.spec.ts:106:1 › summary after the old town: badges, stars and the free-roam hint (5.6s)
+  ✓  59 [tablet-chromium] › e2e/missions.spec.ts:113:1 › mission 6 lucky guess (houses 1 and 2): success scored lucky, 1 star, no cloud card for that dispatch (4.2s)
+  ✓  61 [tablet-chromium] › e2e/perf.spec.ts:11:1 › a house tap updates the DOM in under 100 ms (3.9s)
+  ✓  63 [tablet-chromium] › e2e/smoke.spec.ts:58:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial (2.7s)
+  ✓  64 [tablet-chromium] › e2e/smoke.spec.ts:138:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists (4.3s)
+  ✓  62 [tablet-chromium] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge (6.6s)
+  ✓  66 [tablet-chromium] › e2e/smoke.spec.ts:158:1 › document.title follows the screen and the live region announces each screen (3.5s)
+  ✓  68 [tablet-chromium] › e2e/spray.spec.ts:34:1 › result 3 — blind dispatch X on house 0: still burning (new red fire, true fire revealed, alarms ring) (5.2s)
+  ✓  65 [tablet-chromium] › e2e/smoke.spec.ts:69:1 › mission 1 can be played with the keyboard only (10.1s)
+  ✓  67 [tablet-chromium] › e2e/spray.spec.ts:8:1 › result 1 — blind dispatch X on house 4: restored (fires out, houses restored, alarms quiet) (8.4s)
+  ✓  69 [tablet-chromium] › e2e/spray.spec.ts:52:1 › result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details) (6.3s)
+  ✓  71 [tablet-chromium] › e2e/spray.spec.ts:112:1 › secrecy: in Challenge every house button is identical (index stripped) and nothing names the fire before Spray! (3.5s)
+  ✓  70 [tablet-chromium] › e2e/spray.spec.ts:74:1 › result 4 — silent failure X on house 0: alarms quiet, the memory beacon shows the logical X flip and the chain 0-1-2 (8.1s)
+  -  75 [tablet-chromium] › e2e/viewports.spec.ts:17:3 › viewport 1440×900: every screen fits, screenshots written
+  -  76 [tablet-chromium] › e2e/viewports.spec.ts:17:3 › viewport 390×844: every screen fits, screenshots written
+  -  77 [tablet-chromium] › e2e/viewports.spec.ts:17:3 › viewport 768×1024: every screen fits, screenshots written
+  -  78 [tablet-chromium] › e2e/viewports.spec.ts:17:3 › viewport 375×812: every screen fits, screenshots written
+  ✓  74 [tablet-chromium] › e2e/spray.spec.ts:184:1 › stand down with no crews asks first; confirming shows the fire still burning (0 stars) (4.0s)
+  ✓  72 [tablet-chromium] › e2e/spray.spec.ts:131:1 › rapid taps: triple Spray!, double Skip, Try again mid-spray — attempts increase by exactly one each time (4.8s)
+  ✓  58 [tablet-chromium] › e2e/missions.spec.ts:5:1 › all six districts are playable end to end in order, with tap-to-predict in the propagation lessons (20.2s)
+  ✓  73 [tablet-chromium] › e2e/spray.spec.ts:156:1 › reduced motion: the spray is a stepper with static frames; Why? steps both boards together (6.4s)
+  ✓  82 [desktop-webkit] › e2e/city.spec.ts:50:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice (7.1s)
+  ✓  80 [desktop-webkit] › e2e/city.spec.ts:40:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once (7.9s)
+  ✓  81 [desktop-webkit] › e2e/city.spec.ts:81:1 › settings: toggles persist across reload; reset clears progress after confirmation (8.7s)
+  -  86 [desktop-webkit] › e2e/smoke.spec.ts:69:1 › mission 1 can be played with the keyboard only
+  ✓  85 [desktop-webkit] › e2e/smoke.spec.ts:58:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial (4.7s)
+  ✓  84 [desktop-webkit] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge (10.0s)
+  ✓  87 [desktop-webkit] › e2e/smoke.spec.ts:138:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists (5.3s)
+  ✓  88 [desktop-webkit] › e2e/smoke.spec.ts:158:1 › document.title follows the screen and the live region announces each screen (6.3s)
+  ✓  83 [desktop-webkit] › e2e/city.spec.ts:106:1 › summary after the old town: badges, stars and the free-roam hint (14.0s)
+  ✓  89 [desktop-webkit] › e2e/spray.spec.ts:8:1 › result 1 — blind dispatch X on house 4: restored (fires out, houses restored, alarms quiet) (15.6s)
+  ✓  90 [desktop-webkit] › e2e/spray.spec.ts:34:1 › result 3 — blind dispatch X on house 0: still burning (new red fire, true fire revealed, alarms ring) (15.5s)
+  ✓  93 [desktop-webkit] › e2e/spray.spec.ts:112:1 › secrecy: in Challenge every house button is identical (index stripped) and nothing names the fire before Spray! (11.9s)
+  ✓  91 [desktop-webkit] › e2e/spray.spec.ts:52:1 › result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details) (17.3s)
+  ✓  92 [desktop-webkit] › e2e/spray.spec.ts:74:1 › result 4 — silent failure X on house 0: alarms quiet, the memory beacon shows the logical X flip and the chain 0-1-2 (22.4s)
+  ✓  96 [desktop-webkit] › e2e/spray.spec.ts:184:1 › stand down with no crews asks first; confirming shows the fire still burning (0 stars) (8.9s)
+  ✓  94 [desktop-webkit] › e2e/spray.spec.ts:131:1 › rapid taps: triple Spray!, double Skip, Try again mid-spray — attempts increase by exactly one each time (11.6s)
+  ✓  95 [desktop-webkit] › e2e/spray.spec.ts:156:1 › reduced motion: the spray is a stepper with static frames; Why? steps both boards together (12.2s)
+  ✘  79 [desktop-webkit] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district (2.0m)
 
-  32 passed (45.8s)
+
+  1) [desktop-webkit] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district 
+
+    Test timeout of 120000ms exceeded.
+
+    Error: locator.click: Test timeout of 120000ms exceeded.
+    Call log:
+      - waiting for getByTestId('travel-skip')
+
+
+      22 |   // force: the drive runs on requestAnimationFrame, which parallel (occluded) Chromium pages throttle; the
+      23 |   // stability check would otherwise wait on the same frames the truck is waiting for.
+    > 24 |   await page.getByTestId('travel-skip').click({ force: true });
+         |                                         ^
+      25 |   await expect(page.getByTestId('briefing')).toBeVisible();
+      26 |   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Harbor Bridge');
+      27 |   await expectNoHorizontalOverflow(page);
+        at /Users/hatanakatomoya/Developer/App/Q11/e2e/city.spec.ts:24:41
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/city-city-locked-districts-a8991-e-roam-opens-every-district-desktop-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/city-city-locked-districts-a8991-e-roam-opens-every-district-desktop-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/city-city-locked-districts-a8991-e-roam-opens-every-district-desktop-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/city-city-locked-districts-a8991-e-roam-opens-every-district-desktop-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [desktop-webkit] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district 
+  9 skipped
+  86 passed (4.1m)

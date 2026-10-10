@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-10T11:36:22.476Z",
+  "generatedAt": "2026-10-10T11:45:22.519Z",
   "thresholdMs": 100,
   "projects": {
     "desktop-chromium": {
@@ -10,15 +10,15 @@
       },
       "samplesMs": [
         3.9,
-        3,
-        2.9,
-        2.2,
-        2.3,
-        2.2
+        2.8,
+        2.7,
+        2.4,
+        2.5,
+        2.1
       ],
       "maxMs": 3.9,
-      "meanMs": 2.75,
-      "measuredAt": "2026-10-10T11:34:27.990Z"
+      "meanMs": 2.73,
+      "measuredAt": "2026-10-10T11:41:56.915Z"
     },
     "mobile-chromium": {
       "project": "mobile-chromium",
@@ -27,16 +27,16 @@
         "height": 844
       },
       "samplesMs": [
-        3.8,
-        3.3,
+        3.9,
         2.9,
-        2.2,
-        2.2,
-        2.2
+        2.8,
+        2,
+        2.3,
+        1.8
       ],
-      "maxMs": 3.8,
-      "meanMs": 2.77,
-      "measuredAt": "2026-10-10T11:35:02.356Z"
+      "maxMs": 3.9,
+      "meanMs": 2.62,
+      "measuredAt": "2026-10-10T11:42:30.876Z"
     },
     "tablet-chromium": {
       "project": "tablet-chromium",
@@ -45,16 +45,16 @@
         "height": 1024
       },
       "samplesMs": [
-        3.8,
+        4,
+        3.1,
         2.8,
-        2.9,
-        2.1,
         2.3,
-        2.1
+        2.5,
+        2.8
       ],
-      "maxMs": 3.8,
-      "meanMs": 2.67,
-      "measuredAt": "2026-10-10T11:35:30.450Z"
+      "maxMs": 4,
+      "meanMs": 2.92,
+      "measuredAt": "2026-10-10T11:43:00.653Z"
     }
   }
 }
