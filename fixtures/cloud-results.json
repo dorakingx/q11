@@ -1,1 +1,260 @@
-{ "schema": 1, "results": [] }
+{
+  "note": "Only results that were actually executed. Recorded from the Qollab draft project (IonQ Aria 1 remote noise-model simulator, free). Raw transcripts: reports/qollab-runs/*.json.",
+  "results": [
+    {
+      "analysis": {
+        "circuitExecutionMs": 1000,
+        "dataCheckOddFraction": {
+          "Z0": 0.15,
+          "Z1": 0.09,
+          "Z2": 0.06,
+          "Z3": 0.02
+        },
+        "dominantMatches": {
+          "dataChecks": true,
+          "logical": true,
+          "syndrome": true
+        },
+        "dominantSyndrome": [
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "endToEndSeconds": 12.5,
+        "exactMatchesIdealModel": {
+          "dataChecks": false,
+          "logical": false,
+          "syndrome": false
+        },
+        "logicalHistograms": [
+          {
+            "0": 93,
+            "1": 7
+          }
+        ],
+        "platform": "qollab.xyz draft project q11-quantum-emergency-response (owner doraking)",
+        "predictedLogicalShare": [
+          0.93
+        ],
+        "predictedSyndromeShare": 0.69,
+        "prep": "0",
+        "readoutBasis": "Z"
+      },
+      "backendName": "IonQ Aria 1 simulator (25q) \u2014 ionq_simulator (noise model, free)",
+      "correction": "IIIIXIIII",
+      "counts": {
+        "00000000000000011": 5,
+        "00000011000010011": 1,
+        "00000100100000010": 1,
+        "00000100100000011": 3,
+        "00000101100000011": 1,
+        "00000111100000011": 1,
+        "00010011000110001": 1,
+        "00011011000000011": 3,
+        "00011011001000011": 1,
+        "00011011001100011": 1,
+        "00011011100000011": 1,
+        "00011100001100011": 1,
+        "00011111100000011": 7,
+        "01101000100000001": 1,
+        "01101000100000010": 1,
+        "01101000100000011": 1,
+        "01101001100000011": 1,
+        "01101100000000011": 2,
+        "01110011001000010": 1,
+        "01110011100000011": 4,
+        "01110011100010111": 1,
+        "01110111000000011": 5,
+        "01110111101000011": 1,
+        "01111111110100011": 1,
+        "10000001011000111": 1,
+        "10000111100110011": 1,
+        "10001001000010111": 1,
+        "10001011000000011": 5,
+        "10001111000000010": 1,
+        "10001111100000011": 2,
+        "10001111100100001": 1,
+        "10010000000000011": 6,
+        "10010100100000011": 5,
+        "10010100100010001": 1,
+        "10010101110100100": 1,
+        "10010111100000010": 1,
+        "10011011000000011": 1,
+        "10110100100101011": 1,
+        "11010000000100011": 1,
+        "11100001100000111": 1,
+        "11100111000000011": 6,
+        "11100111001100011": 1,
+        "11101000110010001": 1,
+        "11110011100010011": 1,
+        "11110111010010001": 1,
+        "11111000100000011": 6,
+        "11111011100000010": 1,
+        "11111100000000011": 4,
+        "11111100000010011": 1,
+        "11111100001001010": 1,
+        "11111111001110010": 1
+      },
+      "finishedAt": "2026-10-10T01:40:30Z",
+      "jobId": "01a12378-c4f2-71ea-b5df-920acd440520",
+      "missionId": "blind-dispatch",
+      "prediction": {
+        "equivalentToReference": true,
+        "logicalFlip": {
+          "x": [
+            false
+          ],
+          "z": [
+            false
+          ]
+        },
+        "referenceCorrection": "IIIIXIIII",
+        "referenceVerdict": "success",
+        "residual": "IIIIIIIII",
+        "syndrome": [
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "verdict": "success"
+      },
+      "shots": 100,
+      "source": "cached-cloud",
+      "startedAt": "2026-10-10T01:40:00Z"
+    },
+    {
+      "analysis": {
+        "circuitExecutionMs": 1000,
+        "dataCheckOddFraction": {
+          "Z0": 0.06,
+          "Z1": 0.07,
+          "Z2": 0.03,
+          "Z3": 0.03
+        },
+        "dominantMatches": {
+          "dataChecks": true,
+          "logical": true,
+          "syndrome": true
+        },
+        "dominantSyndrome": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "endToEndSeconds": 12.7,
+        "exactMatchesIdealModel": {
+          "dataChecks": false,
+          "logical": false,
+          "syndrome": false
+        },
+        "logicalHistograms": [
+          {
+            "0": 3,
+            "1": 97
+          }
+        ],
+        "platform": "qollab.xyz draft project q11-quantum-emergency-response (owner doraking)",
+        "predictedLogicalShare": [
+          0.97
+        ],
+        "predictedSyndromeShare": 0.73,
+        "prep": "0",
+        "readoutBasis": "Z"
+      },
+      "backendName": "IonQ Aria 1 simulator (25q) \u2014 ionq_simulator (noise model, free)",
+      "correction": "XIIIIIIII",
+      "counts": {
+        "00000011100000001": 3,
+        "00000100100100001": 1,
+        "00000111000000001": 6,
+        "00000111000010001": 1,
+        "00001000110010001": 1,
+        "00010111000000001": 1,
+        "00010111000000011": 1,
+        "00010111010000001": 1,
+        "00011000100000001": 7,
+        "00011000101000001": 1,
+        "00011011001000001": 1,
+        "00011100000000001": 5,
+        "00111011000001001": 1,
+        "01101011000000001": 5,
+        "01101011000010101": 1,
+        "01101011000110001": 1,
+        "01101011001000001": 1,
+        "01101111100000001": 9,
+        "01101111100100001": 1,
+        "01110000000000001": 4,
+        "01110011000100001": 1,
+        "01110100100000000": 1,
+        "01110100100000001": 2,
+        "10000011110000001": 1,
+        "10001000100000001": 7,
+        "10001100000000001": 4,
+        "10010011001000000": 1,
+        "10010011100000001": 4,
+        "10010101000000101": 1,
+        "10110000000001001": 1,
+        "11011000100101001": 1,
+        "11100000000000001": 3,
+        "11100000000100000": 1,
+        "11100011001100001": 1,
+        "11100100100000001": 2,
+        "11100100100010001": 1,
+        "11100111100110000": 1,
+        "11101000000110011": 1,
+        "11110000010010001": 1,
+        "11111001000000101": 1,
+        "11111010010010110": 1,
+        "11111011000000001": 5,
+        "11111111100000001": 6
+      },
+      "finishedAt": "2026-10-10T01:44:30Z",
+      "jobId": "01a1237b-5f60-7349-89d0-a343dca0201c",
+      "missionId": "silent-failure",
+      "prediction": {
+        "equivalentToReference": true,
+        "logicalFlip": {
+          "x": [
+            true
+          ],
+          "z": [
+            false
+          ]
+        },
+        "referenceCorrection": "XIIIIIIII",
+        "referenceVerdict": "logical-error",
+        "residual": "XXXIIIIII",
+        "syndrome": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "verdict": "logical-error"
+      },
+      "shots": 100,
+      "source": "cached-cloud",
+      "startedAt": "2026-10-10T01:44:00Z"
+    }
+  ],
+  "schema": 1
+}

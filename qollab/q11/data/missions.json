@@ -137,8 +137,8 @@
     ]
   },
   {
-    "allowed": ["X", "Z", "Y"],
-    "briefing": "Two fires this time, and they may be different colours. Red stations only ever notice red fires and blue stations only blue ones, so read the two alarm maps separately. You have two crews; a mixed crew (Y) counts as one crew on one block.",
+    "allowed": ["X", "Z"],
+    "briefing": "Two fires this time, and they may be different colours. Red stations only ever notice red fires and blue stations only blue ones, so read the two alarm maps separately. You have two crews, one red and one blue, and each block takes at most one crew.",
     "budget": 2,
     "challenge": {
       "circuit": [],
