@@ -1,5 +1,13 @@
 # Short descriptions (English)
 
+Where each text goes (verified against the live forms on 2026-10-10): the **project About** field accepts ≤240 characters (shown on the project card and used by the submission); the **Project Card write-up** is the long description (Markdown); the submission form itself has no description field — only project, theme, demo video URL (≤512 chars), optional "What didn't work?" (≤4000 chars), an outside-Qollab-IonQ checkbox, and a dependencies textarea.
+
+## About field (≤240 chars, currently set on the draft)
+A fire-dispatch game about quantum error correction: Pauli errors are fires, stabilizer checks are alarms, corrections are firefighters. The same missions run as Qiskit circuits on Qollab's simulators, including IonQ's.
+
+## "What didn't work?" (optional, ≤4000 chars) — draft
+The web game simulates perfect syndrome extraction (no measurement noise), so repeated rounds and detection events are out of scope. On IonQ's noise-model simulators the measured syndrome histogram only approximates the ideal prediction; the algebraic verdict is the proof, the counts are a demonstration. We did not run on hardware. A union-find/MWPM decoder as a second "what if" was planned but not built in the 48-hour window.
+
 ## One sentence (≤ 140 chars)
 Q11: a fire-dispatch game where alarms are stabilizer checks — read them, send crews, and learn why silent failures happen.
 

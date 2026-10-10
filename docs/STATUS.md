@@ -1,6 +1,6 @@
 # Q11 Status
 
-_Last updated: 2026-10-10 10:05 JST_
+_Last updated: 2026-10-10 10:20 JST_
 
 Overall: **IN PROGRESS** (foundation phase). Nothing deployed, nothing published.
 
@@ -13,7 +13,7 @@ Overall: **IN PROGRESS** (foundation phase). Nothing deployed, nothing published
 | A4 | Real-browser desktop/mobile screens checked | TODO | — |
 | A5 | GitHub private, verified commit pushed | IN PROGRESS | `dorakingx/q11` created private 2026-10-10 00:28 UTC (`isPrivate: true`); `main` pushed; final verified SHA pending |
 | A6 | Protected Vercel deploy works with auth, blocked without | IN PROGRESS | project `q11` (prj_JIAQjMOr0rAnEHwhbY46UaeTNonL) created with `ssoProtection.deploymentType="all"` BEFORE any deployment; linked to GitHub `dorakingx/q11`, production branch `main`; first deployment `dpl_BMJ2zXAFvDsSCz5HMPwp6BjQPvqr` (production, Git push, SHA 809c365) READY; anonymous check of 16 URL/path combos on q11-gwwim0mw3-doraking / q11-git-main-doraking / q11-doraking / q11-pied .vercel.app → all 302 → vercel.com/sso-api, no app body (`reports/protection-check.json` passed). Authenticated fetch via `npx vercel@latest curl` returned the app HTML (title confirmed); the automation bypass secret that command auto-created was revoked right after. Final verified-SHA deployment pending. |
-| A7 | Qollab IonQ simulator run of core mission confirmed | TODO | account session unknown |
+| A7 | Qollab IonQ simulator run of core mission confirmed | IN PROGRESS | Draft project created in the user's account (private). Early check circuit (rep3 syndrome extraction + correction) ran on **Built-in simulator** (200 shots) and on **IonQ Aria 1 remote simulator** (`ionq_simulator`, 100 shots, 18.9 s) with results matching the Pauli-frame prediction 100% — `reports/qollab-runs.md`. Core rsc3 mission circuits + the JS game page pending the build wave. |
 | A8 | Icons, README/MIT/attribution/Qollab materials, demo video | TODO | — |
 | A9 | No publish/submit performed; only approval pending | OK so far | nothing public |
 
@@ -28,7 +28,7 @@ Overall: **IN PROGRESS** (foundation phase). Nothing deployed, nothing published
 - [ ] Submission docs + DEMO.mp4
 
 ## Blocked / external
-- Qollab run requires the user's signed-in Qollab session in a browser (no API/CLI). Checked 2026-10-10 09:40 JST: the Claude browser pane is NOT signed in to qollab.xyz. **User action needed:** sign in at https://qollab.xyz/login inside the Claude browser pane (Google or GitHub, same provider as the hackathon registration). Until then A7 is BLOCKED_EXTERNAL; all Qollab materials are being built locally.
+- Qollab access: RESOLVED 2026-10-10 10:05 JST — the user authorised use of their signed-in Brave browser (Claude in Chrome). Team page confirms: Tomoya Hatanaka, captain, solo, node IIIT Dharwad (Professional), 0 of 5 submitted. Submission form fields: public project (radio), theme (Impact/Playground/Unlocked/Other), demo video URL (≤512 chars; YouTube/Loom/Vimeo/Google Drive, no sign-in), optional 'What didn't work?' (≤4000), 'version outside Qollab runs on IonQ' checkbox, 'Dependencies and environment' textarea, confirmation checkbox. The project's About/description (≤240 chars) and the Project Card write-up are the submission text. Nothing was submitted.
 - Vercel MCP connector has no access to team scope `doraking` (403); using the authenticated Vercel CLI instead (works).
 
 ## Verification log

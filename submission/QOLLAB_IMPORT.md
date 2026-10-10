@@ -15,6 +15,12 @@ qollab/
 ```
 Limits: ≤100 files, ≤2 MB each. `index.html` + `main.js` at the top level make it a **JS project** (editor label HTML/JS).
 
+## Verified editor behaviour (2026-10-10, draft `q11-quantum-emergency-response`)
+- **+ New Project** dialog: Title, description (≤240 chars, becomes the About text), optional template, Project shape = Python / Qiskit · JS / Qiskit wrapper · Upload your own files (files, a folder, or a .zip/.tar archive; max 100 files, 2 MB each). Shape can be changed later by adding/removing top-level files.
+- **Code → Edit Code → File tree view**: file list with *Add a file* and a drop zone with **Browse** (single file, folder, or archive). Uploading a file that already exists asks "Erase existing files first?" → *Keep and add* replaces that file only; *Erase first* wipes the project.
+- **Run Project → Run** opens **Select QPU**: a Run-settings form generated from `main()` parameters (Python projects), then Locally Run Simulators (Built-in, AWS Braket local, IBM ×8), Remotely Run Simulators (IonQ Aria 1/2, Forte 1, Forte Enterprise 1 — all *Free*, noise model), Quantum Computer (IonQ Forte — *Credits apply*). The console shows stdout; IonQ runs add a Circuit panel; a Probabilities panel charts outcomes.
+- Drafts auto-save ("Saved just now"). **Publish** is a separate orange button — never pressed without approval.
+
 ## Steps (user or assistant with the user's signed-in session)
 1. Sign in at https://qollab.xyz/login (Google or GitHub). Drafts are private to the owner.
 2. Create a new project (title "Q11 — Quantum Emergency Response"). Keep it a **draft** (do not publish).
