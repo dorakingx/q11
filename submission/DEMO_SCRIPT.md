@@ -1,5 +1,7 @@
 # Demo video script & storyboard (target 150 s; hard range 120–180 s)
 
+**Recorded 2026-10-10 02:15 UTC** with `scripts/record-demo.mjs` + `scripts/demo-shots.json` (98 scripted shots) against the built app: `submission/DEMO.mp4`, 146 s, sha256 `75a4dd7a…` (`reports/demo-recording.json`). Captions are burned in; no narration; no cloud run is shown as live (the Qollab/IonQ results are quoted in a caption with their recorded figures). The table below is the storyboard the shot list implements.
+
 Recording: real app in Chromium at 1280×800 (desktop) with one mobile insert; captions burned in; no narration required (optional voice). No cloud run is shown as "live" unless it actually ran during recording.
 
 | t (s) | Shot | On screen | Caption |

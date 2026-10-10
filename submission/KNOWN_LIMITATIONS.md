@@ -14,9 +14,14 @@
 - No QPU (hardware) runs were performed. No claim of quantum advantage or fault tolerance.
 - Cloud results shown in the web game are **cached** (labelled) or absent; live cloud execution only happens inside Qollab.
 
+## Game design
+- Mission 5's palette is X and Z only. With a Y crew allowed, the alarm pattern (Z0, Z2, X1) has two equally likely minimum-weight explanations (X1·Z6/Z7 vs Y1·Z4) that differ by a logical Z; rather than score a defensible call as a failure, the mission removes the ambiguity. Y is taught in mission 2.
+- Hand-made missions only (fixed errors per mission, seeded fixtures for verification). No procedurally generated missions.
+
 ## Software
 - Client-side game; progress is in localStorage (none inside Qollab's sandbox). Not a tamper-proof competitive system.
-- E2E tests run on Chromium (desktop + mobile emulation). WebKit/real Safari was **not** part of automated runs unless stated in EVIDENCE_INDEX.
+- E2E tests run on Chromium (desktop + mobile emulation). WebKit/real Safari was **not** part of automated runs unless stated in EVIDENCE_INDEX. The every-screen quality walk once exceeded the default 30 s timeout under full parallel load; the per-test timeout is now 90 s (no assertion was weakened).
+- Inside Qollab, the game runs in a sandboxed iframe: no storage between runs (progress is in memory for that Run), and the page's **Verify** button is the only way to send an IonQ job (one per Run). Browser-automation tools cannot click inside that iframe, so the page's IonQ path was verified with the on-load self-test variant (same code path), see `reports/qollab-runs.md` run 8.
 - Japanese UI (P1) not implemented unless EVIDENCE_INDEX says otherwise. English only.
 - Sound is minimal (Web Audio tones), off by default.
 
