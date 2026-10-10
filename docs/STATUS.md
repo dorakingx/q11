@@ -1,6 +1,6 @@
 # Q11 Status
 
-_Last updated: 2026-10-10 11:50 JST_
+_Last updated: 2026-10-10 12:30 JST_
 
 Overall: **PRE-PUBLICATION GATES PASSING; review-fix wave in progress** — protected Vercel deployments live (auth required), Qollab draft private and unpublished, nothing submitted.
 
@@ -9,7 +9,7 @@ Overall: **PRE-PUBLICATION GATES PASSING; review-fix wave in progress** — prot
 |---|---|---|---|
 | A1 | 6 missions, propagation, hidden syndrome, correction, replay playable | PASS | all six missions playable web + Qollab page; e2e covers every mission flow, replay, retry, keyboard, mobile; orchestrator played title/how/settings/mission 2 training/mission 4 & 6 dispatch+debrief in the built-in browser (desktop + 375×812) |
 | A2 | Quantum model tests + independent Qiskit comparison pass | PASS (so far) | `npx vitest run src/quantum` 82/82; `.venv/bin/python quantum/verify.py` 4749 comparisons, 0 mismatches (exit 0) — `reports/QUANTUM_VERIFICATION.md` |
-| A3 | lint/typecheck/unit/e2e/build/verify:release pass | PASS | `node scripts/verify-release.mjs` at SHA 0e950e8 (2026-10-10 02:24 UTC): lint 0, typecheck 0, unit 137/137 (16 files), build 0, verify:quantum 4749/0 mismatches, e2e 26/26 (desktop + mobile), DEMO.mp4 146 s, secret scan 0 → PASS (`reports/release-verification.json`, `reports/release-verification.log`). Earlier 24/26 was a 30 s timeout under load → per-test timeout 90 s; a later failure was port 4173 held by a manual preview server (environmental). |
+| A3 | lint/typecheck/unit/e2e/build/verify:release pass | PASS | After the review-fix wave (2396e1b): lint 0, typecheck 0, unit 158/158 (17 files), e2e 32/32, build 0, Python 4746/0 (orchestrator runs 03:20–03:27 UTC); final verify:release pending the demo re-record. Earlier: `node scripts/verify-release.mjs` at SHA 0e950e8 (2026-10-10 02:24 UTC): lint 0, typecheck 0, unit 137/137 (16 files), build 0, verify:quantum 4749/0 mismatches, e2e 26/26 (desktop + mobile), DEMO.mp4 146 s, secret scan 0 → PASS (`reports/release-verification.json`, `reports/release-verification.log`). Earlier 24/26 was a 30 s timeout under load → per-test timeout 90 s; a later failure was port 4173 held by a manual preview server (environmental). |
 | A4 | Real-browser desktop/mobile screens checked | PASS | Playwright screenshots (title, mission1/4 challenge, mission6 debrief, mobile title/mission4) reviewed by the orchestrator: no overlap/clipping; Qollab-mode bundle mounted in the local harness (title → missions → board) |
 | A5 | GitHub private, verified commit pushed | IN PROGRESS | `dorakingx/q11` created private 2026-10-10 00:28 UTC (`isPrivate: true`); `main` pushed; final verified SHA pending |
 | A6 | Protected Vercel deploy works with auth, blocked without | IN PROGRESS | project `q11` (prj_JIAQjMOr0rAnEHwhbY46UaeTNonL) created with `ssoProtection.deploymentType="all"` BEFORE any deployment; linked to GitHub `dorakingx/q11`, production branch `main`; first deployment `dpl_BMJ2zXAFvDsSCz5HMPwp6BjQPvqr` (production, Git push, SHA 809c365) READY; anonymous check of 16 URL/path combos on q11-gwwim0mw3-doraking / q11-git-main-doraking / q11-doraking / q11-pied .vercel.app → all 302 → vercel.com/sso-api, no app body (`reports/protection-check.json` passed). Authenticated fetch via `npx vercel@latest curl` returned the app HTML (title confirmed); the automation bypass secret that command auto-created was revoked right after. Final verified-SHA deployment pending. |
@@ -31,7 +31,8 @@ Overall: **PRE-PUBLICATION GATES PASSING; review-fix wave in progress** — prot
 - [x] Private repo + protected Vercel project + deploy + protection check
 - [x] Qollab draft project + simulator runs (built-in, IonQ)
 - [x] Submission docs + DEMO.mp4
-- [ ] Review-wave fixes (scoring/stand-down, mission-6 wording, cloud panel per dispatch, modal focus trap, focus/announcements, a11y minors) → re-run gates, re-upload the Qollab bundle, re-record demo, final protection check
+- [x] Review-wave fixes applied (commit 2396e1b): scoring/stand-down, mission-6 wording from the residual, cloud panel filtered per dispatch, modal focus trap + inert, focus/announcer per screen, a11y minors; orchestrator re-ran lint 0 / typecheck 0 / unit 158 / fixtures idempotent / Python 4746-0 / build 0
+- [ ] Final: e2e re-run, Qollab bundle re-upload + run, demo re-record, verify:release, final protection + authenticated check, final report
 
 ## Blocked / external
 - Qollab access: RESOLVED 2026-10-10 10:05 JST — the user authorised use of their signed-in Brave browser (Claude in Chrome). Team page confirms: Tomoya Hatanaka, captain, solo, node IIIT Dharwad (Professional), 0 of 5 submitted. Submission form fields: public project (radio), theme (Impact/Playground/Unlocked/Other), demo video URL (≤512 chars; YouTube/Loom/Vimeo/Google Drive, no sign-in), optional 'What didn't work?' (≤4000), 'version outside Qollab runs on IonQ' checkbox, 'Dependencies and environment' textarea, confirmation checkbox. The project's About/description (≤240 chars) and the Project Card write-up are the submission text. Nothing was submitted.
