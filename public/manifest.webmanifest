@@ -1,6 +1,6 @@
 {
-  "name": "Q11 — Quantum Emergency Response",
-  "short_name": "Q11",
+  "name": "Q11 Emergency — Quantum Emergency Response",
+  "short_name": "Q11 Emergency",
   "description": "Read the alarms, send the crews, keep the quantum city safe.",
   "start_url": "/",
   "scope": "/",
