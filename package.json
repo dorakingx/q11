@@ -20,7 +20,8 @@
     "verify:release": "node scripts/verify-release.mjs",
     "build:qollab": "node scripts/build-qollab.mjs",
     "check:protection": "node scripts/check-protection.mjs",
-    "preview:qollab": "node scripts/serve-qollab-harness.mjs"
+    "preview:qollab": "node scripts/serve-qollab-harness.mjs",
+    "record:demo": "node scripts/record-demo.mjs"
   },
   "dependencies": {
     "react": "18.3.1",
