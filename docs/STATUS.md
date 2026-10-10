@@ -1,6 +1,6 @@
 # Q11 Status
 
-_Last updated: 2026-10-10 10:00 JST_
+_Last updated: 2026-10-10 10:05 JST_
 
 Overall: **IN PROGRESS** (foundation phase). Nothing deployed, nothing published.
 
@@ -12,7 +12,7 @@ Overall: **IN PROGRESS** (foundation phase). Nothing deployed, nothing published
 | A3 | lint/typecheck/unit/e2e/build/verify:release pass | TODO | — |
 | A4 | Real-browser desktop/mobile screens checked | TODO | — |
 | A5 | GitHub private, verified commit pushed | IN PROGRESS | `dorakingx/q11` created private 2026-10-10 00:28 UTC (`isPrivate: true`); `main` pushed; final verified SHA pending |
-| A6 | Protected Vercel deploy works with auth, blocked without | IN PROGRESS | project `q11` (prj_JIAQjMOr0rAnEHwhbY46UaeTNonL) created with `ssoProtection.deploymentType="all"` BEFORE any deployment; linked to GitHub `dorakingx/q11`, production branch `main`; first deployment + anonymous check pending |
+| A6 | Protected Vercel deploy works with auth, blocked without | IN PROGRESS | project `q11` (prj_JIAQjMOr0rAnEHwhbY46UaeTNonL) created with `ssoProtection.deploymentType="all"` BEFORE any deployment; linked to GitHub `dorakingx/q11`, production branch `main`; first deployment `dpl_BMJ2zXAFvDsSCz5HMPwp6BjQPvqr` (production, Git push, SHA 809c365) READY; anonymous check of 16 URL/path combos on q11-gwwim0mw3-doraking / q11-git-main-doraking / q11-doraking / q11-pied .vercel.app → all 302 → vercel.com/sso-api, no app body (`reports/protection-check.json` passed). Authenticated fetch via `npx vercel@latest curl` returned the app HTML (title confirmed); the automation bypass secret that command auto-created was revoked right after. Final verified-SHA deployment pending. |
 | A7 | Qollab IonQ simulator run of core mission confirmed | TODO | account session unknown |
 | A8 | Icons, README/MIT/attribution/Qollab materials, demo video | TODO | — |
 | A9 | No publish/submit performed; only approval pending | OK so far | nothing public |
@@ -35,4 +35,5 @@ Overall: **IN PROGRESS** (foundation phase). Nothing deployed, nothing published
 (appended as commands run — command, exit code, counts)
 - 2026-10-10 09:35 `npm run typecheck` exit 0; `npm run lint` exit 0; `npm run build` exit 0 (scaffold)
 - 2026-10-10 09:33 `gh repo view dorakingx/q11 --json isPrivate` → true
+- 2026-10-10 09:49 `node scripts/check-protection.mjs <4 urls>` exit 0 — ssoProtection all, 16/16 anonymous requests blocked (302 → vercel.com/sso-api), 0 body leaks
 - 2026-10-10 09:47 `npx vercel@latest api /v9/projects/q11` → ssoProtection.deploymentType = "all", passwordProtection null, trustedIps null, latestDeployments []

@@ -15,7 +15,7 @@ const api = spawnSync('npx', ['-y', 'vercel@latest', 'api', `/v9/projects/q11?te
 const raw = api.stdout || '';
 const project = JSON.parse(raw.slice(raw.indexOf('{')));
 const sso = project.ssoProtection?.deploymentType ?? null;
-const protectionOk = sso === 'all' && project.passwordProtection === null && project.trustedIps === null;
+const protectionOk = sso === 'all' && project.passwordProtection == null && project.trustedIps == null;
 
 const results = [];
 let allBlocked = true;
@@ -29,10 +29,11 @@ for (const url of urls) {
     const leaksApp = /Quantum Emergency Response|id="root"/.test(body) && !/Authentication Required|vercel\.com\/login|Log in to Vercel|sso-api/i.test(body);
     const blocked = (status === '401' || status === '403' || status === '307' || status === '302') && !leaksApp;
     if (!blocked) allBlocked = false;
-    results.push({ url: target, status, redirect: redirect || null, contentType: ct.join(' ') || null, bodyLeaksApp: leaksApp, blocked });
+    const redirectHost = redirect ? (() => { try { const u = new URL(redirect); return u.origin + u.pathname; } catch { return 'invalid'; } })() : null;
+    results.push({ url: target, status, redirect: redirectHost, contentType: ct.join(' ') || null, bodyLeaksApp: leaksApp, blocked });
   }
 }
-const report = { checkedAt: new Date().toISOString(), projectId: project.id, ssoProtectionDeploymentType: sso, passwordProtection: project.passwordProtection, trustedIps: project.trustedIps, protectionOk, unauthenticated: results, allBlocked, passed: protectionOk && allBlocked };
+const report = { checkedAt: new Date().toISOString(), projectId: project.id, ssoProtectionDeploymentType: sso, passwordProtection: project.passwordProtection ?? null, trustedIps: project.trustedIps ?? null, protectionBypassConfigured: Object.keys(project.protectionBypass ?? {}).length, protectionOk, unauthenticated: results, allBlocked, passed: protectionOk && allBlocked };
 mkdirSync('reports', { recursive: true });
 writeFileSync('reports/protection-check.json', JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify(report, null, 2));
