@@ -1,12 +1,6 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { App } from './ui/App';
-import './ui/styles.css';
+import { noneBridge } from './game';
+import { mountQ11 } from './ui/mount';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('#root missing');
-createRoot(root).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+mountQ11(root, { bridge: noneBridge(), storage: 'local' });

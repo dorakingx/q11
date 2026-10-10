@@ -1,0 +1,141 @@
+{
+  "checkedAt": "2026-10-10T00:48:57.158Z",
+  "projectId": "prj_JIAQjMOr0rAnEHwhbY46UaeTNonL",
+  "ssoProtectionDeploymentType": "all",
+  "passwordProtection": null,
+  "trustedIps": null,
+  "protectionBypassConfigured": 0,
+  "protectionOk": true,
+  "unauthenticated": [
+    {
+      "url": "https://q11-gwwim0mw3-doraking.vercel.app/",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-gwwim0mw3-doraking.vercel.app/index.html",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-gwwim0mw3-doraking.vercel.app/manifest.webmanifest",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-gwwim0mw3-doraking.vercel.app/assets/",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-git-main-doraking.vercel.app/",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-git-main-doraking.vercel.app/index.html",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-git-main-doraking.vercel.app/manifest.webmanifest",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-git-main-doraking.vercel.app/assets/",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-doraking.vercel.app/",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-doraking.vercel.app/index.html",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-doraking.vercel.app/manifest.webmanifest",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-doraking.vercel.app/assets/",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-pied.vercel.app/",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-pied.vercel.app/index.html",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-pied.vercel.app/manifest.webmanifest",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    },
+    {
+      "url": "https://q11-pied.vercel.app/assets/",
+      "status": "302",
+      "redirect": "https://vercel.com/sso-api",
+      "contentType": "text/plain",
+      "bodyLeaksApp": false,
+      "blocked": true
+    }
+  ],
+  "allBlocked": true,
+  "passed": true
+}

@@ -1,0 +1,93 @@
+{
+  "generatedAt": "2026-10-10T01:46:48.771Z",
+  "fileCount": 17,
+  "totalBytes": 422554,
+  "files": [
+    {
+      "path": "game/q11-game.js",
+      "bytes": 339044,
+      "sha256": "28dd3aaeb8c7bea1e0835b97a59d7b14acf895d59960a5fb7ecf22773777b339"
+    },
+    {
+      "path": "index.html",
+      "bytes": 509,
+      "sha256": "77f9ebbc56f95912eea415d82b299e759726820c047ae27a75a5a312e1a578d5"
+    },
+    {
+      "path": "main.base.css",
+      "bytes": 518,
+      "sha256": "2673d9546a6b194833605c46fd8a322669f48382cd3137e8983412eb5ad27170"
+    },
+    {
+      "path": "main.css",
+      "bytes": 14615,
+      "sha256": "826cb502d6fbab462c6a9216874e28d9013331d96891ea966bfe788a578290e1"
+    },
+    {
+      "path": "main.js",
+      "bytes": 4711,
+      "sha256": "49ed11ba2f353c8f7879553d0aa470f0ac1d101f2e91f5f910c8a63496919539"
+    },
+    {
+      "path": "main.py",
+      "bytes": 6029,
+      "sha256": "ea5e1369c34de464710b4279199b75a3c03b8ab241249d63bc97ce8e698a4fac"
+    },
+    {
+      "path": "q11/__init__.py",
+      "bytes": 1120,
+      "sha256": "d9135615b3480e9a600aa762479b343d81769bbf5c80eea4b6b76dd525f213a9"
+    },
+    {
+      "path": "q11/circuits.py",
+      "bytes": 17940,
+      "sha256": "168b2b3380dc5aa1af42b32b3a5db6f4dd71ba47968d7fd2b23e8dc77cb7e8d7"
+    },
+    {
+      "path": "q11/codes.py",
+      "bytes": 10747,
+      "sha256": "f8f3f32c1689ef2a40e9fcb940af74c098b4abfda216954c32983bcac9302722"
+    },
+    {
+      "path": "q11/data/codes.json",
+      "bytes": 2221,
+      "sha256": "73e1aa93b8084279b62a02c55b23b718338ef7c5e10b958cbc2fe5e406fb1d86"
+    },
+    {
+      "path": "q11/data/missions.json",
+      "bytes": 9838,
+      "sha256": "0eadbb042c9ca572d849bf5c348822b287569a93b0921bd60fa20210eb68b947"
+    },
+    {
+      "path": "q11/decoder.py",
+      "bytes": 2139,
+      "sha256": "14e354aa7b0ebd8a4971cc8ad13f111ecad035e6591780e3726f1cc7eb3f1002"
+    },
+    {
+      "path": "q11/gf2.py",
+      "bytes": 2371,
+      "sha256": "b268ebaf2bc50a8e75912d71db7e146830118d8b405fdb2690872b816a80387a"
+    },
+    {
+      "path": "q11/missions.py",
+      "bytes": 1371,
+      "sha256": "9b83c95ce6bdc6d8f7629f434ab43eac4d6395c00c27173657a929072f1d417e"
+    },
+    {
+      "path": "q11/pauli.py",
+      "bytes": 7209,
+      "sha256": "30c7923f95e3d559ba71490bf891961cd696fa7f84cf018ffb04aa599f6f1d7b"
+    },
+    {
+      "path": "q11/verdict.py",
+      "bytes": 2151,
+      "sha256": "5ae7430cd6cbca07a93a6d9cb18bceb15c85e7a884bacd41c311a1467bf4de04"
+    },
+    {
+      "path": "requirements.txt",
+      "bytes": 21,
+      "sha256": "f16f483f4de676cd67b8222408e0f6a9b0e1431c3440449959ee97802c0af650"
+    }
+  ],
+  "withinLimits": true
+}
