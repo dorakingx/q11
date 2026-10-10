@@ -91,6 +91,11 @@ export interface SceneProps extends BoardLikeProps {
   readonly houseVariants?: readonly HouseVariant[] | undefined;
   /** Spray frame (SprayPlayer): overrides fires/crews/residual drawing. */
   readonly frame?: SceneFrame | undefined;
+  /**
+   * Training prediction (R10): replaces the "press to send / recall" part of every interactive house label with
+   * this text (e.g. t('a11y.pressToPredict')), so a tap-to-predict scene does not promise a crew. Integration fix.
+   */
+  readonly tapHint?: string | undefined;
   /** Caption / district name shown by the parent; the scene itself never renders prose. */
   readonly className?: string | undefined;
   /** Extra SVG children drawn above everything (dev previews). */
@@ -273,6 +278,7 @@ export function Scene(props: SceneProps) {
               watchers={fog ? [] : code.checks.filter((c) => c.qubits.includes(q)).map((c) => c.id)}
               onToggle={props.onToggle}
               onKeyDown={onKeyDown}
+              tapHint={props.tapHint}
               t={t}
             />
           </div>
@@ -337,10 +343,11 @@ interface HouseButtonProps {
   readonly watchers: readonly string[];
   readonly onToggle: ((q: number) => void) | undefined;
   readonly onKeyDown: (e: KeyboardEvent<HTMLElement>, q: number) => void;
+  readonly tapHint: string | undefined;
   readonly t: Translate;
 }
 
-function HouseButton({ q, state, fog, crew, interactive, selected, budgetReached, watchers, onToggle, onKeyDown, t }: HouseButtonProps) {
+function HouseButton({ q, state, fog, crew, interactive, selected, budgetReached, watchers, onToggle, onKeyDown, tapHint, t }: HouseButtonProps) {
   const parts: string[] = [fog ? t('a11y.fogHouse', { q }) : t('a11y.house', { q })];
   if (watchers.length > 0) parts.push(t('a11y.watchedBy', { list: watchers.join(', ') }));
   if (!fog) {
@@ -364,7 +371,9 @@ function HouseButton({ q, state, fog, crew, interactive, selected, budgetReached
     }
   }
   if (crew !== null) parts.push(t('a11y.crew', { crew: crewName(t, crew) }));
-  if (interactive) {
+  if (interactive && tapHint !== undefined) {
+    parts.push(tapHint);
+  } else if (interactive) {
     if (crew === null) parts.push(budgetReached ? t('a11y.noCrewsLeft') : selected === undefined ? t('a11y.pressToSendAny') : t('a11y.pressToSend', { crew: crewName(t, selected) }));
     else if (crew === selected) parts.push(t('a11y.pressToRecall'));
     else parts.push(selected === undefined ? t('a11y.pressToSwitchAny') : t('a11y.pressToSwitch', { crew: crewName(t, selected) }));
@@ -386,7 +395,7 @@ function HouseButton({ q, state, fog, crew, interactive, selected, budgetReached
       onKeyDown={(e) => onKeyDown(e, q)}
     >
       {/* selected-crew preview: identical markup on every house, visible only on focus/hover (CSS) */}
-      {selected !== undefined && crew === null && !budgetReached ? (
+      {selected !== undefined && crew === null && !budgetReached && tapHint === undefined ? (
         <span className="crew-preview" aria-hidden="true">
           <svg viewBox="-30 -46 60 50" width="30" height="25" focusable="false">
             <HelmetChip letter={selected} x={0} y={0} />

@@ -1,150 +1,176 @@
 /// <reference lib="dom" />
-import { allBlocksLargeEnough, expect, expectNoHorizontalOverflow, openChallenge, openMissions, screenshot, test } from './helpers';
+import { allBlocksLargeEnough, expect, expectNoHorizontalOverflow, readSave, screenshot, seedSave, serialisedHouses, stepSprayToEnd, test } from './helpers';
 
-test('smoke: title → play → mission 1 briefing → training → challenge → place crew → confirm → debrief → next', async ({ page }, info) => {
-  const mobile = info.project.name.includes('mobile');
+test('first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge', async ({ page }, info) => {
   await page.goto('/');
   await expect(page).toHaveTitle(/Q11/);
   await expect(page.getByRole('heading', { name: /Quantum Emergency Response/ })).toBeVisible();
-  await expect(page.getByTestId('play')).toBeVisible();
-  await screenshot(page, mobile ? 'mobile-title' : 'title');
+  await expect(page.getByTestId('lang-toggle')).toBeVisible();
   await expectNoHorizontalOverflow(page);
+  const play = page.getByTestId('play');
+  const box = await play.boundingBox();
+  expect(box?.height ?? 0).toBeGreaterThanOrEqual(52);
+  await play.click();
 
-  await page.getByTestId('play').click();
-  await expect(page.getByRole('heading', { name: 'Missions' })).toBeVisible();
-  await expect(page.getByTestId('mission-6')).toBeVisible();
-
-  await page.getByTestId('mission-1').click();
-  await expect(page.getByText('Briefing', { exact: true })).toBeVisible();
-  await expect(page.getByText(/Welcome to dispatch/)).toBeVisible();
-  await page.getByTestId('start-mission').click();
-
-  // Training: the true fire is visible (block 0 burning) and Z0 rings.
-  await expect(page.getByText(/Training · lesson 1 of 1/)).toBeVisible();
-  await expect(page.locator('[data-check="Z0"][data-ringing="1"]')).toBeVisible();
-  await expect(page.locator('[data-check="Z1"][data-ringing="0"]')).toBeVisible();
-  await expect(page.locator('.block.is-burning[data-q="0"]')).toBeVisible();
-  await page.getByTestId('training-next').click();
-
-  // Challenge: both stations ring, no fire visible, nothing reveals the answer.
-  await expect(page.getByTestId('confirm')).toBeVisible();
-  await expect(page.locator('[data-check="Z0"][data-ringing="1"]')).toBeVisible();
-  await expect(page.locator('[data-check="Z1"][data-ringing="1"]')).toBeVisible();
-  await expect(page.locator('.block.is-burning')).toHaveCount(0);
-  await expect(page.getByTestId('budget')).toContainText('Crews: 0 / 1');
+  // Tutorial mode: straight into Rowhouse Lane's planning scene, three numbered callouts, fog on every house.
+  await expect(page.getByTestId('tutorial-bar')).toBeVisible();
+  await expect(page.getByTestId('confirm')).toHaveText('Spray!');
+  await expect(page.getByTestId('tutorial-callout-1')).toHaveAttribute('data-active', 'true');
+  await expect(page.locator('[data-check][data-ringing="1"]')).toHaveCount(2);
+  await expect(page.locator('[data-house][data-house-state="fog"]')).toHaveCount(3);
+  const houses = await serialisedHouses(page);
+  expect(houses.length).toBe(3);
+  for (const h of houses) expect(h).toBe(houses[0]);
   await allBlocksLargeEnough(page);
   await expectNoHorizontalOverflow(page);
-  if (!mobile) await screenshot(page, 'mission1-challenge');
+  if (info.project.name === 'desktop-chromium') await screenshot(page, 'tutorial-1280x800');
 
-  // Place a crew on block 1 via click; budget enforced (block 2 click ignored).
+  await page.getByTestId('palette-X').click();
+  await expect(page.getByTestId('tutorial-callout-2')).toHaveAttribute('data-active', 'true');
   await page.getByTestId('block-1').click();
   await expect(page.getByTestId('budget')).toContainText('Crews: 1 / 1');
-  await page.getByTestId('block-2').click();
+  await expect(page.getByTestId('tutorial-callout-3')).toHaveAttribute('data-active', 'true');
+  await page.getByTestId('confirm').click();
+
+  // Spray showpiece: header, crew runs, stream, then (on skip) the restored result.
+  await expect(page.getByRole('heading', { name: 'Training replay: answer check' })).toBeVisible();
+  await expect(page.locator('.firefighter[data-crew-q="1"]')).toBeVisible();
+  await page.getByTestId('spray-skip').click();
+  await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'restored');
+  await expect(page.getByTestId('result-title')).toBeFocused();
+  await expect(page.locator('[data-house="1"][data-house-state="restored"]')).toHaveCount(1);
+  await expect(page.locator('.detector[data-ringing="true"]')).toHaveCount(0);
+  await expect(page.getByTestId('result-next')).toHaveText('Back to the city');
+  await expectNoHorizontalOverflow(page);
+  await page.getByTestId('result-next').click();
+
+  await expect(page.getByTestId('city-map')).toBeVisible();
+  await expect(page.getByTestId('toast-badge')).toContainText('Alarm Reader earned!');
+  await expect(page.getByTestId('mission-1')).toHaveAttribute('data-status', 'solved');
+  await expect(page.getByTestId('mission-2')).toHaveAttribute('data-status', 'available');
+  await expect(page.getByTestId('mission-3')).toHaveAttribute('data-status', 'locked');
+  await expect(page.getByTestId('city-stars')).toContainText('3 of 16 stars');
+  const save = await readSave(page);
+  expect(save).toMatchObject({ version: 2, tutorialDone: true, progress: { 'first-alarm': { stars: 3, attempts: 1, completed: true } } });
+  await expectNoHorizontalOverflow(page);
+});
+
+test('skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('play').click();
+  await page.getByTestId('tutorial-skip').click();
+  await expect(page.getByTestId('city-map')).toBeVisible();
+  await page.reload();
+  await expect(page.getByTestId('play')).toHaveText('Play');
+  await page.getByTestId('play').click();
+  await expect(page.getByTestId('city-map')).toBeVisible();
+});
+
+test('mission 1 can be played with the keyboard only', async ({ page }, info) => {
+  test.skip(info.project.name === 'desktop-webkit', 'WebKit does not move focus with Tab unless the OS "full keyboard access" setting is on');
+  await seedSave(page, { reducedMotion: true });
+  await page.goto('/');
+  await page.keyboard.press('Tab');
+  await expect(page.getByTestId('play')).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.getByTestId('city-map')).toBeVisible();
+  // City: Tab to the first district, Enter opens the panel, Tab to Dispatch!, Enter (reduced motion: no drive).
+  for (let i = 0; i < 12; i++) {
+    await page.keyboard.press('Tab');
+    if (await page.getByTestId('mission-1').evaluate((el) => el === document.activeElement)) break;
+  }
+  await expect(page.getByTestId('mission-1')).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.getByTestId('dispatch-go')).toBeVisible();
+  for (let i = 0; i < 12; i++) {
+    await page.keyboard.press('Tab');
+    if (await page.getByTestId('dispatch-go').evaluate((el) => el === document.activeElement)) break;
+  }
+  await page.keyboard.press('Enter');
+  await expect(page.getByTestId('briefing')).toBeVisible();
+  // Briefing: Tab to "Start training", Enter; Training: Tab to "Skip to dispatch", Enter.
+  for (let i = 0; i < 12; i++) {
+    await page.keyboard.press('Tab');
+    if (await page.getByTestId('start-mission').evaluate((el) => el === document.activeElement)) break;
+  }
+  await page.keyboard.press('Enter');
+  await expect(page.getByTestId('training-next')).toBeVisible();
+  for (let i = 0; i < 20; i++) {
+    await page.keyboard.press('Tab');
+    if (await page.getByTestId('start-challenge').evaluate((el) => el === document.activeElement)) break;
+  }
+  await page.keyboard.press('Enter');
+  await expect(page.getByTestId('confirm')).toBeVisible();
+
+  // Challenge: "1" selects the red crew, Tab to house 0, ArrowRight to house 1, Space places, "c" sprays.
+  await page.keyboard.press('1');
+  await expect(page.getByTestId('palette-X')).toHaveAttribute('aria-checked', 'true');
+  const visited: string[] = [];
+  for (let i = 0; i < 24; i++) {
+    await page.keyboard.press('Tab');
+    visited.push(await page.evaluate(() => (document.activeElement as HTMLElement | null)?.dataset['testid'] ?? ''));
+    if (await page.getByTestId('block-0').evaluate((el) => el === document.activeElement)) break;
+  }
+  expect(visited.indexOf('palette-X')).toBeGreaterThanOrEqual(0);
+  expect(visited.indexOf('palette-X')).toBeLessThan(visited.indexOf('block-0'));
+  expect(visited).not.toContain('confirm');
+  await expect(page.getByTestId('block-0')).toBeFocused();
+  await page.keyboard.press('ArrowRight');
+  await expect(page.getByTestId('block-1')).toBeFocused();
+  await page.keyboard.press('Space');
   await expect(page.getByTestId('budget')).toContainText('Crews: 1 / 1');
   await expect(page.getByTestId('block-1')).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByTestId('block-2')).toHaveAttribute('aria-pressed', 'false');
-
-  await page.getByTestId('confirm').click();
-  // The verdict banner is visible immediately (every replay step), focused, and the replay auto-plays from step 1.
-  await expect(page.getByTestId('verdict')).toContainText('Logical qubit safe');
-  await expect(page.getByTestId('verdict')).toBeFocused();
-  await expect(page.getByText('Debrief · everything revealed')).toBeVisible();
-  await expect(page.getByTestId('narrative')).toContainText(/two red flames cancel/);
-  await expect(page.getByTestId('cloud-panel')).toContainText('No cloud result recorded for this dispatch');
-  await expect(page.getByTestId('replay-auto')).toHaveAttribute('aria-pressed', 'true');
-  await expectNoHorizontalOverflow(page);
-
-  // Replay: pause, jump to the first step, step forward, auto-play reaches the verdict step.
-  await page.getByTestId('replay-auto').click();
-  await expect(page.getByTestId('replay-auto')).toHaveAttribute('aria-pressed', 'false');
-  await page.getByRole('button', { name: 'Step 1: Fires placed' }).click();
-  await expect(page.getByTestId('replay-caption')).toContainText('Noise lit a red fire (X) on block 1');
-  await page.getByTestId('replay-next').click();
-  await expect(page.getByTestId('replay-caption')).toContainText(/Alarms: Z0, Z1 ring/);
-  await page.getByTestId('replay-auto').click();
-  await expect(page.getByTestId('replay-caption')).toContainText(/Step 5 of 5 · Verdict/, { timeout: 15_000 });
-  await expect(page.getByTestId('replay-auto')).toHaveAttribute('aria-pressed', 'false');
-
-  // Result → next mission briefing.
-  await page.getByTestId('to-result').click();
-  await expect(page.getByTestId('result')).toContainText('Optimal call');
-  await expect(page.getByTestId('result')).toContainText('1 crew used · minimum 1');
-  await page.getByTestId('next-mission').click();
-  await expect(page.getByText(/Mission 2 · Red Forward/)).toBeVisible();
-  await expect(page.getByText('Briefing', { exact: true })).toBeVisible();
+  await page.keyboard.press('Backspace');
+  await expect(page.getByTestId('budget')).toContainText('Crews: 0 / 1');
+  await page.keyboard.press('Enter');
+  await expect(page.getByTestId('budget')).toContainText('Crews: 1 / 1');
+  await page.keyboard.press('ArrowRight');
+  await expect(page.getByTestId('block-2')).toBeFocused();
+  await page.keyboard.press('ArrowLeft');
+  await expect(page.getByTestId('block-1')).toBeFocused();
+  await page.keyboard.press('c');
+  // Reduced motion: the spray is a stepper; Enter on "Next frame" walks to the end.
+  await stepSprayToEnd(page, true);
+  await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'restored');
+  await expect(page.getByTestId('result-title')).toBeFocused();
 });
 
-test('mission 4 challenge renders the full surface-code board (screenshot)', async ({ page }, info) => {
-  const mobile = info.project.name.includes('mobile');
-  await openMissions(page);
-  await openChallenge(page, 4, { through: 'training' });
-  await expect(page.locator('button.block')).toHaveCount(9);
-  await expect(page.locator('[data-check="Z0"][data-ringing="1"]')).toBeVisible();
-  await expect(page.locator('[data-check="Z1"][data-ringing="1"]')).toBeVisible();
-  await expect(page.locator('[data-ringing="1"]')).toHaveCount(2);
-  await allBlocksLargeEnough(page);
-  await page.getByTestId('block-4').click();
-  await expectNoHorizontalOverflow(page);
-  await screenshot(page, mobile ? 'mobile-mission4' : 'mission4-challenge');
-  await page.getByTestId('confirm').click();
-  await expect(page.getByTestId('verdict')).toContainText('Logical qubit safe');
+test('language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists', async ({ page }) => {
+  await seedSave(page, {});
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Quantum Emergency Response');
+  await page.getByTestId('lang-toggle').click();
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('クアンタム・エマージェンシー・レスポンス');
+  await expect(page).toHaveTitle('Q11 — クアンタム・エマージェンシー・レスポンス');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
+  await expect(page.getByTestId('play')).toHaveText('あそぶ');
+  await page.getByTestId('play').click();
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('量子の街');
+  await expect(page).toHaveTitle('Q11 — 街の地図');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
+  await page.getByTestId('settings').click();
+  await expect(page.getByTestId('lang-ja')).toHaveAttribute('aria-pressed', 'true');
+  await page.getByTestId('lang-en').click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Settings');
 });
 
-test('propagation missions 2 and 3: predict the end state, wrong colour fails, try again works', async ({ page }) => {
-  await openMissions(page);
-  await openChallenge(page, 2, { through: 'training' });
-  // Challenge of mission 2: XZ through CNOT → YY. Send Y to both output blocks.
-  await page.getByTestId('palette-Y').click();
-  await page.getByTestId('block-0').click();
-  await page.getByTestId('block-1').click();
-  await expect(page.getByTestId('budget')).toContainText('Crews: 2 / 2');
-  await page.getByTestId('confirm').click();
-  await expect(page.getByTestId('verdict')).toContainText('Logical qubit safe');
-  // Pause the auto-play and jump to the verdict step (6 steps: placed, gate, alarms, dispatch, residual, verdict).
-  await page.getByTestId('replay-auto').click();
-  await page.getByRole('button', { name: 'Step 6: Verdict' }).click();
-  await expect(page.getByTestId('replay-caption')).toContainText(/every fire is out/);
-  // Replay the gate step and check the propagation caption.
-  await page.getByRole('button', { name: 'Step 2: Gate' }).click();
-  await expect(page.getByTestId('replay-caption')).toContainText('CNOT from block 0 to block 1: XZ becomes YY');
-  await page.getByTestId('debrief-next').click();
-  await expect(page.getByText(/Mission 3 · Color Switch/)).toBeVisible();
-  await page.getByTestId('start-mission').click();
-  await page.getByTestId('start-challenge').click();
-  // Wrong: send X X (true end state is XZ).
-  await page.getByTestId('palette-X').click();
-  await page.getByTestId('block-0').click();
-  await page.getByTestId('block-1').click();
-  await page.getByTestId('confirm').click();
-  // Bare wires have no stabilizers: a miss is a missed prediction, never a "silent failure".
-  await expect(page.getByTestId('verdict')).toContainText('Prediction missed — fires left on the wires');
-  await expect(page.getByTestId('verdict')).not.toContainText('Silent failure');
-  await expect(page.getByTestId('residual')).toContainText('IY');
-  await expect(page.getByText('missed — fires left on block 1')).toBeVisible();
-  await page.getByTestId('try-again').click();
-  await expect(page.getByTestId('budget')).toContainText('Crews: 0 / 2');
-  await page.getByTestId('palette-X').click();
-  await page.getByTestId('block-0').click();
-  await page.getByTestId('palette-Z').click();
-  await page.getByTestId('block-1').click();
-  await page.getByTestId('confirm').click();
-  await expect(page.getByTestId('verdict')).toContainText('Logical qubit safe');
-});
-
-test('standing down with no crews asks for confirmation, then shows fires still burning', async ({ page }) => {
-  await openMissions(page);
-  await openChallenge(page, 1);
-  await page.getByTestId('confirm').click();
-  await expect(page.getByRole('alertdialog')).toContainText('Stand down with no crews?');
-  await page.getByRole('button', { name: 'Keep dispatching' }).click();
-  await expect(page.getByRole('alertdialog')).toHaveCount(0);
-  await page.getByTestId('confirm').click();
-  await page.getByRole('button', { name: 'Stand down' }).click();
-  await expect(page.getByTestId('verdict')).toContainText('Fires still burning');
-  // Standing down with fires present is 0 stars, never "Close".
-  await page.getByTestId('to-result').click();
-  await expect(page.getByTestId('result')).toContainText('Stood down');
-  await expect(page.getByTestId('result')).toContainText('0 crews used');
-  await expect(page.getByRole('img', { name: '0 of 3 stars' })).toBeVisible();
-  await expect(page.getByTestId('result')).not.toContainText('Close');
+test('document.title follows the screen and the live region announces each screen', async ({ page }) => {
+  await seedSave(page, { reducedMotion: true, freeRoam: true });
+  await page.goto('/');
+  await expect(page).toHaveTitle('Q11 — Quantum Emergency Response');
+  await expect(page.getByTestId('announcer')).toHaveText('Q11 title screen.');
+  await page.getByTestId('play').click();
+  await expect(page).toHaveTitle('Q11 — City map');
+  await expect(page.getByTestId('announcer')).toHaveText('City map.');
+  await page.getByTestId('mission-4').click();
+  await page.getByTestId('dispatch-go').click();
+  await expect(page).toHaveTitle('Q11 — Mission 4 · Blind Dispatch');
+  await expect(page.locator('main h1')).toBeFocused();
+  await page.getByTestId('briefing-skip').click();
+  await expect(page.getByTestId('announcer')).toHaveText('Mission 4 dispatch. 2 of 8 stations ringing: Z0, Z1.');
+  await expect(page.locator('main h1')).toBeFocused();
+  // Alarm house lists stay in the accessibility tree even when visually hidden; fogged houses never name watchers.
+  await expect(page.locator('[data-check="Z0"] .alarm-blocks')).toHaveText('houses 0, 1, 3, 4');
+  await expect(page.getByTestId('block-4')).toHaveAccessibleName(/^House 4, hidden, press to send red \(X\) crew$/);
 });

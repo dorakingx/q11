@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-10-10T11:36:22.476Z",
+  "thresholdMs": 100,
+  "projects": {
+    "desktop-chromium": {
+      "project": "desktop-chromium",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "samplesMs": [
+        3.9,
+        3,
+        2.9,
+        2.2,
+        2.3,
+        2.2
+      ],
+      "maxMs": 3.9,
+      "meanMs": 2.75,
+      "measuredAt": "2026-10-10T11:34:27.990Z"
+    },
+    "mobile-chromium": {
+      "project": "mobile-chromium",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "samplesMs": [
+        3.8,
+        3.3,
+        2.9,
+        2.2,
+        2.2,
+        2.2
+      ],
+      "maxMs": 3.8,
+      "meanMs": 2.77,
+      "measuredAt": "2026-10-10T11:35:02.356Z"
+    },
+    "tablet-chromium": {
+      "project": "tablet-chromium",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "samplesMs": [
+        3.8,
+        2.8,
+        2.9,
+        2.1,
+        2.3,
+        2.1
+      ],
+      "maxMs": 3.8,
+      "meanMs": 2.67,
+      "measuredAt": "2026-10-10T11:35:30.450Z"
+    }
+  }
+}

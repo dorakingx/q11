@@ -1,10 +1,14 @@
 /**
- * Non-play screens: title, how it works, mission list, settings, briefing, result, summary.
+ * Non-play screens: title, how it works, settings, briefing, result, summary. The city map lives in src/ui/city.
+ * Every visible string comes from useT(); mission kid copy from missionCopy(); art from src/ui/art.
  */
 import { getCode } from '../quantum';
-import { listPublicMissions, maxTotalStars, QUALITY_LABEL, resultHeading, totalStars, type Action, type Debrief, type GameState, type PublicMissionView } from '../game';
-import { Flame, GearIcon, Helmet, Q11Mark, StationGlyph } from './glyphs';
-import { Stars, TopBar } from './panels';
+import { DISTRICTS, districtForMission, listPublicMissions, maxTotalStars, resultType, totalStars, type Action, type Debrief, type DistrictKind, type GameState, type Language, type PublicMissionView } from '../game';
+import { BridgeSpan, ChapterBadge, ConversionLab, Detector, House, MemoryTower, Tree } from './art';
+import { GearIcon, Q11Mark } from './glyphs';
+import { briefingText, missionCopy, plural, reactionFor, useLanguage, useT } from './i18n';
+import { Details, DetectorIcon, FlameIcon, HelmetIcon, LangToggle, Legend, Stars, TopBar, WaterIcon } from './panels';
+import { badgeNameKey, CODE_KEY, outcomeKey, QUALITY_KEY, resultHeadingKey } from './text';
 
 export interface ScreenProps {
   readonly state: GameState;
@@ -12,116 +16,141 @@ export interface ScreenProps {
   readonly storageLabel: string;
 }
 
+const BADGE_COLOURS = ['#2f6fdd', '#2bb673', '#8a4fd6', '#e8432a', '#f2b200', '#3a2f2a'];
+
+/* ------------------------------------------------------------------ title */
+
 export function TitleScreen({ state, dispatch }: ScreenProps) {
+  const t = useT();
   const stars = totalStars(state.progress);
   return (
     <main className="screen screen-title">
       <div className="title-card">
-        <Q11Mark size={96} />
+        <Q11Mark size={112} label={t('a11y.q11mark')} />
         <h1 className="title-h" tabIndex={-1} data-focus-target>
-          Q11 <span className="title-dash">—</span> Quantum Emergency Response
+          {t('app.name')} <span className="title-dash">—</span> {t('title.heading')}
         </h1>
-        <p className="title-lead">Read the alarms, dispatch the firefighters, protect the logical qubit.</p>
+        <p className="title-lead">{t('title.kidLine')}</p>
         <div className="title-actions">
-          <button type="button" className="btn btn-primary btn-large" onClick={() => dispatch({ type: 'PLAY' })} data-testid="play">
-            Play
+          <button type="button" className="btn btn-primary btn-large btn-play" onClick={() => dispatch({ type: 'PLAY' })} data-testid="play">
+            {state.tutorialDone ? t('title.play') : t('title.firstCall')}
           </button>
-          <button type="button" className="btn btn-large" onClick={() => dispatch({ type: 'OPEN_HOW' })}>
-            How it works
+          <button type="button" className="btn btn-large" onClick={() => dispatch({ type: 'OPEN_HOW' })} data-testid="how">
+            {t('title.how')}
           </button>
-          <button type="button" className="btn btn-ghost btn-icon btn-large" onClick={() => dispatch({ type: 'OPEN_SETTINGS' })} aria-label="Settings">
+        </div>
+        <div className="title-tools">
+          <LangToggle language={state.settings.language} onChange={(language) => dispatch({ type: 'SET_LANGUAGE', language })} />
+          <button type="button" className="btn btn-ghost btn-icon" onClick={() => dispatch({ type: 'OPEN_SETTINGS' })} aria-label={t('title.settings')} data-testid="settings">
             <GearIcon />
           </button>
         </div>
         {stars > 0 ? (
-          <p className="muted title-progress">
-            Progress: {stars} of {maxTotalStars()} stars.
+          <p className="muted title-progress" data-testid="title-progress">
+            {t('title.progress', { stars, max: maxTotalStars() })}
           </p>
         ) : null}
-        <p className="title-foot muted">Qollab × IonQ Global Quantum Hackathon 2026 entry. This effort is supported by Qollab &amp; IonQ.</p>
+        <p className="title-foot muted">{t('title.foot')}</p>
       </div>
     </main>
   );
 }
 
+/* ------------------------------------------------------------------ how it works */
+
 export function HowItWorks({ dispatch }: ScreenProps) {
+  const t = useT();
   return (
     <main className="screen screen-doc">
-      <TopBar title="How it works" onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} onTitle={() => dispatch({ type: 'OPEN_TITLE' })} />
+      <TopBar title={t('how.title')} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} onTitle={() => dispatch({ type: 'OPEN_TITLE' })} />
       <article className="doc">
-        <p>
-          Q11 is a <strong>fire-dispatch metaphor</strong> for quantum error correction. Nothing here is about real fires or real
-          firefighting; every fire, alarm and crew is a piece of quantum algebra.
-        </p>
+        <p className="brief-text">{t('how.kid.intro')}</p>
+        <h2>{t('how.kid.legend')}</h2>
         <dl className="how-list">
           <div>
-            <dt>Blocks</dt>
-            <dd>Qubits. The number is the qubit index.</dd>
+            <dt>
+              <svg width="40" height="40" viewBox="-40 -80 80 84" aria-hidden="true" focusable="false">
+                <House x={0} y={0} variant="small" state={{ kind: 'normal' }} tint={0} />
+              </svg>
+              {t('how.houses.term')}
+            </dt>
+            <dd>{t('how.kid.houses')}</dd>
           </div>
           <div>
             <dt>
-              Fires <Flame letter="X" size={20} /> <Flame letter="Z" size={20} /> <Flame letter="Y" size={20} />
+              <FlameIcon letter="X" size={30} /> <FlameIcon letter="Z" size={30} /> <FlameIcon letter="Y" size={30} />
+              {t('how.fires.term')}
             </dt>
-            <dd>
-              Pauli errors lit by an arsonist called <em>Noise</em>. Red = X, blue = Z, split red-and-blue = Y (= X and Z at once).
-            </dd>
+            <dd>{t('how.kid.fires')}</dd>
           </div>
           <div>
             <dt>
-              Alarm stations <StationGlyph type="Z" ringing={false} /> <StationGlyph type="X" ringing={false} />
+              <DetectorIcon type="Z" size={30} /> <DetectorIcon type="X" size={30} /> <DetectorIcon type="Z" ringing size={30} />
+              {t('how.alarms.term')}
             </dt>
-            <dd>
-              Stabilizer checks that stand between blocks. A <strong>diamond Z station</strong> rings when an <em>odd</em> number of its
-              blocks carry a red (X or Y) fire; a <strong>square X station</strong> rings for an odd number of blue (Z or Y) fires. A station
-              never rings just because a fire is nearby, and it never says which block is burning.
-            </dd>
+            <dd>{t('how.kid.alarms')}</dd>
           </div>
           <div>
             <dt>
-              Crews <Helmet letter="X" size={20} /> <Helmet letter="Z" size={20} /> <Helmet letter="Y" size={20} />
+              <HelmetIcon letter="X" size={30} /> <HelmetIcon letter="Z" size={30} /> <HelmetIcon letter="Y" size={30} />
+              {t('how.crews.term')}
             </dt>
-            <dd>
-              Corrections. A red crew on a red fire puts it out (X·X = I). A red crew on a safe block <em>lights</em> a red fire.
-              Fires and crews combine by XOR, never by “more is better”.
-            </dd>
+            <dd>{t('how.kid.crews')}</dd>
           </div>
           <div>
-            <dt>Gates</dt>
-            <dd>
-              Fires move only through gates. CNOT copies red forward (control → target) and blue backward (target → control).
-              H swaps red and blue on its own wire.
-            </dd>
+            <dt>{t('how.gates.term')}</dt>
+            <dd>{t('how.kid.gates')}</dd>
           </div>
           <div>
-            <dt>Verdict</dt>
-            <dd>
-              After you confirm, the residual R = crews ⊕ fires is judged by the code’s algebra: <strong>Logical qubit safe</strong> if R is a
-              stabilizer; <strong>Silent failure</strong> if every alarm is quiet but R acts as a logical operator; <strong>Fires still
-              burning</strong> if any station still rings. Quiet alarms alone are never proof of safety.
-            </dd>
+            <dt>
+              <WaterIcon size={30} /> <FlameIcon letter="Z" size={30} />
+              {t('legend.water')}
+            </dt>
+            <dd>{t('how.kid.water')}</dd>
           </div>
         </dl>
-        <h2>Controls</h2>
-        <ul className="plain-list">
-          <li>Tap or click a block to send the selected crew; tap again to recall it.</li>
-          <li>
-            Keyboard (while focus is inside the dispatch screen): <kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd> select X/Z/Y crews, arrows move between blocks and
-            between crew colours, <kbd>Enter</kbd> or <kbd>Space</kbd> toggles a crew, <kbd>Backspace</kbd> recalls the focused block’s crew (or every crew when no
-            block is focused), <kbd>C</kbd> confirms.
-          </li>
-          <li>
-            Stars: 3 for the minimum-weight dispatch that succeeds, 2 for a success with extra crews, 1 for the right call on a mission that could not be won (or a
-            near miss with at least one crew sent). Standing down while fires burn scores 0. Mission 6 awards at most 1 star, so the shift totals 16.
-          </li>
-          <li>Sound is off by default; motion follows your system setting and the manual toggle in Settings.</li>
-        </ul>
-        <p className="muted small">
-          Model: Clifford + Pauli educational simulation with a perfect-syndrome assumption. The repetition code is an X-noise-only
-          introduction; the main district is a distance-3 rotated surface code.
-        </p>
+        <p className="how-rule">{t('how.quantumRules')}</p>
+        <p>{t('how.kid.spray')}</p>
+        <Details summary={t('details.title')} testId="how-details">
+          <dl className="how-list how-list-details">
+            <div>
+              <dt>{t('how.houses.term')}</dt>
+              <dd>{t('how.houses.desc')}</dd>
+            </div>
+            <div>
+              <dt>{t('how.fires.term')}</dt>
+              <dd>{t('how.fires.desc')}</dd>
+            </div>
+            <div>
+              <dt>{t('how.alarms.term')}</dt>
+              <dd>{t('how.alarms.desc')}</dd>
+            </div>
+            <div>
+              <dt>{t('how.crews.term')}</dt>
+              <dd>{t('how.crews.desc')}</dd>
+            </div>
+            <div>
+              <dt>{t('how.gates.term')}</dt>
+              <dd>{t('how.gates.desc')}</dd>
+            </div>
+            <div>
+              <dt>{t('how.verdict.term')}</dt>
+              <dd>{t('how.verdict.desc')}</dd>
+            </div>
+          </dl>
+          <h3>{t('how.controls')}</h3>
+          <ul className="plain-list">
+            <li>{t('how.controls.tap')}</li>
+            <li>{t('how.controls.keyboard')}</li>
+            <li>{t('how.controls.stars')}</li>
+            <li>{t('how.controls.sound')}</li>
+          </ul>
+          <p className="muted small">{t('how.model')}</p>
+          <p className="muted small">{t('details.notSyndromeZero')}</p>
+        </Details>
         <div className="doc-actions">
-          <button type="button" className="btn btn-primary" onClick={() => dispatch({ type: 'CLOSE_OVERLAY' })}>
-            Back
+          <button type="button" className="btn btn-primary" onClick={() => dispatch({ type: 'CLOSE_OVERLAY' })} data-testid="back">
+            {t('how.back')}
           </button>
         </div>
       </article>
@@ -129,111 +158,82 @@ export function HowItWorks({ dispatch }: ScreenProps) {
   );
 }
 
-const CODE_LABEL: Readonly<Record<string, string>> = {
-  rep3: 'Repetition code · 3 blocks',
-  rsc3: 'Surface code d=3 · 9 blocks',
-  trivial2: 'Two bare wires',
-  trivial3: 'Three bare wires',
-};
+/* ------------------------------------------------------------------ settings */
 
-export function MissionList({ state, dispatch }: ScreenProps) {
-  const missions = listPublicMissions();
+function Switch({ id, on, onChange, testId }: { readonly id: string; readonly on: boolean; readonly onChange: (on: boolean) => void; readonly testId: string }) {
+  const t = useT();
   return (
-    <main className="screen screen-missions">
-      <TopBar
-        title="Missions"
-        subtitle={`${String(totalStars(state.progress))} of ${String(maxTotalStars())} stars`}
-        onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })}
-        onTitle={() => dispatch({ type: 'OPEN_TITLE' })}
-      />
-      <ol className="mission-list" aria-label="Missions">
-        {missions.map((m) => {
-          const p = state.progress[m.id];
-          return (
-            <li key={m.id}>
-              <button type="button" className={`mission-card ${p?.completed ? 'is-complete' : ''}`} onClick={() => dispatch({ type: 'SELECT_MISSION', id: m.id })} data-testid={`mission-${String(m.index)}`}>
-                <span className="mission-index" aria-hidden="true">
-                  {m.index}
-                </span>
-                <span className="mission-body">
-                  <span className="mission-title">
-                    <span className="sr-only">Mission {m.index}: </span>
-                    {m.title}
-                  </span>
-                  <span className="mission-meta">
-                    {CODE_LABEL[m.code] ?? m.code} · {m.kind === 'dispatch' ? 'dispatch' : 'propagation'}
-                  </span>
-                </span>
-                <span className="mission-stars">
-                  <Stars count={p?.stars ?? 0} max={m.maxStars} size={18} label={p === undefined ? `not played yet, up to ${String(m.maxStars)} star${m.maxStars === 1 ? '' : 's'}` : `${String(p.stars)} of ${String(m.maxStars)} stars`} />
-                  <span className="mission-status">{p === undefined ? 'New' : p.completed ? 'Complete' : `${String(p.attempts)} attempt${p.attempts === 1 ? '' : 's'}`}</span>
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
-    </main>
+    <button type="button" role="switch" aria-checked={on} aria-labelledby={id} className={`switch${on ? ' is-on' : ''}`} onClick={() => onChange(!on)} data-testid={testId}>
+      <span className="switch-knob" aria-hidden="true" />
+      <span className="switch-text">{on ? t('settings.on') : t('settings.off')}</span>
+    </button>
   );
 }
 
 export function SettingsScreen({ state, dispatch, storageLabel, onReset }: ScreenProps & { readonly onReset: () => void }) {
+  const t = useT();
+  const langBtn = (l: Language, label: string) => (
+    <button type="button" className={`seg-btn${state.settings.language === l ? ' is-on' : ''}`} aria-pressed={state.settings.language === l} onClick={() => dispatch({ type: 'SET_LANGUAGE', language: l })} data-testid={`lang-${l}`}>
+      {label}
+    </button>
+  );
   return (
     <main className="screen screen-doc">
-      <TopBar title="Settings" onSettings={() => dispatch({ type: 'CLOSE_OVERLAY' })} settingsLabel="Close settings" onTitle={() => dispatch({ type: 'OPEN_TITLE' })} />
+      <TopBar title={t('settings.title')} onSettings={() => dispatch({ type: 'CLOSE_OVERLAY' })} settingsLabel={t('settings.close')} onTitle={() => dispatch({ type: 'OPEN_TITLE' })} />
       <section className="doc">
         <div className="setting-row">
           <div>
             <span className="setting-name" id="set-sound">
-              Sound
+              {t('settings.sound')}
             </span>
-            <p className="muted small">Simple tones for crews, alarms and verdicts. Off by default.</p>
+            <p className="muted small">{t('settings.sound.desc')}</p>
           </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={state.settings.sound}
-            aria-labelledby="set-sound"
-            className={`switch ${state.settings.sound ? 'is-on' : ''}`}
-            onClick={() => dispatch({ type: 'SET_SOUND', on: !state.settings.sound })}
-            data-testid="switch-sound"
-          >
-            <span className="switch-knob" aria-hidden="true" />
-            <span className="switch-text">{state.settings.sound ? 'On' : 'Off'}</span>
-          </button>
+          <Switch id="set-sound" on={state.settings.sound} onChange={(on) => dispatch({ type: 'SET_SOUND', on })} testId="switch-sound" />
         </div>
         <div className="setting-row">
           <div>
             <span className="setting-name" id="set-motion">
-              Reduce motion
+              {t('settings.motion')}
             </span>
-            <p className="muted small">Stops the alarm pulse and transitions. Your system “reduce motion” preference is always respected too.</p>
+            <p className="muted small">{t('settings.motion.desc')}</p>
           </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={state.settings.reducedMotion}
-            aria-labelledby="set-motion"
-            className={`switch ${state.settings.reducedMotion ? 'is-on' : ''}`}
-            onClick={() => dispatch({ type: 'SET_REDUCED_MOTION', on: !state.settings.reducedMotion })}
-            data-testid="switch-motion"
-          >
-            <span className="switch-knob" aria-hidden="true" />
-            <span className="switch-text">{state.settings.reducedMotion ? 'On' : 'Off'}</span>
-          </button>
+          <Switch id="set-motion" on={state.settings.reducedMotion} onChange={(on) => dispatch({ type: 'SET_REDUCED_MOTION', on })} testId="switch-motion" />
         </div>
         <div className="setting-row">
           <div>
-            <span className="setting-name">Progress</span>
-            <p className="muted small">{storageLabel}</p>
+            <span className="setting-name" id="set-language">
+              {t('settings.language')}
+            </span>
+            <p className="muted small">{t('settings.language.desc')}</p>
+          </div>
+          <div className="seg" role="group" aria-labelledby="set-language" data-testid="language-group">
+            {langBtn('en', t('settings.language.en'))}
+            {langBtn('ja', t('settings.language.ja'))}
+          </div>
+        </div>
+        <div className="setting-row">
+          <div>
+            <span className="setting-name" id="set-free-roam">
+              {t('settings.freeRoam')}
+            </span>
+            <p className="muted small">{t('settings.freeRoam.desc')}</p>
+          </div>
+          <Switch id="set-free-roam" on={state.settings.freeRoam} onChange={(on) => dispatch({ type: 'SET_FREE_ROAM', on })} testId="switch-free-roam" />
+        </div>
+        <div className="setting-row">
+          <div>
+            <span className="setting-name">{t('settings.progress')}</span>
+            <p className="muted small" data-testid="settings-storage">
+              {storageLabel}
+            </p>
           </div>
           <button type="button" className="btn btn-danger" onClick={onReset} data-testid="reset-progress">
-            Reset progress
+            {t('settings.reset')}
           </button>
         </div>
         <div className="doc-actions">
-          <button type="button" className="btn btn-primary" onClick={() => dispatch({ type: 'CLOSE_OVERLAY' })}>
-            Back
+          <button type="button" className="btn btn-primary" onClick={() => dispatch({ type: 'CLOSE_OVERLAY' })} data-testid="back">
+            {t('settings.back')}
           </button>
         </div>
       </section>
@@ -241,102 +241,195 @@ export function SettingsScreen({ state, dispatch, storageLabel, onReset }: Scree
   );
 }
 
+/* ------------------------------------------------------------------ briefing */
+
+/** Decorative district thumbnail built from the art parts (never from mission data). */
+export function DistrictThumb({ kind, beacon = false, size = 180 }: { readonly kind: DistrictKind; readonly beacon?: boolean; readonly size?: number }) {
+  const w = 320;
+  const h = 170;
+  let body: JSX.Element;
+  switch (kind) {
+    case 'houses-row':
+      body = (
+        <>
+          <House x={70} y={150} variant="small" tint={0} scale={0.9} />
+          <House x={160} y={150} variant="tall" tint={1} scale={0.9} />
+          <House x={250} y={150} variant="small" tint={2} scale={0.9} />
+          <Detector type="Z" x={115} y={150} scale={0.8} />
+          <Detector type="Z" x={205} y={150} scale={0.8} />
+        </>
+      );
+      break;
+    case 'bridge':
+      body = (
+        <>
+          <House x={48} y={150} variant="small" tint={3} scale={0.8} />
+          <BridgeSpan x={160} y={150} width={150} />
+          <House x={272} y={150} variant="small" tint={4} scale={0.8} />
+        </>
+      );
+      break;
+    case 'lab':
+      body = (
+        <>
+          <ConversionLab x={160} y={152} active />
+          <Tree x={40} y={152} size={0.9} />
+          <Tree x={290} y={152} size={0.8} />
+        </>
+      );
+      break;
+    case 'grid':
+      body = (
+        <>
+          <House x={60} y={150} variant="shop" tint={2} scale={0.8} />
+          <House x={150} y={150} variant="small" tint={4} scale={0.8} />
+          <House x={230} y={150} variant="tall" tint={5} scale={0.8} />
+          <Detector type="Z" x={105} y={150} scale={0.75} />
+          <Detector type="X" x={190} y={150} scale={0.75} />
+          {beacon ? <MemoryTower x={290} y={152} scale={0.55} lit /> : <Tree x={295} y={152} size={0.9} />}
+        </>
+      );
+      break;
+  }
+  return (
+    <svg className="district-thumb" viewBox={`0 0 ${String(w)} ${String(h)}`} width={size} height={(size * h) / w} aria-hidden="true" focusable="false">
+      <rect x={0} y={0} width={w} height={h} rx={18} fill="var(--sky)" />
+      <rect x={0} y={118} width={w} height={h - 118} fill="var(--ground-2)" />
+      {body}
+    </svg>
+  );
+}
+
 export function BriefingScreen({ state, dispatch, mission }: ScreenProps & { readonly mission: PublicMissionView }) {
+  const t = useT();
+  const lang = useLanguage();
+  const copy = missionCopy(mission.id, lang);
+  const district = districtForMission(mission.id);
   const code = getCode(mission.code);
+  const hasTraining = mission.training.length > 0;
   return (
     <main className="screen screen-brief">
-      <TopBar
-        title={`Mission ${String(mission.index)} · ${mission.title}`}
-        subtitle="Briefing"
-        onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })}
-        onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })}
-      />
-      <section className="brief">
-        <p className="brief-text">{mission.briefing}</p>
+      <TopBar title={copy.districtName} subtitle={`${t('mission.label', { n: mission.index })} · ${copy.kidTitle}`} onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} />
+      <section className="brief panel-card" data-testid="briefing">
+        <div className="brief-head">
+          <DistrictThumb kind={district?.kind ?? 'grid'} beacon={district?.hasBeacon ?? false} />
+          <div className="brief-copy">
+            <h2 className="brief-goal-h">{t('briefing.goal')}</h2>
+            <p className="brief-text" data-testid="briefing-goal">
+              {copy.goal}
+            </p>
+            <h2 className="brief-goal-h">{t('briefing.lesson')}</h2>
+            <p className="brief-lesson">{copy.lessonOneLiner}</p>
+          </div>
+        </div>
         <dl className="brief-facts">
           <div>
-            <dt>District</dt>
-            <dd>{code.name}</dd>
-          </div>
-          <div>
-            <dt>Crews</dt>
+            <dt>{t('briefing.crews')}</dt>
             <dd>
               {mission.allowed.map((l) => (
                 <span key={l} className="inline-glyph">
-                  <Helmet letter={l} size={20} /> {l}
+                  <HelmetIcon letter={l} size={26} /> {l}
                 </span>
               ))}
             </dd>
           </div>
           <div>
-            <dt>Budget</dt>
-            <dd>{mission.budget === 1 ? '1 crew' : `${String(mission.budget)} crews`}</dd>
+            <dt>{t('briefing.budget')}</dt>
+            <dd>{plural(lang, 'briefing.budget', mission.budget)}</dd>
           </div>
           <div>
-            <dt>Previous best</dt>
+            <dt>{t('briefing.previousBest')}</dt>
             <dd>
-              <Stars count={state.progress[mission.id]?.stars ?? 0} max={mission.maxStars} size={18} />
-              {mission.maxStars < 3 ? <span className="muted small">(up to {mission.maxStars})</span> : null}
+              <Stars count={state.progress[mission.id]?.stars ?? 0} max={mission.maxStars} size={20} />
+              {mission.maxStars < 3 ? <span className="muted small">{t('briefing.upTo', { n: mission.maxStars })}</span> : null}
             </dd>
           </div>
         </dl>
         <div className="brief-actions">
           <button type="button" className="btn btn-primary btn-large" onClick={() => dispatch({ type: 'START_MISSION' })} data-testid="start-mission">
-            {mission.training.length > 0 ? 'Start training' : 'Start'}
+            {hasTraining ? t('briefing.startTraining') : t('briefing.go')}
           </button>
-          {mission.training.length > 0 ? (
-            <button type="button" className="btn btn-large" onClick={() => dispatch({ type: 'START_CHALLENGE' })}>
-              Skip to dispatch
+          {hasTraining ? (
+            <button type="button" className="btn btn-large" onClick={() => dispatch({ type: 'START_CHALLENGE' })} data-testid="briefing-skip">
+              {t('briefing.skipToDispatch')}
             </button>
           ) : null}
         </div>
+        <Details summary={copy.detailsTitle} testId="briefing-details">
+          <p className="brief-original">{briefingText(mission.id, lang, mission.briefing)}</p>
+          <p className="muted small">
+            {t('details.code')}: {t(CODE_KEY[mission.code] ?? 'mission.code.rsc3')} · {code.name}
+          </p>
+        </Details>
       </section>
     </main>
   );
 }
 
+/* ------------------------------------------------------------------ result */
+
 export function ResultScreen({ state, dispatch, mission, debrief }: ScreenProps & { readonly mission: PublicMissionView; readonly debrief: Debrief }) {
+  const t = useT();
+  const lang = useLanguage();
   const s = debrief.score;
+  const copy = missionCopy(mission.id, lang);
   const isLast = mission.index === listPublicMissions().length;
+  const hasChecks = getCode(mission.code).checks.length > 0;
+  const earned = state.progress[mission.id]?.completed === true;
+  const di = DISTRICTS.findIndex((d) => d.missionId === mission.id);
+  const result = resultType(debrief);
+  const next = () => dispatch(state.tutorialActive ? { type: 'OPEN_MISSIONS' } : { type: 'NEXT_MISSION' });
+  const nextLabel = state.tutorialActive ? t('result.city') : isLast ? t('result.summary') : t('result.next');
   return (
     <main className="screen screen-result">
-      <TopBar title={`Mission ${String(mission.index)} · ${mission.title}`} subtitle="Result" onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} />
-      <section className="result" data-testid="result">
-        <Stars count={s.stars} max={s.maxStars} size={44} />
-        <h2 className="result-h">{resultHeading(s)}</h2>
-        <p className="muted small">
-          {s.stars} of {s.maxStars} star{s.maxStars === 1 ? '' : 's'}
-          {s.maxStars < 3 ? ' · this mission awards at most one star: the alarms alone cannot win it' : ''}
-        </p>
+      <TopBar title={copy.districtName} subtitle={t('result.subtitle')} onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} />
+      <section className="result panel-card" data-testid="result" data-result={result}>
+        <div className="result-top">
+          <svg className="result-badge" viewBox="-30 -62 60 66" width={64} height={70} aria-label={t('result.badge', { district: t(badgeNameKey(mission.id)) })} role="img" focusable="false">
+            <ChapterBadge x={0} y={0} colour={BADGE_COLOURS[di] ?? '#2f6fdd'} earned={earned} />
+          </svg>
+          <div>
+            <h2 className="result-h">{t(resultHeadingKey(s))}</h2>
+            <Stars count={s.stars} max={s.maxStars} size={40} />
+            <p className="muted small">
+              {s.maxStars === 1 ? t('result.starsOf.one', { stars: s.stars }) : t('result.starsOf.other', { stars: s.stars, max: s.maxStars })}
+              {s.maxStars < 3 ? ` · ${t('result.maxOne')}` : ''}
+            </p>
+          </div>
+        </div>
+        <p className="result-reaction">{reactionFor(copy, result)}</p>
         <dl className="result-facts">
           <div>
-            <dt>Decision</dt>
-            <dd>{QUALITY_LABEL[s.quality]}</dd>
+            <dt>{t('result.decision')}</dt>
+            <dd>{t(QUALITY_KEY[s.quality])}</dd>
           </div>
           <div>
-            <dt>Outcome</dt>
-            <dd className={`outcome outcome-${s.outcome}`}>{debrief.verdictLabel}</dd>
+            <dt>{t('result.outcome')}</dt>
+            <dd className={`outcome outcome-${s.outcome}`}>{t(outcomeKey(s.outcome, hasChecks))}</dd>
           </div>
           <div>
-            <dt>Cost</dt>
-            <dd>
-              {s.crewsUsed} crew{s.crewsUsed === 1 ? '' : 's'} used · minimum {s.minCrews}
-            </dd>
+            <dt>{t('result.cost')}</dt>
+            <dd>{plural(lang, 'result.costText', s.crewsUsed, { used: s.crewsUsed, min: s.minCrews })}</dd>
           </div>
           <div>
-            <dt>Attempts</dt>
-            <dd>{state.progress[mission.id]?.attempts ?? 1}</dd>
+            <dt>{t('result.attempts')}</dt>
+            <dd data-testid="result-attempts">{state.progress[mission.id]?.attempts ?? 1}</dd>
           </div>
         </dl>
+        {earned ? (
+          <p className="result-badge-line" data-testid="result-badge-line">
+            {t('result.badge', { district: t(badgeNameKey(mission.id)) })}
+          </p>
+        ) : null}
         <div className="result-actions">
-          <button type="button" className="btn btn-primary btn-large" onClick={() => dispatch({ type: 'NEXT_MISSION' })} data-testid="next-mission">
-            {isLast ? 'Summary' : 'Next mission'}
+          <button type="button" className="btn btn-large" onClick={() => dispatch({ type: 'OPEN_WHY' })} data-testid="result-why">
+            {t('dispatch.why')}
           </button>
-          <button type="button" className="btn btn-large" onClick={() => dispatch({ type: 'TRY_AGAIN' })}>
-            Try again
+          <button type="button" className="btn btn-large" onClick={() => dispatch({ type: 'TRY_AGAIN' })} data-testid="try-again">
+            {t('result.tryAgain')}
           </button>
-          <button type="button" className="btn btn-ghost btn-large" onClick={() => dispatch({ type: 'OPEN_MISSIONS' })}>
-            Missions
+          <button type="button" className="btn btn-primary btn-large" onClick={next} data-testid="next-mission">
+            {nextLabel}
           </button>
         </div>
       </section>
@@ -344,23 +437,38 @@ export function ResultScreen({ state, dispatch, mission, debrief }: ScreenProps 
   );
 }
 
+/* ------------------------------------------------------------------ summary */
+
 export function SummaryScreen({ state, dispatch }: ScreenProps) {
+  const t = useT();
+  const lang = useLanguage();
   const missions = listPublicMissions();
   const total = totalStars(state.progress);
   return (
     <main className="screen screen-summary">
-      <TopBar title="Shift complete" subtitle={`${String(total)} of ${String(maxTotalStars())} stars`} onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} />
-      <section className="summary" data-testid="summary">
-        <p className="brief-text">
-          Every mission is on record. Single fires are always caught in a distance-3 district; the lesson of Silent Failure is why
-          real machines build bigger ones.
-        </p>
+      <TopBar title={t('summary.title')} subtitle={t('mission.starsOf', { stars: total, max: maxTotalStars() })} onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} />
+      <section className="summary panel-card" data-testid="summary">
+        <p className="brief-text">{t('summary.lead')}</p>
+        <h2 className="panel-title">{t('summary.badges')}</h2>
+        <ul className="badge-row" aria-label={t('summary.badges')}>
+          {DISTRICTS.map((d, i) => {
+            const earned = state.progress[d.missionId]?.completed === true;
+            return (
+              <li key={d.id} className={earned ? 'badge-item is-earned' : 'badge-item'} data-badge={d.id} data-earned={earned ? 'true' : 'false'}>
+                <svg viewBox="-30 -62 60 66" width={52} height={57} aria-hidden="true" focusable="false">
+                  <ChapterBadge x={0} y={0} colour={BADGE_COLOURS[i] ?? '#2f6fdd'} earned={earned} />
+                </svg>
+                <span>{t(badgeNameKey(d.missionId))}</span>
+              </li>
+            );
+          })}
+        </ul>
         <table className="summary-table">
           <thead>
             <tr>
-              <th scope="col">Mission</th>
-              <th scope="col">Stars</th>
-              <th scope="col">Attempts</th>
+              <th scope="col">{t('summary.mission')}</th>
+              <th scope="col">{t('summary.stars')}</th>
+              <th scope="col">{t('summary.attempts')}</th>
             </tr>
           </thead>
           <tbody>
@@ -369,7 +477,7 @@ export function SummaryScreen({ state, dispatch }: ScreenProps) {
               return (
                 <tr key={m.id}>
                   <th scope="row">
-                    {m.index}. {m.title}
+                    {m.index}. {missionCopy(m.id, lang).districtName}
                   </th>
                   <td>
                     <Stars count={p?.stars ?? 0} max={m.maxStars} size={18} />
@@ -380,14 +488,19 @@ export function SummaryScreen({ state, dispatch }: ScreenProps) {
             })}
           </tbody>
         </table>
+        <p className="muted">{t('summary.freeRoamHint')}</p>
         <div className="result-actions">
-          <button type="button" className="btn btn-primary btn-large" onClick={() => dispatch({ type: 'OPEN_MISSIONS' })}>
-            Missions
+          <button type="button" className="btn btn-primary btn-large" onClick={() => dispatch({ type: 'OPEN_MISSIONS' })} data-testid="summary-city">
+            {t('summary.playAgain')}
           </button>
-          <button type="button" className="btn btn-large" onClick={() => dispatch({ type: 'OPEN_TITLE' })}>
-            Title
+          <button type="button" className="btn btn-large" onClick={() => dispatch({ type: 'OPEN_SETTINGS' })}>
+            {t('settings.freeRoam')}
+          </button>
+          <button type="button" className="btn btn-ghost btn-large" onClick={() => dispatch({ type: 'OPEN_TITLE' })}>
+            {t('summary.titleBtn')}
           </button>
         </div>
+        <Legend allowed={['X', 'Z', 'Y']} alarms water />
       </section>
     </main>
   );

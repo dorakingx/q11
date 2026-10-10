@@ -36,6 +36,8 @@ export const en = {
   'title.settings': 'Settings',
   'title.progress': 'Progress: {stars} of {max} stars.',
   'title.foot': 'Qollab × IonQ Global Quantum Hackathon 2026 entry. This effort is supported by Qollab & IonQ.',
+  'title.kidLine': 'Fires you cannot see. Alarms you can. Send the right crew!',
+  'title.language': 'Language: {lang}',
 
   /* ------------------------------------------------------------------ how it works */
   'how.title': 'How it works',
@@ -60,6 +62,15 @@ export const en = {
   'how.model': 'Model: Clifford + Pauli educational simulation with a perfect-syndrome assumption. The repetition code is an X-noise-only introduction; the main district is a distance-3 rotated surface code.',
   'how.quantumRules': 'Same crew puts a fire out. A different crew changes it. A crew on an empty house starts one. Quantum rules!',
   'how.back': 'Back',
+  'how.kid.intro': 'Some houses in this city are on fire, but you cannot see the flames. Alarm stations tell you something is burning. You send crews to put the fires out. It is really a game about how quantum computers fix their mistakes.',
+  'how.kid.legend': 'What the pictures mean',
+  'how.kid.houses': 'A house is a qubit: one tiny piece of quantum memory.',
+  'how.kid.fires': 'A fire is a mistake. Red is X, blue is Z, and both at once is Y. During a call you cannot see them.',
+  'how.kid.alarms': 'Alarm stations watch a few houses each. A diamond rings for red fires, a square for blue fires. They ring only for an odd number of fires, and they never say which house.',
+  'how.kid.crews': 'A crew is a fix. Same letter as the fire: fire out. Different letter: the fire changes. Crew on an empty house: a new fire starts.',
+  'how.kid.gates': 'Gates move fires along the wires. Fires never move on their own.',
+  'how.kid.water': 'Water is pale and round. A blue Z fire is a flame with a Z. They are never the same thing.',
+  'how.kid.spray': 'After Spray! the true fires are shown so you can check your plan. A real quantum computer never gets to peek.',
 
   /* ------------------------------------------------------------------ city map */
   'city.title': 'Quantum City',
@@ -120,6 +131,7 @@ export const en = {
   'briefing.startTraining': 'Start training',
   'briefing.start': 'Start',
   'briefing.skipToDispatch': 'Skip to dispatch',
+  'briefing.go': 'Go!',
 
   /* ------------------------------------------------------------------ training */
   'training.subtitle': 'Training · lesson {n} of {total} · fires visible',
@@ -138,6 +150,10 @@ export const en = {
   'training.firesVisible': 'Fires visible',
   'training.predict': 'Guess first: where will the fire be after this gate?',
   'training.check': 'Check',
+  'training.predictTap': 'Which house burns next? Tap it!',
+  'training.predict.hit': 'Yes! House {q} burns after this gate.',
+  'training.predict.miss': 'Not this time: house {q} stays safe. Watch where the fire goes.',
+  'training.predict.waiting': 'Tap a house to see the next step.',
 
   /* ------------------------------------------------------------------ challenge (planning) */
   'challenge.subtitle.dispatch': 'Dispatch · fires hidden, alarms live',
@@ -314,6 +330,7 @@ export const en = {
   'debrief.nextMission': 'Next district',
   'debrief.house.one': 'house',
   'debrief.house.other': 'houses',
+  'debrief.stepByStep': 'Step by step',
 
   /* ------------------------------------------------------------------ details fold (jargon lives here) */
   'details.show': 'Details',
@@ -327,6 +344,8 @@ export const en = {
   'details.rawResidual': 'Raw residual',
   'details.syndrome': 'Alarm bits',
   'details.code': 'Code',
+  'details.englishOriginal': 'Original report (English)',
+  'details.replayEnglish': 'Replay captions and the what-if explanation are generated in English.',
 
   /* ------------------------------------------------------------------ cloud verification (labels kept) */
   'cloud.title': 'Quantum verification',
@@ -407,6 +426,8 @@ export const en = {
   'summary.badges': 'Badges',
   'summary.city': 'Back to the city',
   'summary.titleBtn': 'Title',
+  'summary.playAgain': 'Play again',
+  'summary.freeRoamHint': 'Want to replay any district in any order? Turn on Free roam in Settings.',
 
   /* ------------------------------------------------------------------ mission list / cards (legacy + city) */
   'mission.label': 'Mission {n}',
@@ -491,6 +512,7 @@ export const en = {
   'a11y.stationRinging': '{station}, ringing, watches houses {list}',
   'a11y.stationQuiet': '{station}, quiet, watches houses {list}',
   'a11y.fogHouse': 'House {q}, hidden',
+  'a11y.pressToPredict': 'press to predict this house burns next',
   'a11y.screen.title': 'Q11 title screen.',
   'a11y.screen.how': 'How it works.',
   'a11y.screen.settings': 'Settings.',

@@ -1,15 +1,19 @@
 /**
- * Play screens: Training, Challenge (dispatch) and Debrief (replay + what-if + quantum verification).
- * The Challenge view receives ONLY a PublicMissionView and the live placements — never the true error.
+ * Play screens on the Scene: Training (fires visible, tap-to-predict on propagation lessons), Challenge (planning
+ * with fog, detectors, big crew chips, undo/redo/clear, tutorial callouts), Dispatch (spray showpiece → result
+ * overlay) and Why? (debrief: your spray vs. the alternative + the step-by-step replay under Details).
+ * The Challenge view receives ONLY a PublicMissionView and the live plan — never the true error.
  */
-import { useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { getCode, fromString, letterAt, syndrome as syndromeOf, syndromeToArray, propagate, toString as pauliToString } from '../quantum';
 import {
+  buildEffects,
   crewCount,
+  districtForMission,
   filterByDispatch,
-  outcomeLabel,
-  QUALITY_LABEL,
-  SOURCE_LABEL,
+  listPublicMissions,
+  logicalPatternSupport,
+  resultType,
   type Action,
   type CloudResult,
   type CloudResultOk,
@@ -19,21 +23,29 @@ import {
   type PublicMissionView,
   type QuantumBridge,
 } from '../game';
-import { Board } from './Board';
-import { Helmet } from './glyphs';
-import { AlarmList, Dialog, Legend, Palette, Stars, TopBar, VerdictBanner } from './panels';
-import { alarmSummary, fireLabel } from './text';
+import { debriefNarrative, missionCopy, trainingCaption, useLanguage, useT, type Key } from './i18n';
+import { AlarmList, Details, Dialog, HelmetIcon, Legend, Palette, Stars, TopBar } from './panels';
+import { ResultOverlay, Scene, SprayPlayer, WhyCompare, type SceneOutcome } from './scene';
+import { alarmSummary, fireLabel, outcomeKey, QUALITY_KEY, stepTitle } from './text';
 
 interface PlayProps {
   readonly state: GameState;
   readonly dispatch: (a: Action) => void;
 }
 
+const SOURCE_KEY: Readonly<Record<CloudResultOk['source'], Key>> = { 'local-simulator': 'cloud.source.local', 'cached-cloud': 'cloud.source.cached', 'live-cloud': 'cloud.source.live' };
+
 /* ------------------------------------------------------------------ training */
 
 export function TrainingScreen({ state, dispatch, mission }: PlayProps & { readonly mission: PublicMissionView }) {
+  const t = useT();
+  const lang = useLanguage();
   const lesson = mission.training[state.lesson];
   const descId = useId();
+  // Tap-to-predict (R10): on propagation lessons the player taps the house they expect to burn after the next gate
+  // BEFORE the step reveals. The reveal is the engine's next frame; the reaction compares the tap with that frame.
+  const [prediction, setPrediction] = useState<{ readonly lesson: number; readonly cursor: number; readonly q: number } | null>(null);
+  const copy = missionCopy(mission.id, lang);
   if (lesson === undefined) return null;
   const code = getCode(mission.code);
   const start = fromString(lesson.fire);
@@ -41,71 +53,90 @@ export function TrainingScreen({ state, dispatch, mission }: PlayProps & { reado
   const cursor = state.lessonCursor;
   const frame = traj.frames[cursor + 1] ?? start;
   const frameStr = pauliToString(frame);
-  const isWires = lesson.circuit.length > 0 || code.checks.length === 0;
+  const isLanes = lesson.circuit.length > 0 || code.checks.length === 0;
   const synd = code.checks.length > 0 ? syndromeToArray(syndromeOf(code, frame)) : null;
   const lessonCount = mission.training.length;
   const atLastFrame = cursor >= lesson.circuit.length - 1;
   const atLastLesson = state.lesson === lessonCount - 1;
-  const nextLabel = !atLastFrame ? 'Next step' : !atLastLesson ? 'Next lesson' : 'Start dispatch';
+  const predicting = lesson.circuit.length > 0 && !atLastFrame;
+  const nextLabel = !atLastFrame ? t('training.nextStep') : !atLastLesson ? t('training.nextLesson') : t('training.startDispatch');
+  const predict = (q: number) => {
+    if (!predicting) return;
+    setPrediction({ lesson: state.lesson, cursor: cursor + 1, q });
+    dispatch({ type: 'LESSON_NEXT' });
+  };
+  // Reaction for the step that was just revealed (prediction made for this lesson at this cursor).
+  const reaction = prediction !== null && prediction.lesson === state.lesson && prediction.cursor === cursor ? (letterAt(frame, prediction.q) !== 'I' ? t('training.predict.hit', { q: prediction.q }) : t('training.predict.miss', { q: prediction.q })) : null;
+  const caption = trainingCaption(mission.id, state.lesson, lang, lesson.caption);
   return (
-    <main className="screen screen-play">
+    <main className="screen screen-play screen-training">
       <TopBar
-        title={`Mission ${String(mission.index)} · ${mission.title}`}
-        subtitle={`Training · lesson ${String(state.lesson + 1)} of ${String(lessonCount)} · fires visible`}
+        title={copy.districtName}
+        subtitle={t('training.subtitle', { n: state.lesson + 1, total: lessonCount })}
         onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })}
         onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })}
       />
       <div className="play-layout">
-        <section className="board-col" aria-label="Training board">
-          <Board
+        <section className="board-col" aria-label={t('training.boardLabel')}>
+          <Scene
             codeId={mission.code}
             circuit={lesson.circuit}
             fires={frameStr}
             crews={null}
             residual={null}
             syndrome={synd}
-            interactive={false}
-            gateCursor={isWires ? cursor : undefined}
-            inputFires={isWires ? lesson.fire : null}
+            interactive={predicting}
+            onToggle={predict}
+            tapHint={t('a11y.pressToPredict')}
+            gateCursor={isLanes ? cursor : undefined}
+            inputFires={isLanes ? lesson.fire : null}
             ariaDescribedBy={descId}
-            ariaLabel="Training board, fires visible"
+            ariaLabel={t('training.board')}
           />
+          {predicting ? (
+            <p className="predict-prompt" data-testid="predict-prompt" role="status">
+              <strong>{t('training.predictTap')}</strong> <span className="muted">{t('training.predict.waiting')}</span>
+            </p>
+          ) : null}
+          {reaction !== null ? (
+            <p className="predict-reaction" data-testid="predict-reaction" role="status">
+              {reaction}
+            </p>
+          ) : null}
           <p className="board-caption" id={descId} aria-live="polite" data-testid="training-caption">
             {lesson.circuit.length > 0 ? (
-              <>
-                <strong>
-                  {cursor < 0 ? 'Start: ' : `After gate ${String(cursor + 1)} of ${String(lesson.circuit.length)}: `}
-                  {frameStr}
-                </strong>{' '}
-              </>
-            ) : null}
-            {lesson.caption}
+              <strong className="mono-lead">
+                {cursor < 0 ? t('training.start') : t('training.afterGate', { n: cursor + 1, total: lesson.circuit.length })} <span className="mono">{frameStr}</span>
+              </strong>
+            ) : null}{' '}
+            {caption}
           </p>
         </section>
         <aside className="panel">
           {code.checks.length > 0 ? <AlarmList codeId={mission.code} syndrome={synd} /> : null}
           <section className="panel-section">
-            <h2 className="panel-title">Lesson</h2>
-            <ol className="lesson-dots" aria-label="Lessons">
-              {mission.training.map((t, i) => (
+            <h2 className="panel-title">{t('training.lesson')}</h2>
+            <p className="muted small">{copy.lessonOneLiner}</p>
+            <ol className="lesson-dots" aria-label={t('training.lessons')}>
+              {mission.training.map((l, i) => (
                 <li key={i}>
-                  <button type="button" className={`dot ${i === state.lesson ? 'is-current' : ''}`} aria-current={i === state.lesson ? 'step' : undefined} onClick={() => dispatch({ type: 'LESSON_SELECT', lesson: i })} aria-label={`Lesson ${String(i + 1)}: ${fireLabel(t.fire)}`}>
+                  <button type="button" className={`dot${i === state.lesson ? ' is-current' : ''}`} aria-current={i === state.lesson ? 'step' : undefined} onClick={() => dispatch({ type: 'LESSON_SELECT', lesson: i })} aria-label={t('training.lessonLabel', { n: i + 1, fires: fireLabel(t, l.fire) })}>
                     {i + 1}
                   </button>
                 </li>
               ))}
             </ol>
-            <Legend allowed={mission.allowed} />
+            <Legend allowed={mission.allowed} alarms={code.checks.length > 0} />
           </section>
           <div className="actions">
             <button type="button" className="btn" onClick={() => dispatch({ type: 'LESSON_PREV' })} disabled={state.lesson === 0 && cursor <= -1} data-testid="training-prev">
-              Prev
+              {t('training.prev')}
             </button>
-            <button type="button" className="btn btn-primary" onClick={() => dispatch({ type: 'LESSON_NEXT' })} data-testid="training-next">
+            <button type="button" className="btn btn-primary" onClick={() => dispatch({ type: 'LESSON_NEXT' })} disabled={predicting} aria-disabled={predicting} data-testid="training-next">
               {nextLabel}
             </button>
             <button type="button" className="btn btn-ghost" onClick={() => dispatch({ type: 'START_CHALLENGE' })} data-testid="start-challenge">
-              Skip to dispatch
+              {t('training.skip')}
             </button>
           </div>
         </aside>
@@ -122,39 +153,66 @@ export interface ChallengeProps {
   readonly placements: Readonly<Record<number, CrewLetter>>;
   readonly selected: CrewLetter;
   readonly standDownDialog: boolean;
+  readonly highlightedCheck: number | null;
+  readonly canUndo: boolean;
+  readonly canRedo: boolean;
+  readonly tutorialActive: boolean;
   readonly dispatch: (a: Action) => void;
 }
 
+function Callout({ step, current, title, body }: { readonly step: 1 | 2 | 3; readonly current: number; readonly title: string; readonly body: string }) {
+  const done = step < current;
+  const active = step === current;
+  return (
+    <div className={`callout${active ? ' is-active' : ''}${done ? ' is-done' : ''}`} data-testid={`tutorial-callout-${String(step)}`} data-active={active ? 'true' : 'false'} data-done={done ? 'true' : 'false'} aria-current={active ? 'step' : undefined}>
+      <span className="callout-n" aria-hidden="true">
+        {done ? '✓' : step}
+      </span>
+      <span className="callout-text">
+        <strong>{title}</strong> <span>{body}</span>
+      </span>
+    </div>
+  );
+}
+
 /**
- * DOM order is palette → blocks → actions (the Tab order from docs/GAME_DESIGN.md); the visual layout
- * (board left, panel right; board on top on phones) comes from CSS grid areas.
+ * DOM order is alarms → palette → scene → plan → actions (the Tab order); the visual layout (scene left, panel
+ * right; scene first on phones) comes from CSS grid areas. The action bar is fixed at the bottom on phones.
  */
-export function ChallengeScreen({ mission, placements, selected, standDownDialog, dispatch }: ChallengeProps) {
+export function ChallengeScreen({ mission, placements, selected, standDownDialog, highlightedCheck, canUndo, canRedo, tutorialActive, dispatch }: ChallengeProps) {
+  const t = useT();
+  const lang = useLanguage();
   const descId = useId();
   const mainRef = useRef<HTMLElement>(null);
+  const copy = missionCopy(mission.id, lang);
   const used = crewCount(placements);
   const budgetReached = used >= mission.budget;
   const isWires = mission.kind === 'propagation';
   const synd = isWires ? null : mission.syndrome;
+  const [crewTapped, setCrewTapped] = useState(false);
+  const tutorialStep = !crewTapped ? 1 : used === 0 ? 2 : 3;
 
-  // Keyboard shortcuts: 1/2/3 select, Backspace recalls the focused block's crew (or clears all), C confirms.
+  // Keyboard shortcuts: 1/2/3 select, Backspace recalls the focused house's crew (or clears all), C sprays.
   // Active only while focus is inside this dispatch screen (never from the body, a notice or a dialog).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (standDownDialog || e.metaKey || e.ctrlKey || e.altKey) return;
-      const t = e.target instanceof HTMLElement ? e.target : null;
+      const target = e.target instanceof HTMLElement ? e.target : null;
       const root = mainRef.current;
-      if (t === null || root === null || !root.contains(t)) return;
-      if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') return;
+      if (target === null || root === null || !root.contains(target)) return;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
       const map: Record<string, CrewLetter> = { '1': 'X', '2': 'Z', '3': 'Y' };
       const letter = map[e.key];
       if (letter !== undefined) {
-        if (mission.allowed.includes(letter)) dispatch({ type: 'SELECT_LETTER', letter });
+        if (mission.allowed.includes(letter)) {
+          dispatch({ type: 'SELECT_LETTER', letter });
+          setCrewTapped(true);
+        }
         e.preventDefault();
         return;
       }
       if (e.key === 'Backspace' || e.key === 'Delete') {
-        const block = t.closest<HTMLElement>('button.block[data-q]');
+        const block = target.closest<HTMLElement>('button.block[data-q]');
         const q = block === null ? NaN : Number(block.dataset['q']);
         if (Number.isInteger(q)) dispatch({ type: 'RECALL_BLOCK', qubit: q });
         else dispatch({ type: 'CLEAR_CREWS' });
@@ -171,22 +229,42 @@ export function ChallengeScreen({ mission, placements, selected, standDownDialog
   }, [dispatch, mission.allowed, standDownDialog]);
 
   const startLetters = mission.visibleStart === null ? [] : Array.from(mission.visibleStart).map((l, q) => ({ q, l })).filter((x) => x.l !== 'I');
+  const placed = Object.entries(placements).sort(([a], [b]) => Number(a) - Number(b));
 
   return (
-    <main className="screen screen-play screen-challenge" ref={mainRef}>
+    <main className={`screen screen-play screen-challenge${tutorialActive ? ' is-tutorial' : ''}`} ref={mainRef} data-tutorial={tutorialActive ? 'true' : 'false'}>
       <TopBar
-        title={`Mission ${String(mission.index)} · ${mission.title}`}
-        subtitle={isWires ? 'Dispatch · predict where the fires end up' : 'Dispatch · fires hidden, alarms live'}
+        title={copy.districtName}
+        subtitle={isWires ? t('challenge.subtitle.predict') : t('challenge.subtitle.dispatch')}
         onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })}
         onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })}
       />
+      {tutorialActive ? (
+        <div className="tutorial-bar" data-testid="tutorial-bar">
+          <p className="tutorial-intro">
+            <strong>{t('tutorial.title')}</strong> {t('tutorial.intro')}
+          </p>
+          <button type="button" className="btn btn-ghost btn-small" onClick={() => dispatch({ type: 'TUTORIAL_SKIP' })} data-testid="tutorial-skip">
+            {t('tutorial.skip')}
+          </button>
+        </div>
+      ) : null}
       <div className="play-layout play-layout-challenge">
         <aside className="panel panel-before">
-          {!isWires ? <AlarmList codeId={mission.code} syndrome={synd} /> : null}
-          <Palette allowed={mission.allowed} selected={selected} onSelect={(l) => dispatch({ type: 'SELECT_LETTER', letter: l })} />
+          {!isWires ? <AlarmList codeId={mission.code} syndrome={synd} compact={getCode(mission.code).checks.length > 4} hint={t('challenge.detector.hint')} /> : null}
+          <Palette
+            allowed={mission.allowed}
+            selected={selected}
+            onSelect={(l) => {
+              dispatch({ type: 'SELECT_LETTER', letter: l });
+              setCrewTapped(true);
+            }}
+            callout={tutorialActive ? <Callout step={1} current={tutorialStep} title={t('tutorial.step1')} body={t('tutorial.step1.body')} /> : undefined}
+          />
         </aside>
-        <section className="board-col" aria-label="Dispatch board">
-          <Board
+        <section className="board-col" aria-label={t('challenge.board')}>
+          {tutorialActive ? <Callout step={2} current={tutorialStep} title={t('tutorial.step2')} body={t('tutorial.step2.body')} /> : null}
+          <Scene
             codeId={mission.code}
             circuit={mission.circuit}
             fires={null}
@@ -194,217 +272,354 @@ export function ChallengeScreen({ mission, placements, selected, standDownDialog
             placements={placements}
             residual={null}
             syndrome={synd}
+            fog={!isWires}
             interactive
             onToggle={(q) => dispatch({ type: 'TOGGLE_BLOCK', qubit: q })}
             selected={selected}
             budgetReached={budgetReached}
+            highlightedCheck={highlightedCheck}
+            onToggleDetector={isWires ? undefined : (i) => dispatch({ type: 'TOGGLE_DETECTOR_HIGHLIGHT', checkIndex: i })}
+            gateCursor={isWires ? mission.circuit.length : undefined}
             inputFires={isWires ? mission.visibleStart : null}
             ariaDescribedBy={descId}
           />
           <p className="board-caption" id={descId}>
-            {isWires ? (
-              <>
-                Starting fire: {startLetters.map((x) => `${x.l} on q${String(x.q)}`).join(', ')}. The fires travel through the circuit; send crews to where they
-                <em> end up</em>.
-              </>
-            ) : (
-              alarmSummary(mission.code, synd)
-            )}{' '}
-            <span className="muted">Tap a block to send the selected crew; tap again to recall it.</span>
+            {isWires ? t('challenge.startingFire', { fires: startLetters.map((x) => t('challenge.startToken', { letter: x.l, q: x.q })).join(', ') }) : `${t('challenge.fog')} ${alarmSummary(t, mission.code, synd)}`} <span className="muted">{t('challenge.tapHint')}</span>
           </p>
+          {!isWires && highlightedCheck !== null ? (
+            <p className="muted small" data-testid="detector-watch">
+              {t('challenge.detector.watches', { station: getCode(mission.code).checks[highlightedCheck]?.id ?? '', list: (getCode(mission.code).checks[highlightedCheck]?.qubits ?? []).join(', ') })}
+            </p>
+          ) : null}
         </section>
         <aside className="panel panel-after">
-          <section className="panel-section">
-            <h2 className="panel-title">Dispatch</h2>
+          <section className="panel-section plan">
+            <h2 className="panel-title">{t('plan.title')}</h2>
             <p className="budget" data-testid="budget" aria-live="polite">
-              Crews: <strong>{used}</strong> / {mission.budget}
-              {budgetReached ? <span className="muted"> · budget reached</span> : null}
+              {t('challenge.crews', { used, budget: mission.budget })}
+              {budgetReached ? <span className="muted"> · {t('challenge.budgetReached')}</span> : null}
             </p>
-            <ul className="placement-list" aria-label="Placed crews">
-              {Object.entries(placements)
-                .sort(([a], [b]) => Number(a) - Number(b))
-                .map(([q, l]) => (
-                  <li key={q}>
-                    <Helmet letter={l} size={18} /> {l} crew → block {q}
-                  </li>
-                ))}
-              {used === 0 ? <li className="muted">No crews placed.</li> : null}
+            <ul className="placement-list" aria-label={t('challenge.placed')}>
+              {placed.map(([q, l]) => (
+                <li key={q}>
+                  <HelmetIcon letter={l} size={22} /> {t('challenge.placement', { letter: l, q })}
+                </li>
+              ))}
+              {used === 0 ? <li className="muted">{t('plan.empty')}</li> : null}
             </ul>
+            <p className="muted small">{t('plan.hint')}</p>
+            <div className="plan-tools">
+              <button type="button" className="btn btn-small" onClick={() => dispatch({ type: 'REDO_PLACEMENT' })} disabled={!canRedo} data-testid="redo">
+                {t('plan.redo')}
+              </button>
+              <button type="button" className="btn btn-small" onClick={() => dispatch({ type: 'CLEAR_CREWS' })} disabled={used === 0} data-testid="clear">
+                {t('plan.clear')}
+              </button>
+            </div>
           </section>
-          <div className="actions actions-sticky">
-            <button type="button" className="btn" onClick={() => dispatch({ type: 'CLEAR_CREWS' })} disabled={used === 0}>
-              Clear
+          {tutorialActive ? <Callout step={3} current={tutorialStep} title={t('tutorial.step3')} body={t('tutorial.step3.body')} /> : null}
+          <div className="actions action-bar" data-testid="action-bar">
+            <button type="button" className="btn" onClick={() => dispatch({ type: 'UNDO_PLACEMENT' })} disabled={!canUndo} data-testid="undo">
+              {t('plan.undo')}
             </button>
-            <button type="button" className="btn btn-primary" onClick={() => dispatch({ type: 'CONFIRM' })} data-testid="confirm">
-              Confirm dispatch
+            <button type="button" className="btn btn-primary btn-spray" onClick={() => dispatch({ type: 'CONFIRM' })} data-testid="confirm">
+              {t('challenge.spray')}
             </button>
           </div>
         </aside>
       </div>
       {standDownDialog ? (
-        <Dialog title="Stand down with no crews?" confirmLabel="Stand down" cancelLabel="Keep dispatching" onConfirm={() => dispatch({ type: 'STAND_DOWN_CONFIRM' })} onCancel={() => dispatch({ type: 'STAND_DOWN_CANCEL' })}>
-          <p>You are about to confirm without sending any crew. Whatever is burning stays burning.</p>
+        <Dialog title={t('challenge.standDown.title')} confirmLabel={t('challenge.standDown.confirm')} cancelLabel={t('challenge.standDown.cancel')} onConfirm={() => dispatch({ type: 'STAND_DOWN_CONFIRM' })} onCancel={() => dispatch({ type: 'STAND_DOWN_CANCEL' })}>
+          <p>{t('challenge.standDown.body')}</p>
         </Dialog>
       ) : null}
     </main>
   );
 }
 
-/* ------------------------------------------------------------------ debrief */
+/* ------------------------------------------------------------------ dispatch (spray → result overlay) */
 
-export interface DebriefProps extends PlayProps {
+export interface DispatchProps extends PlayProps {
   readonly mission: PublicMissionView;
   readonly debrief: Debrief;
   readonly bridge: QuantumBridge;
+  readonly reducedMotion: boolean;
 }
 
-export function DebriefScreen({ state, dispatch, mission, debrief, bridge }: DebriefProps) {
-  const step = debrief.steps[state.replayIndex] ?? debrief.steps[debrief.steps.length - 1];
-  const descId = useId();
+function outcomeOf(debrief: Debrief): SceneOutcome {
+  const result = resultType(debrief);
+  const hasBeacon = districtForMission(debrief.missionId)?.hasBeacon ?? false;
+  return { result, logicalFlip: debrief.logicalFlip, patternQubits: logicalPatternSupport(debrief), beacon: hasBeacon || result === 'logical-failure' };
+}
+
+/** Details content shared by the result overlay and the Why screen: residual, alarms, decision, cost, cloud. */
+function ResultDetails({ state, mission, debrief, bridge, children }: DispatchProps & { readonly children?: ReactNode }) {
+  const t = useT();
+  const lang = useLanguage();
   const code = getCode(mission.code);
-  if (step === undefined) return null;
-  const last = debrief.steps.length - 1;
-  const isWires = mission.kind === 'propagation';
-  const residualP = fromString(debrief.residual);
-  const residualBlocks = Array.from({ length: code.n }, (_, q) => q).filter((q) => letterAt(residualP, q) !== 'I');
-  const logicalText =
-    debrief.verdict === 'success'
-      ? 'preserved'
-      : debrief.verdict === 'detectable'
-        ? 'undecided — alarms still ringing'
-        : isWires
-          ? `missed — fires left on ${residualBlocks.length === 1 ? 'block' : 'blocks'} ${residualBlocks.join(', ')}`
-          : `flipped (${[debrief.logicalFlip.x.some(Boolean) ? 'X̄' : null, debrief.logicalFlip.z.some(Boolean) ? 'Z̄' : null].filter(Boolean).join(' and ')})`;
+  const s = debrief.score;
   return (
-    <main className="screen screen-play screen-debrief">
-      <TopBar
-        title={`Mission ${String(mission.index)} · ${mission.title}`}
-        subtitle="Debrief · everything revealed"
-        onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })}
-        onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })}
-      />
-      <div className="play-layout">
-        <section className="board-col" aria-label="Replay board">
-          <VerdictBanner verdict={debrief.verdict} label={debrief.verdictLabel} />
-          <Board
-            codeId={mission.code}
-            circuit={mission.circuit}
-            fires={step.fires}
-            crews={step.crews}
-            residual={step.residual}
-            syndrome={step.syndrome}
-            interactive={false}
-            gateCursor={isWires ? step.gateCursor : undefined}
-            inputFires={isWires ? debrief.startFires : null}
-            ariaDescribedBy={descId}
-            ariaLabel="Replay board"
-          />
-          <p className="board-caption" id={descId} aria-live="polite" data-testid="replay-caption">
-            <strong>
-              Step {state.replayIndex + 1} of {debrief.steps.length} · {STEP_TITLE[step.id.startsWith('gate-') ? 'gate' : step.id] ?? step.id}.
-            </strong>{' '}
-            {step.caption}
-          </p>
-          <div className="replay-controls" role="group" aria-label="Replay controls">
-            <button type="button" className="btn" onClick={() => dispatch({ type: 'REPLAY_PREV' })} disabled={state.replayIndex === 0} data-testid="replay-prev">
-              Prev
-            </button>
-            <button type="button" className="btn" onClick={() => dispatch({ type: 'REPLAY_NEXT' })} disabled={state.replayIndex === last} data-testid="replay-next">
-              Next
-            </button>
-            <button type="button" className={`btn ${state.autoPlay ? 'is-active' : ''}`} aria-pressed={state.autoPlay} onClick={() => dispatch({ type: 'REPLAY_AUTO', on: !state.autoPlay })} data-testid="replay-auto">
-              Auto-play
-            </button>
-            <ol className="step-dots" aria-label="Replay steps">
-              {debrief.steps.map((s, i) => (
-                <li key={s.id}>
-                  <button type="button" className={`dot ${i === state.replayIndex ? 'is-current' : ''}`} aria-current={i === state.replayIndex ? 'step' : undefined} onClick={() => dispatch({ type: 'REPLAY_GOTO', index: i })} aria-label={`Step ${String(i + 1)}: ${STEP_TITLE[s.id.startsWith('gate-') ? 'gate' : s.id] ?? s.id}`}>
-                    {i + 1}
-                  </button>
-                </li>
-              ))}
-            </ol>
+    <>
+      <dl className="facts">
+        <div>
+          <dt>{t('details.rawResidual')}</dt>
+          <dd className="mono" data-testid="residual">
+            {debrief.residual}
+          </dd>
+        </div>
+        <div>
+          <dt>{t('debrief.yourCrews')}</dt>
+          <dd className="mono">{debrief.crews}</dd>
+        </div>
+        <div>
+          <dt>{t('details.syndrome')}</dt>
+          <dd className="mono" data-testid="residual-syndrome">
+            {code.checks.length === 0 ? t('alarms.summary.none') : debrief.syndromeOfResidual.join('')}
+          </dd>
+        </div>
+        <div>
+          <dt>{t('result.decision')}</dt>
+          <dd data-testid="decision">
+            {t(QUALITY_KEY[s.quality])} · <Stars count={s.stars} max={s.maxStars} size={16} />
+          </dd>
+        </div>
+        <div>
+          <dt>{t('result.outcome')}</dt>
+          <dd data-testid="verdict-label">{t(outcomeKey(s.outcome, code.checks.length > 0))}</dd>
+        </div>
+        <div>
+          <dt>{t('result.cost')}</dt>
+          <dd>{s.crewsUsed === 1 ? t('result.costText.one', { min: s.minCrews }) : t('result.costText.other', { used: s.crewsUsed, min: s.minCrews })}</dd>
+        </div>
+        <div>
+          <dt>{t('result.attempts')}</dt>
+          <dd data-testid="attempts">{state.progress[mission.id]?.attempts ?? 1}</dd>
+        </div>
+      </dl>
+      {code.checks.length > 0 ? <AlarmList codeId={mission.code} syndrome={debrief.syndromeOfResidual} compact /> : null}
+      <p className="narrative" data-testid="narrative">
+        {debriefNarrative(mission.id, debrief.verdict, lang, debrief.narrative)}
+      </p>
+      {children}
+      <CloudPanel key={`${mission.id}:${debrief.crews}`} bridge={bridge} missionId={mission.id} correction={debrief.crews} />
+    </>
+  );
+}
+
+export function DispatchScreen(props: DispatchProps) {
+  const { state, dispatch, mission, debrief, reducedMotion } = props;
+  const t = useT();
+  const lang = useLanguage();
+  const copy = missionCopy(mission.id, lang);
+  const timeline = useMemo(() => buildEffects(debrief, reducedMotion), [debrief, reducedMotion]);
+  const onDone = useCallback(() => dispatch({ type: 'DISPATCH_DONE' }), [dispatch]);
+  const isLast = mission.index === listPublicMissions().length;
+  const nextLabel = state.tutorialActive ? t('result.city') : isLast ? t('result.summary') : t('result.next');
+  const isLanes = mission.kind === 'propagation';
+  return (
+    <main className="screen screen-play screen-dispatch" data-dispatch-done={state.dispatchDone ? 'true' : 'false'}>
+      <TopBar title={copy.districtName} subtitle={t('dispatch.subtitle')} onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} />
+      {!state.dispatchDone ? (
+        <div className="dispatch-stage">
+          <SprayPlayer key={`${debrief.missionId}:${debrief.crews}:${String(state.progress[mission.id]?.attempts ?? 0)}`} codeId={mission.code} circuit={mission.circuit} debrief={debrief} timeline={timeline} reducedMotion={reducedMotion} onDone={onDone} missionCopy={copy} />
+          <p className="muted small">{t('dispatch.answerCheck.note')}</p>
+        </div>
+      ) : (
+        <div className="scene-stage" data-testid="dispatch-result">
+          <div className="board-col">
+            <h2 className="spray-title">{t('dispatch.answerCheck')}</h2>
+            <Scene
+              codeId={mission.code}
+              circuit={mission.circuit}
+              fires={debrief.fires}
+              crews={debrief.crews}
+              residual={debrief.residual}
+              syndrome={debrief.syndromeOfResidual}
+              interactive={false}
+              outcome={outcomeOf(debrief)}
+              gateCursor={isLanes ? mission.circuit.length : undefined}
+              inputFires={isLanes ? debrief.startFires : null}
+              ariaLabel={t('dispatch.answerCheck')}
+            />
+            <p className="muted small">{t('dispatch.answerCheck.note')}</p>
           </div>
-        </section>
-        <aside className="panel">
-          <section className="panel-section">
-            <h2 className="panel-title">Report</h2>
-            <dl className="facts">
-              <div>
-                <dt>True fires</dt>
-                <dd className="mono">{debrief.fires}</dd>
+          <ResultOverlay
+            debrief={debrief}
+            result={resultType(debrief)}
+            missionCopy={copy}
+            stars={debrief.score.stars}
+            maxStars={debrief.score.maxStars}
+            onWhy={() => dispatch({ type: 'OPEN_WHY', reducedMotion })}
+            onRetry={() => dispatch({ type: 'TRY_AGAIN' })}
+            onNext={() => dispatch(state.tutorialActive ? { type: 'OPEN_MISSIONS' } : { type: 'NEXT_MISSION' })}
+            nextLabel={nextLabel}
+          >
+            <ResultDetails {...props}>
+              <div className="actions">
+                <button type="button" className="btn btn-small" onClick={() => dispatch({ type: 'OPEN_WHY', reducedMotion })} data-testid="step-by-step">
+                  {t('debrief.stepByStep')}
+                </button>
+                <button type="button" className="btn btn-small" onClick={() => dispatch({ type: 'SHOW_RESULT' })} data-testid="to-result">
+                  {t('debrief.result')}
+                </button>
               </div>
-              {isWires ? (
-                <div>
-                  <dt>Started as</dt>
-                  <dd className="mono">{debrief.startFires}</dd>
-                </div>
-              ) : null}
-              <div>
-                <dt>Your crews</dt>
-                <dd className="mono">{debrief.crews}</dd>
-              </div>
-              <div>
-                <dt>Residual</dt>
-                <dd className="mono" data-testid="residual">
-                  {debrief.residual}
-                  {residualBlocks.length > 0 ? <span className="muted"> · blocks {residualBlocks.join(', ')}</span> : <span className="muted"> · nothing left</span>}
-                </dd>
-              </div>
-              <div>
-                <dt>Logical</dt>
-                <dd>{logicalText}</dd>
-              </div>
-              <div>
-                <dt>Decision</dt>
-                <dd>
-                  {QUALITY_LABEL[debrief.score.quality]} · <Stars count={debrief.score.stars} max={debrief.score.maxStars} size={16} />
-                </dd>
-              </div>
-            </dl>
-            <p className="narrative" data-testid="narrative">
-              {debrief.narrative}
-            </p>
-          </section>
-          {code.checks.length > 0 ? <AlarmList codeId={mission.code} syndrome={step.syndrome} compact /> : null}
-          <section className="panel-section whatif" data-testid="whatif">
-            <h2 className="panel-title">What if</h2>
-            <p>
-              Minimum-weight dispatch for these alarms: <span className="mono">{debrief.whatIf.decoderCrews}</span> → {outcomeLabel(debrief.whatIf.decoderVerdict, code.checks.length > 0)}.
-            </p>
-            {debrief.whatIf.trueFireCrews !== null ? (
-              <p>
-                Crews matching the true fires: <span className="mono">{debrief.whatIf.trueFireCrews}</span> → Logical qubit safe.
-              </p>
-            ) : null}
-            <p className="muted">{debrief.whatIf.explanation}</p>
-          </section>
-          <CloudPanel key={`${mission.id}:${debrief.crews}`} bridge={bridge} missionId={mission.id} correction={debrief.crews} />
-          <div className="actions actions-sticky">
-            <button type="button" className="btn" onClick={() => dispatch({ type: 'TRY_AGAIN' })} data-testid="try-again">
-              Try again
-            </button>
-            <button type="button" className="btn btn-primary" onClick={() => dispatch({ type: 'SHOW_RESULT' })} data-testid="to-result">
-              Result
-            </button>
-            <button type="button" className="btn btn-ghost" onClick={() => dispatch({ type: 'NEXT_MISSION' })} data-testid="debrief-next">
-              Next mission
-            </button>
-          </div>
-        </aside>
-      </div>
+            </ResultDetails>
+          </ResultOverlay>
+        </div>
+      )}
     </main>
   );
 }
 
-const STEP_TITLE: Readonly<Record<string, string>> = {
-  placed: 'Fires placed',
-  gate: 'Gate',
-  alarms: 'Alarms',
-  dispatch: 'Your dispatch',
-  residual: 'Residual',
-  verdict: 'Verdict',
-};
+/* ------------------------------------------------------------------ why? (debrief) */
+
+export function DebriefScreen(props: DispatchProps) {
+  const { state, dispatch, mission, debrief, reducedMotion } = props;
+  const t = useT();
+  const lang = useLanguage();
+  const copy = missionCopy(mission.id, lang);
+  const code = getCode(mission.code);
+  const step = debrief.steps[state.replayIndex] ?? debrief.steps[debrief.steps.length - 1];
+  const descId = useId();
+  if (step === undefined) return null;
+  const last = debrief.steps.length - 1;
+  const isLanes = mission.kind === 'propagation';
+  const alternative =
+    debrief.whatIf.trueFireCrews !== null
+      ? { crews: debrief.whatIf.trueFireCrews, verdict: 'success' as const, label: t('why.trueFires') }
+      : { crews: debrief.whatIf.decoderCrews, verdict: debrief.whatIf.decoderVerdict, label: t('why.decoder') };
+  const residualP = fromString(debrief.residual);
+  const residualHouses = Array.from({ length: code.n }, (_, q) => q).filter((q) => letterAt(residualP, q) !== 'I');
+  const logicalText =
+    debrief.verdict === 'success'
+      ? t('debrief.logical.preserved')
+      : debrief.verdict === 'detectable'
+        ? t('debrief.logical.undecided')
+        : isLanes
+          ? t('debrief.logical.missed', { houses: residualHouses.join(', ') })
+          : t('debrief.logical.flipped', { ops: [debrief.logicalFlip.x.some(Boolean) ? 'X̄' : null, debrief.logicalFlip.z.some(Boolean) ? 'Z̄' : null].filter(Boolean).join(` ${t('common.and')} `) });
+  const isLast = mission.index === listPublicMissions().length;
+  return (
+    <main className="screen screen-play screen-debrief">
+      <TopBar title={copy.districtName} subtitle={t('why.title')} onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} />
+      <section className="why-section" aria-labelledby="why-h">
+        <h2 id="why-h" className="section-h" tabIndex={-1} data-focus-target data-testid="why-heading">
+          {t('why.title')}
+        </h2>
+        <p className="why-short" data-testid="why-short">
+          {copy.whyShort}
+        </p>
+        <WhyCompare codeId={mission.code} circuit={mission.circuit} mine={debrief} alternative={alternative} reducedMotion={reducedMotion} missionCopy={copy} />
+      </section>
+      <Details summary={t('debrief.stepByStep')} testId="step-details" className="step-details">
+        <div className="play-layout">
+          <section className="board-col" aria-label={t('debrief.replayBoard')}>
+            <Scene
+              codeId={mission.code}
+              circuit={mission.circuit}
+              fires={step.fires}
+              crews={step.crews}
+              residual={step.residual}
+              syndrome={step.syndrome}
+              interactive={false}
+              outcome={step.showVerdict ? outcomeOf(debrief) : undefined}
+              gateCursor={isLanes ? step.gateCursor : undefined}
+              inputFires={isLanes ? debrief.startFires : null}
+              ariaDescribedBy={descId}
+              ariaLabel={t('a11y.replayBoard')}
+            />
+            <p className="board-caption" id={descId} aria-live="polite" data-testid="replay-caption">
+              <strong>{t('debrief.step', { n: state.replayIndex + 1, total: debrief.steps.length, title: stepTitle(t, step.id) })}</strong> {step.caption}
+            </p>
+            <p className="muted small">{t('details.replayEnglish')}</p>
+            <div className="replay-controls" role="group" aria-label={t('a11y.replayControls')}>
+              <button type="button" className="btn" onClick={() => dispatch({ type: 'REPLAY_PREV' })} disabled={state.replayIndex === 0} data-testid="replay-prev">
+                {t('debrief.prev')}
+              </button>
+              <button type="button" className="btn" onClick={() => dispatch({ type: 'REPLAY_NEXT' })} disabled={state.replayIndex === last} data-testid="replay-next">
+                {t('debrief.next')}
+              </button>
+              <button type="button" className={`btn${state.autoPlay ? ' is-active' : ''}`} aria-pressed={state.autoPlay} onClick={() => dispatch({ type: 'REPLAY_AUTO', on: !state.autoPlay })} data-testid="replay-auto">
+                {t('debrief.autoPlay')}
+              </button>
+              <ol className="step-dots" aria-label={t('a11y.replaySteps')}>
+                {debrief.steps.map((s, i) => (
+                  <li key={s.id}>
+                    <button type="button" className={`dot${i === state.replayIndex ? ' is-current' : ''}`} aria-current={i === state.replayIndex ? 'step' : undefined} onClick={() => dispatch({ type: 'REPLAY_GOTO', index: i })} aria-label={t('a11y.step', { n: i + 1, title: stepTitle(t, s.id) })}>
+                      {i + 1}
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </section>
+          <aside className="panel">
+            <section className="panel-section">
+              <h2 className="panel-title">{t('debrief.report')}</h2>
+              <dl className="facts">
+                <div>
+                  <dt>{t('debrief.trueFires')}</dt>
+                  <dd className="mono">{debrief.fires}</dd>
+                </div>
+                {isLanes ? (
+                  <div>
+                    <dt>{t('debrief.startedAs')}</dt>
+                    <dd className="mono">{debrief.startFires}</dd>
+                  </div>
+                ) : null}
+                <div>
+                  <dt>{t('debrief.yourCrews')}</dt>
+                  <dd className="mono">{debrief.crews}</dd>
+                </div>
+                <div>
+                  <dt>{t('debrief.residual')}</dt>
+                  <dd className="mono" data-testid="residual">
+                    {debrief.residual}
+                    <span className="muted"> {residualHouses.length > 0 ? t('debrief.residualHouses', { list: residualHouses.join(', ') }) : t('debrief.nothingLeft')}</span>
+                  </dd>
+                </div>
+                <div>
+                  <dt>{t('debrief.logical')}</dt>
+                  <dd data-testid="logical">{logicalText}</dd>
+                </div>
+                <div>
+                  <dt>{t('debrief.decision')}</dt>
+                  <dd>
+                    {t(QUALITY_KEY[debrief.score.quality])} · <Stars count={debrief.score.stars} max={debrief.score.maxStars} size={16} />
+                  </dd>
+                </div>
+              </dl>
+              <p className="narrative" data-testid="narrative">
+                {debriefNarrative(mission.id, debrief.verdict, lang, debrief.narrative)}
+              </p>
+            </section>
+            {code.checks.length > 0 ? <AlarmList codeId={mission.code} syndrome={step.syndrome} compact /> : null}
+            <section className="panel-section whatif" data-testid="whatif">
+              <h2 className="panel-title">{t('debrief.whatIf')}</h2>
+              <p>{t('debrief.whatIf.decoder', { crews: debrief.whatIf.decoderCrews, verdict: t(outcomeKey(debrief.whatIf.decoderVerdict, code.checks.length > 0)) })}</p>
+              {debrief.whatIf.trueFireCrews !== null ? <p>{t('debrief.whatIf.trueFires', { crews: debrief.whatIf.trueFireCrews })}</p> : null}
+              <h3 className="panel-title">{t('details.englishOriginal')}</h3>
+              <p className="muted">{debrief.whatIf.explanation}</p>
+              {lang !== 'en' ? <p className="muted small">{debrief.narrative}</p> : null}
+            </section>
+            <CloudPanel key={`${mission.id}:${debrief.crews}`} bridge={props.bridge} missionId={mission.id} correction={debrief.crews} />
+          </aside>
+        </div>
+      </Details>
+      <div className="actions">
+        <button type="button" className="btn btn-primary" onClick={() => dispatch({ type: 'SHOW_RESULT' })} data-testid="to-result">
+          {t('debrief.result')}
+        </button>
+        <button type="button" className="btn" onClick={() => dispatch({ type: 'TRY_AGAIN' })} data-testid="try-again">
+          {t('debrief.tryAgain')}
+        </button>
+        <button type="button" className="btn btn-ghost" onClick={() => dispatch(state.tutorialActive ? { type: 'OPEN_MISSIONS' } : { type: 'NEXT_MISSION' })} data-testid="debrief-next">
+          {state.tutorialActive ? t('result.city') : isLast ? t('result.summary') : t('debrief.nextMission')}
+        </button>
+      </div>
+    </main>
+  );
+}
 
 /* ------------------------------------------------------------------ cloud verification */
 
@@ -414,14 +629,17 @@ type CloudState = { readonly kind: 'idle' } | { readonly kind: 'running' } | { r
  * Shows only recorded results that verify THIS dispatch (identical crews, or crews that differ from the
  * recorded ones by a stabilizer). The bridge filters already; the UI filters again so a bridge that ignores
  * the second argument (the Qollab live path) can never show a card for a different dispatch.
+ * Source labels (Local (Aer) / Cached cloud result / Live cloud result) are kept verbatim in English.
  */
 export function CloudPanel({ bridge, missionId, correction }: { readonly bridge: QuantumBridge; readonly missionId: string; readonly correction: string }) {
+  const t = useT();
   const [live, setLive] = useState<CloudState>({ kind: 'idle' });
   const allForMission = bridge.cached(missionId);
   const cached = filterByDispatch(bridge.cached(missionId, correction), missionId, correction);
   const otherDispatches = Array.from(new Set(allForMission.map((r) => r.correction))).filter((c) => !cached.some((r) => r.correction === c));
   const canRun = bridge.kind === 'qollab' && typeof bridge.run === 'function';
   const remaining = bridge.jobsRemaining?.() ?? 0;
+  const backend = bridge.backendName ?? t('cloud.selectedBackend');
   const run = async () => {
     if (!canRun || bridge.run === undefined) return;
     setLive({ kind: 'running' });
@@ -430,14 +648,11 @@ export function CloudPanel({ bridge, missionId, correction }: { readonly bridge:
   };
   return (
     <section className="panel-section cloud" data-testid="cloud-panel">
-      <h2 className="panel-title">Quantum verification</h2>
-      <p className="muted small">
-        The verdict above is exact Pauli-frame algebra computed locally. Circuit-level runs (Qiskit) are labelled by where they ran and are never invented. Only runs of
-        this dispatch (<span className="mono">{correction}</span>, or crews equivalent to it) are shown.
-      </p>
+      <h2 className="panel-title">{t('cloud.title')}</h2>
+      <p className="muted small">{t('cloud.intro', { correction })}</p>
       {cached.length === 0 && live.kind === 'idle' ? (
         <p className="cloud-empty" data-testid="cloud-empty">
-          No cloud result recorded for this dispatch{otherDispatches.length > 0 ? ` (recorded dispatches: ${otherDispatches.join(', ')})` : ''}.
+          {t('cloud.empty', { others: otherDispatches.length > 0 ? t('cloud.emptyOthers', { list: otherDispatches.join(', ') }) : '' })}
         </p>
       ) : null}
       {cached.map((r, i) => (
@@ -445,13 +660,21 @@ export function CloudPanel({ bridge, missionId, correction }: { readonly bridge:
       ))}
       {live.kind === 'running' ? (
         <p className="cloud-running" role="status">
-          Running on {bridge.backendName ?? 'the selected backend'} (100 shots)…
+          {t('cloud.running', { backend })}
         </p>
       ) : null}
-      {live.kind === 'done' ? live.result.status === 'ok' ? <CloudResultCard result={live.result} /> : <p className="cloud-error" role="alert">Verification failed: {live.result.message}</p> : null}
+      {live.kind === 'done' ? (
+        live.result.status === 'ok' ? (
+          <CloudResultCard result={live.result} />
+        ) : (
+          <p className="cloud-error" role="alert">
+            {t('cloud.failed', { message: live.result.message })}
+          </p>
+        )
+      ) : null}
       {canRun ? (
         <button type="button" className="btn" onClick={() => void run()} disabled={live.kind === 'running' || remaining <= 0}>
-          {remaining <= 0 ? 'No job left in this run' : `Verify on ${bridge.backendName ?? 'selected backend'} (100 shots)`}
+          {remaining <= 0 ? t('cloud.noJobs') : t('cloud.verifyOn', { backend })}
         </button>
       ) : null}
     </section>
@@ -459,6 +682,7 @@ export function CloudPanel({ bridge, missionId, correction }: { readonly bridge:
 }
 
 function CloudResultCard({ result }: { readonly result: CloudResultOk }) {
+  const t = useT();
   const total = Object.values(result.counts).reduce((a, b) => a + b, 0);
   const top = Object.entries(result.counts)
     .sort(([, a], [, b]) => b - a)
@@ -466,10 +690,10 @@ function CloudResultCard({ result }: { readonly result: CloudResultOk }) {
   return (
     <div className={`cloud-card cloud-${result.source}`} data-testid="cloud-card">
       <p className="cloud-source">
-        <span className="tag">{SOURCE_LABEL[result.source]}</span> {result.backendName} · {result.shots} shots · {new Date(result.finishedAt).toISOString().slice(0, 16).replace('T', ' ')} UTC
+        <span className="tag">{t(SOURCE_KEY[result.source])}</span> {result.backendName} · {t('cloud.shots', { n: result.shots })} · {new Date(result.finishedAt).toISOString().slice(0, 16).replace('T', ' ')} UTC
       </p>
       <p className="cloud-dispatch small">
-        Recorded crews: <span className="mono">{result.correction}</span> · Job id: <span className="mono">{result.jobId ?? 'none (local run)'}</span>
+        {t('cloud.recordedCrews')} <span className="mono">{result.correction}</span> · {t('cloud.jobId')} <span className="mono">{result.jobId ?? t('cloud.noneLocal')}</span>
       </p>
       <ul className="counts">
         {top.map(([bits, n]) => (
@@ -479,7 +703,7 @@ function CloudResultCard({ result }: { readonly result: CloudResultOk }) {
         ))}
       </ul>
       <dl className="facts small cloud-facts">
-        {summariseAnalysis(result).map(([k, v]) => (
+        {summariseAnalysis(result, t).map(([k, v]) => (
           <div key={k}>
             <dt>{k}</dt>
             <dd>{v}</dd>
@@ -491,7 +715,7 @@ function CloudResultCard({ result }: { readonly result: CloudResultOk }) {
 }
 
 /** Curated, human-readable summary of the Python-side analysis (shape documented in qollab/q11/circuits.py). */
-function summariseAnalysis(result: CloudResultOk): readonly (readonly [string, string])[] {
+function summariseAnalysis(result: CloudResultOk, t: ReturnType<typeof useT>): readonly (readonly [string, string])[] {
   const out: (readonly [string, string])[] = [];
   const a = isRecord(result.analysis) ? result.analysis : {};
   const p = isRecord(result.prediction) ? result.prediction : {};
@@ -499,20 +723,20 @@ function summariseAnalysis(result: CloudResultOk): readonly (readonly [string, s
   const bits = (x: unknown): string | null => (Array.isArray(x) && x.every((b) => b === 0 || b === 1) ? x.map(String).join('') : null);
   const dom = bits(a['dominantSyndrome']);
   const predSyn = bits(p['syndrome']);
-  if (dom !== null) out.push(['Dominant alarm pattern', predSyn !== null ? `${dom} (predicted ${predSyn})` : dom]);
+  if (dom !== null) out.push([t('cloud.analysis.dominant'), predSyn !== null ? t('cloud.analysis.predicted', { dom, pred: predSyn }) : dom]);
   const synShare = pct(a['predictedSyndromeShare']);
-  if (synShare !== null) out.push(['Shots with the predicted alarms', synShare]);
+  if (synShare !== null) out.push([t('cloud.analysis.syndromeShare'), synShare]);
   const ls = a['predictedLogicalShare'];
-  if (Array.isArray(ls) && typeof ls[0] === 'number') out.push(['Shots with the predicted logical bit', pct(ls[0]) ?? '—']);
+  if (Array.isArray(ls) && typeof ls[0] === 'number') out.push([t('cloud.analysis.logicalShare'), pct(ls[0]) ?? '—']);
   const dm = a['dominantMatches'];
   if (isRecord(dm)) {
     const ok = Object.values(dm).every((v) => v === true || v === null);
-    out.push(['Dominant outcome agrees with the verdict', ok ? 'yes' : 'no']);
+    out.push([t('cloud.analysis.dominantMatches'), ok ? t('cloud.analysis.yes') : t('cloud.analysis.no')]);
   }
   const em = a['exactMatchesIdealModel'] ?? a['matches'];
-  if (isRecord(em)) out.push(['Exact match with the noiseless model', Object.values(em).every((v) => v === true || v === null) ? 'yes' : 'no (expected under a noise model)']);
-  if (typeof p['verdict'] === 'string') out.push(['Pauli-frame verdict', p['verdict']]);
-  if (typeof a['readoutBasis'] === 'string' && typeof a['prep'] === 'string') out.push(['Prepared / readout', `logical |${a['prep']}⟩ / ${a['readoutBasis']} basis`]);
+  if (isRecord(em)) out.push([t('cloud.analysis.exact'), Object.values(em).every((v) => v === true || v === null) ? t('cloud.analysis.yes') : t('cloud.analysis.noNoise')]);
+  if (typeof p['verdict'] === 'string') out.push([t('cloud.analysis.verdict'), p['verdict']]);
+  if (typeof a['readoutBasis'] === 'string' && typeof a['prep'] === 'string') out.push([t('cloud.analysis.prep'), t('cloud.analysis.prepValue', { prep: a['prep'], basis: a['readoutBasis'] })]);
   return out;
 }
 

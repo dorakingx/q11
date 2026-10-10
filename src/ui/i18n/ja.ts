@@ -31,6 +31,8 @@ export const ja: Readonly<Record<Key, string>> = {
   'title.settings': '設定',
   'title.progress': '進み具合：星 {stars} / {max}',
   'title.foot': 'Qollab × IonQ Global Quantum Hackathon 2026 参加作品。This effort is supported by Qollab & IonQ.',
+  'title.kidLine': '見えない火事。聞こえる警報。正しい隊を送ろう！',
+  'title.language': '言語：{lang}',
 
   /* ------------------------------------------------------------------ how it works */
   'how.title': 'あそび方',
@@ -55,6 +57,15 @@ export const ja: Readonly<Record<Key, string>> = {
   'how.model': 'モデル：クリフォード + パウリの教育用シミュレーションで、シンドローム (syndrome) は完全に読めると仮定しています。反復符号は X ノイズだけの入門、メインの地区は距離 3 の回転表面符号 (rotated surface code) です。',
   'how.quantumRules': '同じ隊なら火が消える。ちがう隊なら火が変わる。空の家に隊を送ると火がつく。量子のルール！',
   'how.back': 'もどる',
+  'how.kid.intro': 'この街では、見えない火事が家で起きています。警報所 (alarm) が「どこかが燃えている」と教えてくれます。あなたは隊を送って火を消します。これは、量子コンピュータがまちがいを直すしくみのゲームです。',
+  'how.kid.legend': '絵の意味',
+  'how.kid.houses': '家は量子ビット (qubit)：小さな量子のメモリです。',
+  'how.kid.fires': '火はまちがいです。赤が X、青が Z、両方いっしょが Y。出動中は火が見えません。',
+  'how.kid.alarms': '警報所はそれぞれいくつかの家を見ています。ひし形は赤い火で、四角は青い火で鳴ります。鳴るのは火が奇数のときだけで、どの家かは教えてくれません。',
+  'how.kid.crews': '隊は直す力です。火と同じ文字なら火が消えます。ちがう文字なら火が変わります。空の家に送ると新しい火がつきます。',
+  'how.kid.gates': 'ゲートが火を線にそって動かします。火はひとりでに動きません。',
+  'how.kid.water': '水はうすい色の丸いしずく。青い Z の火は Z の文字がついた炎。ぜんぜん別のものです。',
+  'how.kid.spray': '放水！のあとは本当の火が見えるので、作戦をたしかめられます。本物の量子コンピュータはのぞき見できません。',
 
   /* ------------------------------------------------------------------ city map */
   'city.title': '量子の街',
@@ -115,6 +126,7 @@ export const ja: Readonly<Record<Key, string>> = {
   'briefing.startTraining': '訓練をはじめる',
   'briefing.start': 'はじめる',
   'briefing.skipToDispatch': '訓練をとばして出動',
+  'briefing.go': 'いくぞ！',
 
   /* ------------------------------------------------------------------ training */
   'training.subtitle': '訓練 · レッスン {n} / {total} · 火が見えます',
@@ -133,6 +145,10 @@ export const ja: Readonly<Record<Key, string>> = {
   'training.firesVisible': '火が見えます',
   'training.predict': 'まず予想してみよう。このゲートのあと、火はどこにある？',
   'training.check': 'たしかめる',
+  'training.predictTap': '次に燃えるのはどの家？ タップしてみよう！',
+  'training.predict.hit': '正解！ このゲートのあと、家 {q} が燃えます。',
+  'training.predict.miss': '今回はちがいました：家 {q} は無事です。火がどこへ行くか見てみよう。',
+  'training.predict.waiting': '家をタップすると次のステップが見られます。',
 
   /* ------------------------------------------------------------------ challenge (planning) */
   'challenge.subtitle.dispatch': '出動 · 火はかくれている、警報は生きている',
@@ -309,6 +325,7 @@ export const ja: Readonly<Record<Key, string>> = {
   'debrief.nextMission': 'つぎの地区',
   'debrief.house.one': '家',
   'debrief.house.other': '家',
+  'debrief.stepByStep': '一歩ずつ',
 
   /* ------------------------------------------------------------------ details fold (jargon lives here) */
   'details.show': 'くわしく',
@@ -322,6 +339,8 @@ export const ja: Readonly<Record<Key, string>> = {
   'details.rawResidual': '残りそのまま',
   'details.syndrome': '警報ビット',
   'details.code': '符号',
+  'details.englishOriginal': '元の報告（英語）',
+  'details.replayEnglish': 'リプレイの説明と「もしも」の解説は英語で生成されます。',
 
   /* ------------------------------------------------------------------ cloud verification (labels kept) */
   'cloud.title': '量子検証',
@@ -402,6 +421,8 @@ export const ja: Readonly<Record<Key, string>> = {
   'summary.badges': 'バッジ',
   'summary.city': '街にもどる',
   'summary.titleBtn': 'タイトル',
+  'summary.playAgain': 'もう一度遊ぶ',
+  'summary.freeRoamHint': '好きな地区を好きな順で遊びたいときは、設定で「フリーモード」をオンにしよう。',
 
   /* ------------------------------------------------------------------ mission list / cards (legacy + city) */
   'mission.label': 'ミッション {n}',
@@ -486,6 +507,7 @@ export const ja: Readonly<Record<Key, string>> = {
   'a11y.stationRinging': '{station}、鳴っている、家 {list} を見ている',
   'a11y.stationQuiet': '{station}、静か、家 {list} を見ている',
   'a11y.fogHouse': '家 {q}、かくれている',
+  'a11y.pressToPredict': '押すとこの家が次に燃えると予想する',
   'a11y.screen.title': 'Q11 タイトル画面。',
   'a11y.screen.how': 'あそび方。',
   'a11y.screen.settings': '設定。',

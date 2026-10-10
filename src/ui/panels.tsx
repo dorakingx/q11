@@ -1,80 +1,126 @@
 /**
- * Side-panel building blocks: alarm list, crew palette, verdict banner, stars, top bar, notice, dialog.
- * Panel titles are h2 (each screen has exactly one h1 in the top bar).
+ * Shared building blocks: art icons (flame / helmet / detector lamp / water drop), alarm list, crew palette (big
+ * chips), stars, top bar, language pill, Details fold, notice and the modal dialog. Panel titles are h2 (each screen
+ * has exactly one h1 in the top bar). Every string goes through useT().
  */
 import { useEffect, useLayoutEffect, useRef, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { getCode, type CodeId, type VerdictKind } from '../quantum';
-import { Flame, GearIcon, Helmet, StarIcon, StationGlyph } from './glyphs';
-import { CREW_LABEL } from './theme';
-import { alarmSummary } from './text';
-import { OUTCOME_LABEL, type CrewLetter } from '../game';
+import { getCode, type CodeId } from '../quantum';
+import type { CrewLetter, Language } from '../game';
+import { DetectorLamp, Drop, Flame, HelmetChip } from './art';
+import { GearIcon, StarIcon } from './glyphs';
+import { LANGUAGE_NAMES, useT } from './i18n';
+import { alarmSummary, CREW_KEY, PUTS_OUT_KEY } from './text';
+
+/* ------------------------------------------------------------------ art icons (decorative) */
+
+export function FlameIcon({ letter, size = 28, ghost = false, residual = false }: { readonly letter: CrewLetter; readonly size?: number; readonly ghost?: boolean; readonly residual?: boolean }) {
+  return (
+    <svg className={`icon icon-flame icon-${letter}`} width={size} height={size} viewBox="-34 -100 68 104" aria-hidden="true" focusable="false">
+      <Flame letter={letter} x={0} y={0} ghost={ghost} residual={residual} />
+    </svg>
+  );
+}
+
+export function HelmetIcon({ letter, size = 28 }: { readonly letter: CrewLetter; readonly size?: number }) {
+  return (
+    <svg className={`icon icon-helmet icon-${letter}`} width={size} height={size * 0.8} viewBox="-30 -44 60 48" aria-hidden="true" focusable="false">
+      <HelmetChip letter={letter} x={0} y={0} />
+    </svg>
+  );
+}
+
+export function DetectorIcon({ type, ringing = false, size = 26 }: { readonly type: 'X' | 'Z'; readonly ringing?: boolean; readonly size?: number }) {
+  return (
+    <svg className={`icon icon-detector icon-detector-${type}${ringing ? ' is-ringing' : ''}`} width={size} height={size} viewBox="-30 -30 60 60" aria-hidden="true" focusable="false">
+      <DetectorLamp type={type} ringing={ringing} x={0} y={0} />
+    </svg>
+  );
+}
+
+export function WaterIcon({ size = 26 }: { readonly size?: number }) {
+  return (
+    <svg className="icon icon-water" width={size} height={size} viewBox="-22 -44 44 48" aria-hidden="true" focusable="false">
+      <Drop x={0} y={0} />
+    </svg>
+  );
+}
+
+/* ------------------------------------------------------------------ alarms */
 
 export interface AlarmListProps {
   readonly codeId: CodeId;
   /** null = not read yet */
   readonly syndrome: readonly number[] | null;
-  readonly id?: string;
-  readonly compact?: boolean;
+  readonly id?: string | undefined;
+  readonly compact?: boolean | undefined;
+  /** Optional hint line under the title (e.g. "Tap a station to see the houses it watches."). */
+  readonly hint?: string | undefined;
 }
 
-export function AlarmList({ codeId, syndrome, id, compact = false }: AlarmListProps) {
+export function AlarmList({ codeId, syndrome, id, compact = false, hint }: AlarmListProps) {
+  const t = useT();
   const code = getCode(codeId);
   if (code.checks.length === 0) {
     return (
       <section className="panel-section" aria-labelledby={id === undefined ? undefined : `${id}-h`}>
         <h2 id={id === undefined ? undefined : `${id}-h`} className="panel-title">
-          Alarms
+          {t('alarms.title')}
         </h2>
         <p className="muted" id={id}>
-          No alarm stations on bare wires. Predict where the fires end up.
+          {t('alarms.noneBareWires')}
         </p>
       </section>
     );
   }
   return (
-    <section className="panel-section" aria-labelledby={id === undefined ? undefined : `${id}-h`}>
+    <section className={`panel-section alarms${compact ? ' is-compact' : ''}`} aria-labelledby={id === undefined ? undefined : `${id}-h`}>
       <h2 id={id === undefined ? undefined : `${id}-h`} className="panel-title">
-        Alarms
+        {t('alarms.title')}
       </h2>
       <p className="sr-only" id={id} aria-live="polite">
-        {alarmSummary(codeId, syndrome)}
+        {alarmSummary(t, codeId, syndrome)}
       </p>
-      <ul className={`alarm-list ${code.checks.length > 4 ? 'is-grid' : ''} ${compact ? 'is-compact' : ''}`} aria-label="Alarm stations">
+      <ul className={`alarm-list${code.checks.length > 4 ? ' is-grid' : ''}${compact ? ' is-compact' : ''}`} aria-label={t('alarms.stations')}>
         {code.checks.map((c, i) => {
           const ringing = syndrome !== null && (syndrome[i] ?? 0) === 1;
           return (
             <li key={c.id} className={ringing ? 'alarm is-ringing' : 'alarm'} data-check={c.id} data-ringing={ringing ? '1' : '0'}>
-              <StationGlyph type={c.type} ringing={ringing} size={22} />
+              <DetectorIcon type={c.type} ringing={ringing} size={26} />
               <span className="alarm-main">
                 <span className="alarm-id">{c.id}</span>
-                {/* Hidden visually on small screens / compact lists but always read by screen readers. */}
-                <span className="alarm-blocks">blocks {c.qubits.join(', ')}</span>
+                {/* Hidden visually in compact lists but always read by screen readers. */}
+                <span className="alarm-blocks">{t('alarms.houses', { list: c.qubits.join(', ') })}</span>
               </span>
-              <span className="alarm-state">{syndrome === null ? '—' : ringing ? 'RINGING' : 'quiet'}</span>
+              <span className="alarm-state">{syndrome === null ? t('alarms.notRead') : ringing ? t('alarms.ringing') : t('alarms.quiet')}</span>
             </li>
           );
         })}
       </ul>
+      {hint !== undefined ? <p className="muted small alarm-hint">{hint}</p> : null}
     </section>
   );
 }
+
+/* ------------------------------------------------------------------ palette */
 
 export interface PaletteProps {
   readonly allowed: readonly CrewLetter[];
   readonly selected: CrewLetter;
   readonly onSelect: (l: CrewLetter) => void;
+  /** Rendered after the title (tutorial callout). */
+  readonly callout?: ReactNode;
 }
 
 const KEY_FOR: Readonly<Record<CrewLetter, string>> = { X: '1', Z: '2', Y: '3' };
-const PUTS_OUT: Readonly<Record<CrewLetter, string>> = { X: 'puts out red fires', Z: 'puts out blue fires', Y: 'puts out red-and-blue fires' };
 const ORDER: readonly CrewLetter[] = ['X', 'Z', 'Y'];
 
 /**
  * Radio group with a roving tabindex: one Tab stop (the selected crew), arrow keys move the selection.
- * The accessible name is the visible text ("X crew puts out red fires") plus hidden colour / key hints.
+ * Big chips with the helmet art; the accessible name is the visible text plus hidden colour / key hints.
  */
-export function Palette({ allowed, selected, onSelect }: PaletteProps) {
+export function Palette({ allowed, selected, onSelect, callout }: PaletteProps) {
+  const t = useT();
   const letters = ORDER.filter((l) => allowed.includes(l));
   const onKeyDown = (e: ReactKeyboardEvent<HTMLButtonElement>, l: CrewLetter) => {
     const i = letters.indexOf(l);
@@ -91,11 +137,12 @@ export function Palette({ allowed, selected, onSelect }: PaletteProps) {
     root?.querySelector<HTMLElement>(`[data-letter="${next}"]`)?.focus();
   };
   return (
-    <section className="panel-section" aria-labelledby="palette-h">
+    <section className="panel-section palette-section" aria-labelledby="palette-h">
       <h2 id="palette-h" className="panel-title">
-        Crews
+        {t('palette.title')}
       </h2>
-      <div className="palette" role="radiogroup" aria-label="Crew colour">
+      {callout}
+      <div className="palette" role="radiogroup" aria-label={t('palette.group')}>
         {letters.map((l) => (
           <button
             key={l}
@@ -103,23 +150,24 @@ export function Palette({ allowed, selected, onSelect }: PaletteProps) {
             role="radio"
             aria-checked={selected === l}
             tabIndex={selected === l ? 0 : -1}
-            className={`palette-btn palette-${l} ${selected === l ? 'is-selected' : ''}`}
+            className={`palette-btn palette-${l}${selected === l ? ' is-selected' : ''}`}
             onClick={() => onSelect(l)}
             onKeyDown={(e) => onKeyDown(e, l)}
             data-letter={l}
             data-testid={`palette-${l}`}
           >
-            <Helmet letter={l} size={30} />
+            <HelmetIcon letter={l} size={44} />
             <span className="palette-text">
               <span className="palette-name">
-                {l} crew<span className="sr-only">, {CREW_LABEL[l]},</span>
+                {t('palette.crew', { letter: l })}
+                <span className="sr-only">, {t(CREW_KEY[l])},</span>
               </span>
-              <span className="palette-hint">{PUTS_OUT[l]}</span>
+              <span className="palette-hint">{t(PUTS_OUT_KEY[l])}</span>
             </span>
             <kbd className="palette-key" aria-hidden="true">
               {KEY_FOR[l]}
             </kbd>
-            <span className="sr-only">, key {KEY_FOR[l]}</span>
+            <span className="sr-only">{t('palette.key', { key: KEY_FOR[l] })}</span>
           </button>
         ))}
       </div>
@@ -127,35 +175,7 @@ export function Palette({ allowed, selected, onSelect }: PaletteProps) {
   );
 }
 
-export function VerdictBanner({ verdict, label }: { readonly verdict: VerdictKind; readonly label?: string }) {
-  return (
-    <div className={`verdict verdict-${verdict}`} role="status" data-testid="verdict" tabIndex={-1} data-focus-target>
-      <span className="verdict-icon" aria-hidden="true">
-        {verdict === 'success' ? <OkMark /> : verdict === 'detectable' ? <Flame letter="X" size={26} /> : <WarnMark />}
-      </span>
-      <span className="verdict-text">{label ?? OUTCOME_LABEL[verdict]}</span>
-    </div>
-  );
-}
-
-function OkMark() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" strokeWidth="2" />
-      <path d="M7 12.5l3.2 3.2L17 8.8" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function WarnMark() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3 2.5 20h19Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-      <path d="M12 9v5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-      <circle cx="12" cy="17" r="1.3" fill="currentColor" />
-    </svg>
-  );
-}
+/* ------------------------------------------------------------------ stars */
 
 export interface StarsProps {
   readonly count: number;
@@ -166,14 +186,17 @@ export interface StarsProps {
 }
 
 export function Stars({ count, max = 3, size = 22, label }: StarsProps) {
+  const t = useT();
   return (
-    <span className="stars" role="img" aria-label={label ?? `${String(count)} of ${String(max)} stars`}>
+    <span className="stars" role="img" aria-label={label ?? t('mission.starsOf', { stars: count, max })}>
       {Array.from({ length: Math.max(1, max) }, (_, i) => (
         <StarIcon key={i} filled={i < count} size={size} />
       ))}
     </span>
   );
 }
+
+/* ------------------------------------------------------------------ top bar */
 
 export interface TopBarProps {
   readonly title: ReactNode;
@@ -185,15 +208,16 @@ export interface TopBarProps {
   readonly onTitle?: () => void;
 }
 
-export function TopBar({ title, subtitle, onMissions, onSettings, settingsLabel = 'Settings', onTitle }: TopBarProps) {
+export function TopBar({ title, subtitle, onMissions, onSettings, settingsLabel, onTitle }: TopBarProps) {
+  const t = useT();
   return (
     <header className="topbar">
       <div className="topbar-title">
         {onTitle === undefined ? (
-          <span className="brand">Q11</span>
+          <span className="brand">{t('app.name')}</span>
         ) : (
-          <button type="button" className="btn btn-ghost brand-btn" onClick={onTitle} aria-label="Q11 — back to title">
-            Q11
+          <button type="button" className="btn btn-ghost brand-btn" onClick={onTitle} aria-label={t('a11y.backToTitle')}>
+            {t('app.name')}
           </button>
         )}
         <div className="topbar-text">
@@ -203,13 +227,13 @@ export function TopBar({ title, subtitle, onMissions, onSettings, settingsLabel 
           {subtitle !== undefined ? <p className="topbar-sub">{subtitle}</p> : null}
         </div>
       </div>
-      <nav className="topbar-actions" aria-label="Game">
+      <nav className="topbar-actions" aria-label={t('a11y.gameNav')}>
         {onMissions !== undefined ? (
-          <button type="button" className="btn btn-ghost" onClick={onMissions}>
-            Missions
+          <button type="button" className="btn btn-ghost" onClick={onMissions} data-testid="topbar-city">
+            {t('city.title')}
           </button>
         ) : null}
-        <button type="button" className="btn btn-ghost btn-icon" onClick={onSettings} aria-label={settingsLabel} data-testid="topbar-settings">
+        <button type="button" className="btn btn-ghost btn-icon" onClick={onSettings} aria-label={settingsLabel ?? t('title.settings')} data-testid="topbar-settings">
           <GearIcon />
         </button>
       </nav>
@@ -217,16 +241,58 @@ export function TopBar({ title, subtitle, onMissions, onSettings, settingsLabel 
   );
 }
 
+/* ------------------------------------------------------------------ language pill */
+
+export function LangToggle({ language, onChange, testId = 'lang-toggle' }: { readonly language: Language; readonly onChange: (l: Language) => void; readonly testId?: string }) {
+  const t = useT();
+  const other: Language = language === 'en' ? 'ja' : 'en';
+  return (
+    <button
+      type="button"
+      className="lang-pill"
+      onClick={() => onChange(other)}
+      aria-label={t('settings.language.switchTo', { lang: LANGUAGE_NAMES[other] })}
+      title={t('title.language', { lang: LANGUAGE_NAMES[language] })}
+      data-testid={testId}
+      data-language={language}
+    >
+      <span className={language === 'en' ? 'lang-opt is-on' : 'lang-opt'} aria-hidden="true">
+        EN
+      </span>
+      <span className={language === 'ja' ? 'lang-opt is-on' : 'lang-opt'} aria-hidden="true">
+        JA
+      </span>
+    </button>
+  );
+}
+
+/* ------------------------------------------------------------------ details fold */
+
+export function Details({ summary, children, testId, className }: { readonly summary?: string; readonly children: ReactNode; readonly testId?: string; readonly className?: string }) {
+  const t = useT();
+  return (
+    <details className={`details-fold${className === undefined ? '' : ` ${className}`}`} data-testid={testId}>
+      <summary>{summary ?? t('details.show')}</summary>
+      <div className="details-body">{children}</div>
+    </details>
+  );
+}
+
+/* ------------------------------------------------------------------ notice */
+
 export function Notice({ text, onDismiss }: { readonly text: string; readonly onDismiss: () => void }) {
+  const t = useT();
   return (
     <div className="notice" role="status" data-testid="notice">
       <span>{text}</span>
-      <button type="button" className="btn btn-ghost btn-small" onClick={onDismiss} aria-label="Dismiss notice">
-        Dismiss
+      <button type="button" className="btn btn-ghost btn-small" onClick={onDismiss} aria-label={t('a11y.dismissNotice')}>
+        {t('notice.dismiss')}
       </button>
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ dialog */
 
 export interface DialogProps {
   readonly title: string;
@@ -249,7 +315,8 @@ const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select
  *  - Tab / Shift+Tab cycle inside the dialog, Escape cancels,
  *  - the cancel button receives focus once on open (not on every render), and focus returns to the opener on close.
  */
-export function Dialog({ title, children, confirmLabel, cancelLabel = 'Cancel', onConfirm, onCancel, danger = false }: DialogProps) {
+export function Dialog({ title, children, confirmLabel, cancelLabel, onConfirm, onCancel, danger = false }: DialogProps) {
+  const t = useT();
   const first = useRef<HTMLButtonElement>(null);
   const box = useRef<HTMLDivElement>(null);
   const onCancelRef = useRef(onCancel);
@@ -315,7 +382,7 @@ export function Dialog({ title, children, confirmLabel, cancelLabel = 'Cancel', 
         </div>
         <div className="dialog-actions">
           <button type="button" className="btn" ref={first} onClick={onCancel}>
-            {cancelLabel}
+            {cancelLabel ?? t('common.cancel')}
           </button>
           <button type="button" className={danger ? 'btn btn-danger' : 'btn btn-primary'} onClick={onConfirm}>
             {confirmLabel}
@@ -327,19 +394,37 @@ export function Dialog({ title, children, confirmLabel, cancelLabel = 'Cancel', 
   return createPortal(dialog, document.body);
 }
 
-export function Legend({ allowed }: { readonly allowed: readonly CrewLetter[] }) {
+/* ------------------------------------------------------------------ legend */
+
+export function Legend({ allowed, alarms = false, water = false }: { readonly allowed: readonly CrewLetter[]; readonly alarms?: boolean; readonly water?: boolean }) {
+  const t = useT();
   return (
-    <ul className="legend" aria-label="Legend">
+    <ul className="legend" aria-label={t('legend.title')}>
       {allowed.map((l) => (
         <li key={`f-${l}`}>
-          <Flame letter={l} size={20} /> {CREW_LABEL[l]} fire
+          <FlameIcon letter={l} size={24} /> {t('legend.fire', { crew: t(CREW_KEY[l]) })}
         </li>
       ))}
       {allowed.map((l) => (
         <li key={`c-${l}`}>
-          <Helmet letter={l} size={20} /> {CREW_LABEL[l]} crew
+          <HelmetIcon letter={l} size={24} /> {t('legend.crew', { crew: t(CREW_KEY[l]) })}
         </li>
       ))}
+      {alarms ? (
+        <>
+          <li>
+            <DetectorIcon type="Z" size={24} /> {t('legend.alarmZ')}
+          </li>
+          <li>
+            <DetectorIcon type="X" size={24} /> {t('legend.alarmX')}
+          </li>
+        </>
+      ) : null}
+      {water ? (
+        <li>
+          <WaterIcon size={24} /> {t('legend.water')}
+        </li>
+      ) : null}
     </ul>
   );
 }
