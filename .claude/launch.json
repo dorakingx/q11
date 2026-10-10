@@ -1,0 +1,8 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "q11-dev", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 5173 },
+    { "name": "q11-preview", "runtimeExecutable": "npm", "runtimeArgs": ["run", "preview"], "port": 4173 },
+    { "name": "qollab-harness", "runtimeExecutable": "node", "runtimeArgs": ["scripts/serve-qollab-harness.mjs"], "port": 4174 }
+  ]
+}

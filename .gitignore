@@ -56,3 +56,6 @@ reports/screenshots/*.png
 
 # local upload payloads for Qollab (regenerable)
 reports/qollab-upload/
+
+# Qollab bundle build output (qollab/game + qollab/main.css are assembled from it)
+dist-qollab/
