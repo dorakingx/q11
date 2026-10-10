@@ -207,8 +207,6 @@ export interface TopBarProps {
   /** Accessible name of the gear button ("Settings" or, on the settings screen itself, "Close settings"). */
   readonly settingsLabel?: string;
   readonly onTitle?: () => void;
-  /** Training / planning: a way back to the district's briefing (rendered as a ghost button in the actions). */
-  readonly onBack?: (() => void) | undefined;
 }
 
 /**
@@ -228,7 +226,7 @@ export function BrandName() {
   );
 }
 
-export function TopBar({ title, subtitle, onMissions, onSettings, settingsLabel, onTitle, onBack }: TopBarProps) {
+export function TopBar({ title, subtitle, onMissions, onSettings, settingsLabel, onTitle }: TopBarProps) {
   const t = useT();
   return (
     <header className="topbar">
@@ -256,11 +254,6 @@ export function TopBar({ title, subtitle, onMissions, onSettings, settingsLabel,
         </div>
       </div>
       <nav className="topbar-actions" aria-label={t('a11y.gameNav')}>
-        {onBack !== undefined ? (
-          <button type="button" className="btn btn-ghost" onClick={onBack} data-testid="back-to-briefing">
-            {t('briefing.back')}
-          </button>
-        ) : null}
         {onMissions !== undefined ? (
           <button type="button" className="btn btn-ghost" onClick={onMissions} data-testid="topbar-city">
             {t('city.title')}

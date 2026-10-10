@@ -9402,15 +9402,15 @@ function Pa() {
     /* @__PURE__ */ i.jsx("span", { className: "brand-word", children: s.slice(l) })
   ] });
 }
-function un({ title: n, subtitle: s, onMissions: l, onSettings: a, settingsLabel: u, onTitle: f, onBack: p }) {
-  const g = Ce();
+function un({ title: n, subtitle: s, onMissions: l, onSettings: a, settingsLabel: u, onTitle: f }) {
+  const p = Ce();
   return /* @__PURE__ */ i.jsxs("header", { className: "topbar", children: [
     /* @__PURE__ */ i.jsxs("div", { className: "topbar-title", children: [
       f === void 0 ? /* @__PURE__ */ i.jsxs("span", { className: "brand", children: [
-        /* @__PURE__ */ i.jsx("span", { className: "brand-mark", "aria-hidden": "true", children: /* @__PURE__ */ i.jsx(pl, { size: 28, lettering: g("app.lettering") }) }),
+        /* @__PURE__ */ i.jsx("span", { className: "brand-mark", "aria-hidden": "true", children: /* @__PURE__ */ i.jsx(pl, { size: 28, lettering: p("app.lettering") }) }),
         /* @__PURE__ */ i.jsx(Pa, {})
-      ] }) : /* @__PURE__ */ i.jsxs("button", { type: "button", className: "btn btn-ghost brand-btn", onClick: f, "aria-label": g("a11y.backToTitle"), children: [
-        /* @__PURE__ */ i.jsx("span", { className: "brand-mark", "aria-hidden": "true", children: /* @__PURE__ */ i.jsx(pl, { size: 28, lettering: g("app.lettering") }) }),
+      ] }) : /* @__PURE__ */ i.jsxs("button", { type: "button", className: "btn btn-ghost brand-btn", onClick: f, "aria-label": p("a11y.backToTitle"), children: [
+        /* @__PURE__ */ i.jsx("span", { className: "brand-mark", "aria-hidden": "true", children: /* @__PURE__ */ i.jsx(pl, { size: 28, lettering: p("app.lettering") }) }),
         /* @__PURE__ */ i.jsx(Pa, {})
       ] }),
       /* @__PURE__ */ i.jsxs("div", { className: "topbar-text", children: [
@@ -9418,10 +9418,9 @@ function un({ title: n, subtitle: s, onMissions: l, onSettings: a, settingsLabel
         s !== void 0 ? /* @__PURE__ */ i.jsx("p", { className: "topbar-sub", children: s }) : null
       ] })
     ] }),
-    /* @__PURE__ */ i.jsxs("nav", { className: "topbar-actions", "aria-label": g("a11y.gameNav"), children: [
-      p !== void 0 ? /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-ghost", onClick: p, "data-testid": "back-to-briefing", children: g("briefing.back") }) : null,
-      l !== void 0 ? /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-ghost", onClick: l, "data-testid": "topbar-city", children: g("city.title") }) : null,
-      /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-ghost btn-icon", onClick: a, "aria-label": u ?? g("title.settings"), "data-testid": "topbar-settings", children: /* @__PURE__ */ i.jsx(Ja, {}) })
+    /* @__PURE__ */ i.jsxs("nav", { className: "topbar-actions", "aria-label": p("a11y.gameNav"), children: [
+      l !== void 0 ? /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-ghost", onClick: l, "data-testid": "topbar-city", children: p("city.title") }) : null,
+      /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-ghost btn-icon", onClick: a, "aria-label": u ?? p("title.settings"), "data-testid": "topbar-settings", children: /* @__PURE__ */ i.jsx(Ja, {}) })
     ] })
   ] });
 }
@@ -10719,8 +10718,7 @@ function J1({ state: n, dispatch: s, mission: l }) {
         title: b.districtName,
         subtitle: a("training.subtitle", { n: n.lesson + 1, total: V }),
         onMissions: () => s({ type: "OPEN_MISSIONS" }),
-        onSettings: () => s({ type: "OPEN_SETTINGS" }),
-        onBack: () => s({ type: "BACK_TO_BRIEFING" })
+        onSettings: () => s({ type: "OPEN_SETTINGS" })
       }
     ),
     /* @__PURE__ */ i.jsxs("div", { className: "play-layout", children: [
@@ -10770,7 +10768,8 @@ function J1({ state: n, dispatch: s, mission: l }) {
         /* @__PURE__ */ i.jsxs("div", { className: "actions", children: [
           /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn", onClick: () => s({ type: "LESSON_PREV" }), disabled: n.lesson === 0 && O <= -1, "data-testid": "training-prev", children: a("training.prev") }),
           /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-primary", onClick: () => s({ type: "LESSON_NEXT" }), disabled: J, "aria-disabled": J, "data-testid": "training-next", children: fe }),
-          /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-ghost", onClick: () => s({ type: "START_CHALLENGE" }), "data-testid": "start-challenge", children: a("training.skip") })
+          /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-ghost", onClick: () => s({ type: "START_CHALLENGE" }), "data-testid": "start-challenge", children: a("training.skip") }),
+          /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-ghost", onClick: () => s({ type: "BACK_TO_BRIEFING" }), "data-testid": "back-to-briefing", children: a("briefing.back") })
         ] })
       ] })
     ] })
@@ -10871,7 +10870,8 @@ function tx({ mission: n, placements: s, selected: l, standDownDialog: a, highli
     /* @__PURE__ */ i.jsx("p", { className: "muted small", children: w("plan.hint") }),
     /* @__PURE__ */ i.jsxs("div", { className: "plan-tools", children: [
       /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-small", onClick: () => y({ type: "REDO_PLACEMENT" }), disabled: !p, "data-testid": "redo", children: w("plan.redo") }),
-      /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-small", onClick: () => y({ type: "CLEAR_CREWS" }), disabled: O === 0, "data-testid": "clear", children: w("plan.clear") })
+      /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-small", onClick: () => y({ type: "CLEAR_CREWS" }), disabled: O === 0, "data-testid": "clear", children: w("plan.clear") }),
+      g ? null : /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-small btn-ghost", onClick: () => y({ type: "BACK_TO_BRIEFING" }), "data-testid": "back-to-briefing", children: w("briefing.back") })
     ] })
   ] }), Se = /* @__PURE__ */ i.jsxs("div", { className: "actions action-bar", "data-testid": "action-bar", children: [
     /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn", onClick: () => y({ type: "UNDO_PLACEMENT" }), disabled: !f, "data-testid": "undo", children: w("plan.undo") }),
@@ -10884,8 +10884,7 @@ function tx({ mission: n, placements: s, selected: l, standDownDialog: a, highli
         title: L.districtName,
         subtitle: w(I ? "challenge.subtitle.predict" : "challenge.subtitle.dispatch"),
         onMissions: () => y({ type: "OPEN_MISSIONS" }),
-        onSettings: () => y({ type: "OPEN_SETTINGS" }),
-        onBack: g ? void 0 : () => y({ type: "BACK_TO_BRIEFING" })
+        onSettings: () => y({ type: "OPEN_SETTINGS" })
       }
     ),
     g ? /* @__PURE__ */ i.jsxs("div", { className: "tutorial-bar", "data-testid": "tutorial-bar", children: [

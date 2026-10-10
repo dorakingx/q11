@@ -107,7 +107,6 @@ export function TrainingScreen({ state, dispatch, mission }: PlayProps & { reado
         subtitle={t('training.subtitle', { n: state.lesson + 1, total: lessonCount })}
         onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })}
         onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })}
-        onBack={() => dispatch({ type: 'BACK_TO_BRIEFING' })}
       />
       <div className="play-layout">
         <section className="board-col" aria-label={t('training.boardLabel')}>
@@ -170,6 +169,9 @@ export function TrainingScreen({ state, dispatch, mission }: PlayProps & { reado
             </button>
             <button type="button" className="btn btn-ghost" onClick={() => dispatch({ type: 'START_CHALLENGE' })} data-testid="start-challenge">
               {t('training.skip')}
+            </button>
+            <button type="button" className="btn btn-ghost" onClick={() => dispatch({ type: 'BACK_TO_BRIEFING' })} data-testid="back-to-briefing">
+              {t('briefing.back')}
             </button>
           </div>
         </aside>
@@ -342,6 +344,11 @@ export function ChallengeScreen({ mission, placements, selected, standDownDialog
         <button type="button" className="btn btn-small" onClick={() => dispatch({ type: 'CLEAR_CREWS' })} disabled={used === 0} data-testid="clear">
           {t('plan.clear')}
         </button>
+        {tutorialActive ? null : (
+          <button type="button" className="btn btn-small btn-ghost" onClick={() => dispatch({ type: 'BACK_TO_BRIEFING' })} data-testid="back-to-briefing">
+            {t('briefing.back')}
+          </button>
+        )}
       </div>
     </section>
   );
@@ -363,7 +370,6 @@ export function ChallengeScreen({ mission, placements, selected, standDownDialog
         subtitle={isWires ? t('challenge.subtitle.predict') : t('challenge.subtitle.dispatch')}
         onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })}
         onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })}
-        onBack={tutorialActive ? undefined : () => dispatch({ type: 'BACK_TO_BRIEFING' })}
       />
       {tutorialActive ? (
         <div className="tutorial-bar" data-testid="tutorial-bar">

@@ -34,9 +34,9 @@ Running 59 tests using 2 workers
 [31/59] [mobile-chromium] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
 [32/59] [mobile-chromium] › e2e/smoke.spec.ts:226:1 › back to briefing: training and the planning stage both return to the briefing, and Skip starts a fresh plan
 [33/59] [tablet-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
-[34/59] [tablet-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
-[35/59] [tablet-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
-[36/59] [tablet-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[34/59] [tablet-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[35/59] [tablet-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[36/59] [tablet-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
 [37/59] [tablet-chromium] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
 [38/59] [tablet-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 375×812: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
 [39/59] [tablet-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 390×844: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
@@ -61,5 +61,5 @@ Running 59 tests using 2 workers
 [58/59] [desktop-webkit] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
 [59/59] [desktop-webkit] › e2e/smoke.spec.ts:226:1 › back to briefing: training and the planning stage both return to the briefing, and Skip starts a fresh plan
   5 skipped
-  54 passed (2.4m)
+  54 passed (1.2m)
 exit=0
