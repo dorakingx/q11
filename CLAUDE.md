@@ -16,7 +16,7 @@ The authoritative build spec is `spec/Q11_BUILD_SPEC.md`. Plan / status / decisi
 ```
 src/quantum/   Pauli frame (binary symplectic), stabilizer codes, GF(2) algebra, verdicts, decoders
 src/game/      missions, state machine, scoring, replay
-src/ui/        React UI (board is the hero), accessibility
+src/ui/        React UI (city map + scene are the hero), accessibility; src/ui/art (SVG parts), src/ui/city, src/ui/scene, src/ui/i18n (EN/JA)
 public/        original icon assets (Q guard ring + flame)
 quantum/       Python/Qiskit independent reference implementation + comparison
 qollab/        Qollab-native Python/Qiskit project (main.py + data files)
@@ -36,6 +36,9 @@ Python: `uv venv --python 3.12 .venv && uv pip install -r quantum/requirements.t
 - Repetition code = X-noise-only intro. Main code = distance-3 rotated surface code (9 data, 8 checks).
 - Success ⇔ residual C·E ∈ stabilizer group (GF(2) membership), logical error ⇔ commutes but not in group, detectable ⇔ anticommutes with some check. Never "syndrome == 0" alone, never one-state fidelity alone.
 - Perfect-syndrome model unless stated. Clifford+Pauli educational simulation; do not overclaim.
+
+## Redesign (2026-10-10 18:15 →)
+Acceptance criteria R1–R15: `docs/UX_REDESIGN.md`; screen spec: `docs/UX_SCREENS.md`. The engine, fixtures, Python verification and Qollab bridge are kept; the experience layer is rebuilt (city map, scene art, spray effects, EN/JA).
 
 ## Working style
 Plan → Implement → Run → Inspect → Fix → Commit → Deploy → Verify. Keep `docs/STATUS.md` current. Commit at meaningful milestones with real test results. Never disable TS strict or lint to pass.
