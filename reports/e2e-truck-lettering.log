@@ -1,0 +1,96 @@
+
+Running 90 tests using 2 workers
+
+[1/90] [desktop-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[2/90] [desktop-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[3/90] [desktop-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[4/90] [desktop-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[5/90] [desktop-chromium] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
+[6/90] [desktop-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 375×812: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[7/90] [desktop-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 390×844: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[8/90] [desktop-chromium] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge
+[9/90] [desktop-chromium] › e2e/smoke.spec.ts:89:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial
+[10/90] [desktop-chromium] › e2e/smoke.spec.ts:101:1 › mission 1 can be played with the keyboard only
+[11/90] [desktop-chromium] › e2e/smoke.spec.ts:175:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists
+[12/90] [desktop-chromium] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
+[13/90] [desktop-chromium] › e2e/spray.spec.ts:8:1 › result 1 — blind dispatch X on house 4: restored (fires out, houses restored, alarms quiet)
+[14/90] [desktop-chromium] › e2e/spray.spec.ts:36:1 › result 3 — blind dispatch X on house 0: still burning (new red fire, true fire revealed, alarms ring)
+[15/90] [desktop-chromium] › e2e/spray.spec.ts:56:1 › prediction miss — Harbor Bridge, red crew on house 0 only: no alarms, no beacon, Try again is the primary action
+[16/90] [desktop-chromium] › e2e/spray.spec.ts:78:1 › propagation prelude — Harbor Bridge: the start fires travel through the coupler before the trucks; the houses light only when the fires arrive; the narration follows the picture; Skip during the prelude jumps to the final frame
+[17/90] [desktop-chromium] › e2e/spray.spec.ts:174:1 › propagation prelude under reduced motion — Harbor Bridge: the stepper gains the start / gate / arrive frames before the trucks
+[18/90] [desktop-chromium] › e2e/spray.spec.ts:225:1 › result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details)
+[19/90] [desktop-chromium] › e2e/spray.spec.ts:247:1 › result 4 — silent failure X on house 0: alarms quiet, the memory beacon shows the logical X flip and the chain 0-1-2
+[20/90] [desktop-chromium] › e2e/spray.spec.ts:287:1 › secrecy: in Challenge every house button is identical (index stripped) and nothing names the fire before Spray!
+[21/90] [desktop-chromium] › e2e/spray.spec.ts:306:1 › rapid taps: triple Spray!, double Skip, Try again mid-spray — attempts increase by exactly one each time
+[22/90] [desktop-chromium] › e2e/spray.spec.ts:331:1 › reduced motion: the spray is a stepper with static frames; Why? steps both boards together
+[23/90] [desktop-chromium] › e2e/spray.spec.ts:362:1 › stand down with no crews asks first; confirming shows the fire still burning (0 stars)
+[24/90] [mobile-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[25/90] [mobile-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[26/90] [mobile-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[27/90] [mobile-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[28/90] [mobile-chromium] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
+[29/90] [mobile-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 375×812: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[30/90] [mobile-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 390×844: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[31/90] [mobile-chromium] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge
+[32/90] [mobile-chromium] › e2e/smoke.spec.ts:89:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial
+[33/90] [mobile-chromium] › e2e/smoke.spec.ts:101:1 › mission 1 can be played with the keyboard only
+[34/90] [mobile-chromium] › e2e/smoke.spec.ts:175:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists
+[35/90] [mobile-chromium] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
+[36/90] [mobile-chromium] › e2e/spray.spec.ts:8:1 › result 1 — blind dispatch X on house 4: restored (fires out, houses restored, alarms quiet)
+[37/90] [mobile-chromium] › e2e/spray.spec.ts:36:1 › result 3 — blind dispatch X on house 0: still burning (new red fire, true fire revealed, alarms ring)
+[38/90] [mobile-chromium] › e2e/spray.spec.ts:56:1 › prediction miss — Harbor Bridge, red crew on house 0 only: no alarms, no beacon, Try again is the primary action
+[39/90] [mobile-chromium] › e2e/spray.spec.ts:78:1 › propagation prelude — Harbor Bridge: the start fires travel through the coupler before the trucks; the houses light only when the fires arrive; the narration follows the picture; Skip during the prelude jumps to the final frame
+[40/90] [mobile-chromium] › e2e/spray.spec.ts:174:1 › propagation prelude under reduced motion — Harbor Bridge: the stepper gains the start / gate / arrive frames before the trucks
+[41/90] [mobile-chromium] › e2e/spray.spec.ts:225:1 › result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details)
+[42/90] [mobile-chromium] › e2e/spray.spec.ts:247:1 › result 4 — silent failure X on house 0: alarms quiet, the memory beacon shows the logical X flip and the chain 0-1-2
+[43/90] [mobile-chromium] › e2e/spray.spec.ts:287:1 › secrecy: in Challenge every house button is identical (index stripped) and nothing names the fire before Spray!
+[44/90] [mobile-chromium] › e2e/spray.spec.ts:306:1 › rapid taps: triple Spray!, double Skip, Try again mid-spray — attempts increase by exactly one each time
+[45/90] [mobile-chromium] › e2e/spray.spec.ts:331:1 › reduced motion: the spray is a stepper with static frames; Why? steps both boards together
+[46/90] [mobile-chromium] › e2e/spray.spec.ts:362:1 › stand down with no crews asks first; confirming shows the fire still burning (0 stars)
+[47/90] [tablet-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[48/90] [tablet-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[49/90] [tablet-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[50/90] [tablet-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[51/90] [tablet-chromium] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
+[52/90] [tablet-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 375×812: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[53/90] [tablet-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 390×844: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[54/90] [tablet-chromium] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge
+[55/90] [tablet-chromium] › e2e/smoke.spec.ts:89:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial
+[56/90] [tablet-chromium] › e2e/smoke.spec.ts:101:1 › mission 1 can be played with the keyboard only
+[57/90] [tablet-chromium] › e2e/smoke.spec.ts:175:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists
+[58/90] [tablet-chromium] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
+[59/90] [tablet-chromium] › e2e/spray.spec.ts:8:1 › result 1 — blind dispatch X on house 4: restored (fires out, houses restored, alarms quiet)
+[60/90] [tablet-chromium] › e2e/spray.spec.ts:36:1 › result 3 — blind dispatch X on house 0: still burning (new red fire, true fire revealed, alarms ring)
+[61/90] [tablet-chromium] › e2e/spray.spec.ts:56:1 › prediction miss — Harbor Bridge, red crew on house 0 only: no alarms, no beacon, Try again is the primary action
+[62/90] [tablet-chromium] › e2e/spray.spec.ts:78:1 › propagation prelude — Harbor Bridge: the start fires travel through the coupler before the trucks; the houses light only when the fires arrive; the narration follows the picture; Skip during the prelude jumps to the final frame
+[63/90] [tablet-chromium] › e2e/spray.spec.ts:174:1 › propagation prelude under reduced motion — Harbor Bridge: the stepper gains the start / gate / arrive frames before the trucks
+[64/90] [tablet-chromium] › e2e/spray.spec.ts:225:1 › result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details)
+[65/90] [tablet-chromium] › e2e/spray.spec.ts:247:1 › result 4 — silent failure X on house 0: alarms quiet, the memory beacon shows the logical X flip and the chain 0-1-2
+[66/90] [tablet-chromium] › e2e/spray.spec.ts:287:1 › secrecy: in Challenge every house button is identical (index stripped) and nothing names the fire before Spray!
+[67/90] [tablet-chromium] › e2e/spray.spec.ts:306:1 › rapid taps: triple Spray!, double Skip, Try again mid-spray — attempts increase by exactly one each time
+[68/90] [tablet-chromium] › e2e/spray.spec.ts:331:1 › reduced motion: the spray is a stepper with static frames; Why? steps both boards together
+[69/90] [tablet-chromium] › e2e/spray.spec.ts:362:1 › stand down with no crews asks first; confirming shows the fire still burning (0 stars)
+[70/90] [desktop-webkit] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[71/90] [desktop-webkit] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[72/90] [desktop-webkit] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[73/90] [desktop-webkit] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[74/90] [desktop-webkit] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
+[75/90] [desktop-webkit] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge
+[76/90] [desktop-webkit] › e2e/smoke.spec.ts:89:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial
+[77/90] [desktop-webkit] › e2e/smoke.spec.ts:101:1 › mission 1 can be played with the keyboard only
+[78/90] [desktop-webkit] › e2e/smoke.spec.ts:175:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists
+[79/90] [desktop-webkit] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
+[80/90] [desktop-webkit] › e2e/spray.spec.ts:8:1 › result 1 — blind dispatch X on house 4: restored (fires out, houses restored, alarms quiet)
+[81/90] [desktop-webkit] › e2e/spray.spec.ts:36:1 › result 3 — blind dispatch X on house 0: still burning (new red fire, true fire revealed, alarms ring)
+[82/90] [desktop-webkit] › e2e/spray.spec.ts:56:1 › prediction miss — Harbor Bridge, red crew on house 0 only: no alarms, no beacon, Try again is the primary action
+[83/90] [desktop-webkit] › e2e/spray.spec.ts:78:1 › propagation prelude — Harbor Bridge: the start fires travel through the coupler before the trucks; the houses light only when the fires arrive; the narration follows the picture; Skip during the prelude jumps to the final frame
+[84/90] [desktop-webkit] › e2e/spray.spec.ts:174:1 › propagation prelude under reduced motion — Harbor Bridge: the stepper gains the start / gate / arrive frames before the trucks
+[85/90] [desktop-webkit] › e2e/spray.spec.ts:225:1 › result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details)
+[86/90] [desktop-webkit] › e2e/spray.spec.ts:247:1 › result 4 — silent failure X on house 0: alarms quiet, the memory beacon shows the logical X flip and the chain 0-1-2
+[87/90] [desktop-webkit] › e2e/spray.spec.ts:287:1 › secrecy: in Challenge every house button is identical (index stripped) and nothing names the fire before Spray!
+[88/90] [desktop-webkit] › e2e/spray.spec.ts:306:1 › rapid taps: triple Spray!, double Skip, Try again mid-spray — attempts increase by exactly one each time
+[89/90] [desktop-webkit] › e2e/spray.spec.ts:331:1 › reduced motion: the spray is a stepper with static frames; Why? steps both boards together
+[90/90] [desktop-webkit] › e2e/spray.spec.ts:362:1 › stand down with no crews asks first; confirming shows the fire still burning (0 stars)
+  5 skipped
+  85 passed (2.7m)
+exit=0

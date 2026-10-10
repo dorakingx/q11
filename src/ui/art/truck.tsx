@@ -5,6 +5,7 @@
  */
 import { ART, OUTLINE, OUTLINE_THIN } from './palette';
 import { GroundShadow, Part, type PartProps } from './primitives';
+import { FONT } from './util';
 
 export interface FireTruckProps extends PartProps {
   readonly facing?: 1 | -1;
@@ -12,11 +13,14 @@ export interface FireTruckProps extends PartProps {
   readonly lights?: boolean;
   /** Wheel frame for a simple rolling effect (0 or 1). */
   readonly wheelFrame?: 0 | 1;
-  /** Clean red body (no lockers, no hose reel) so lettering can be painted on it — used by the brand mark. */
+  /** Clean red body (no lockers, no hose reel) so lettering can be painted on it. Implied by `lettering`. */
   readonly plain?: boolean;
+  /** Text painted in white on the red body ("Q11" in English, "11Q" in Japanese — the same lettering as the app icon). */
+  readonly lettering?: string | undefined;
 }
 
-export function FireTruck({ facing = 1, lights = false, wheelFrame = 0, plain = false, ...part }: FireTruckProps) {
+export function FireTruck({ facing = 1, lights = false, wheelFrame = 0, plain = false, lettering, ...part }: FireTruckProps) {
+  const clean = plain || lettering !== undefined;
   return (
     <Part {...part}>
       <GroundShadow cx={0} cy={2} rx={72} ry={6} />
@@ -33,7 +37,7 @@ export function FireTruck({ facing = 1, lights = false, wheelFrame = 0, plain = 
         <rect x={-72} y={-52} width={100} height={42} rx={4} fill={ART.truck} stroke={ART.ink} strokeWidth={OUTLINE} />
         <rect x={-72} y={-32} width={100} height={6} fill={ART.truckTrim} />
         {/* lockers (omitted on the plain body) */}
-        {plain ? null : (
+        {clean ? null : (
           <g fill={ART.truckDark} stroke={ART.ink} strokeWidth={OUTLINE_THIN}>
             <rect x={-64} y={-47} width={22} height={13} rx={2} />
             <rect x={-38} y={-47} width={22} height={13} rx={2} />
@@ -46,7 +50,7 @@ export function FireTruck({ facing = 1, lights = false, wheelFrame = 0, plain = 
         <rect x={28} y={-32} width={48} height={6} fill={ART.truckTrim} />
         {/* bumper + hose reel */}
         <rect x={70} y={-18} width={10} height={8} rx={2} fill={ART.inkSoft} stroke={ART.ink} strokeWidth={OUTLINE_THIN} />
-        {plain ? null : <circle cx={-56} cy={-24} r={6} fill={ART.hose} stroke={ART.ink} strokeWidth={OUTLINE_THIN} />}
+        {clean ? null : <circle cx={-56} cy={-24} r={6} fill={ART.hose} stroke={ART.ink} strokeWidth={OUTLINE_THIN} />}
         {/* beacon */}
         <rect x={40} y={-70} width={14} height={8} rx={3} fill={lights ? ART.beaconBlue : ART.glass} stroke={ART.ink} strokeWidth={OUTLINE_THIN} />
         {lights ? <circle cx={47} cy={-66} r={11} fill="none" stroke={ART.beaconBlue} strokeWidth={2} /> : null}
@@ -54,6 +58,25 @@ export function FireTruck({ facing = 1, lights = false, wheelFrame = 0, plain = 
         <Wheel cx={-42} frame={wheelFrame} />
         <Wheel cx={48} frame={wheelFrame} />
       </g>
+      {lettering !== undefined ? (
+        <text
+          x={facing === -1 ? 22 : -22}
+          y={-35}
+          textAnchor="middle"
+          fontSize={20}
+          fontWeight={900}
+          fill={ART.paper}
+          stroke={ART.ink}
+          strokeWidth={1.1}
+          strokeLinejoin="round"
+          paintOrder="stroke"
+          fontFamily={FONT}
+          letterSpacing={1}
+          style={{ userSelect: 'none' }}
+        >
+          {lettering}
+        </text>
+      ) : null}
     </Part>
   );
 }

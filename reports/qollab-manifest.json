@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-10T18:20:17.163Z",
+  "generatedAt": "2026-10-10T21:34:29.442Z",
   "fileCount": 17,
-  "totalBytes": 698081,
+  "totalBytes": 698190,
   "files": [
     {
       "path": "game/q11-game.js",
-      "bytes": 586762,
-      "sha256": "bf86b79840bc640521542cad34d5c03a226cadd1b907dd6019a2f7ff999acc6f"
+      "bytes": 586871,
+      "sha256": "65bc5d561cd38e4b968c34c9418ce9e21adeda2ec589c038463ee488f7ae3ab3"
     },
     {
       "path": "index.html",

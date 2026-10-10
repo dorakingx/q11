@@ -378,7 +378,7 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
               {travelBox !== null ? <path ref={roadRef} d={ROADS[travelBox.id]} fill="none" stroke="none" data-testid="travel-road" /> : null}
               {truck !== null ? (
                 <g className="city-truck" data-testid="travel-truck">
-                  <FireTruck x={truck.x} y={truck.y} scale={0.85} facing={truck.facing} lights={truck.wheelFrame === 0} wheelFrame={truck.wheelFrame} />
+                  <FireTruck x={truck.x} y={truck.y} scale={0.85} facing={truck.facing} lights={truck.wheelFrame === 0} wheelFrame={truck.wheelFrame} lettering={t('app.lettering')} />
                 </g>
               ) : null}
             </svg>

@@ -240,7 +240,7 @@ export function Scene(props: SceneProps) {
             );
           })}
           {/* truck */}
-          {frame?.truck !== null && frame?.truck !== undefined ? <TruckActor geo={geo} progress={frame.truck.progress} lights={frame.truck.lights} wheelFrame={frame.truck.wheelFrame} /> : null}
+          {frame?.truck !== null && frame?.truck !== undefined ? <TruckActor geo={geo} progress={frame.truck.progress} lights={frame.truck.lights} wheelFrame={frame.truck.wheelFrame} lettering={t('app.lettering')} /> : null}
           {/* logical pattern chain connector (behind the houses, visible in the gaps) */}
           {chain.length > 0 ? <ChainOutline geo={geo} qubits={chain} variants={variants} part="connector" /> : null}
           {/* houses, drawn top row first so lower rows overlap correctly */}
@@ -570,11 +570,11 @@ function ChainOutline({ geo, qubits, variants, part }: { readonly geo: SceneGeom
 
 /* ------------------------------------------------------------------ spray actors */
 
-function TruckActor({ geo, progress, lights, wheelFrame }: { readonly geo: SceneGeometry; readonly progress: number; readonly lights: boolean; readonly wheelFrame: 0 | 1 }) {
+function TruckActor({ geo, progress, lights, wheelFrame, lettering }: { readonly geo: SceneGeometry; readonly progress: number; readonly lights: boolean; readonly wheelFrame: 0 | 1; readonly lettering: string }) {
   const p = lerpPt(geo.truck.from, geo.truck.stop, easeOut(progress));
   return (
     <g className="truck" data-progress={progress.toFixed(2)}>
-      <FireTruck x={p.x} y={p.y} facing={geo.truck.facing} lights={lights} wheelFrame={wheelFrame} scale={geo.truck.scale} />
+      <FireTruck x={p.x} y={p.y} facing={geo.truck.facing} lights={lights} wheelFrame={wheelFrame} scale={geo.truck.scale} lettering={lettering} />
     </g>
   );
 }
