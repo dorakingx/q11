@@ -78,7 +78,7 @@ for (const [w, h] of SIZES) {
     await check('why');
     await page.getByTestId('topbar-city').click();
 
-    // The other three results.
+    // The other results (restored → Try again → still burning; silent failure → result screen → summary).
     await goToDistrict(page, 4);
     await startChallenge(page);
     await page.getByTestId('block-4').click();

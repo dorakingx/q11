@@ -79,6 +79,62 @@ export async function openCity(page: Page): Promise<void> {
   await expect(page.getByTestId('city-map')).toBeVisible();
 }
 
+/** The app's primary red (tokens.css --primary) and the computed font of a primary button. */
+export const PRIMARY_RGB = 'rgb(201, 58, 34)';
+
+export async function expectPrimaryButton(page: Page, testId: string): Promise<void> {
+  const style = await page.getByTestId(testId).evaluate((el) => {
+    const cs = getComputedStyle(el);
+    return { bg: cs.backgroundColor, color: cs.color, weight: cs.fontWeight };
+  });
+  expect(style.bg, `${testId} background`).toBe(PRIMARY_RGB);
+  expect(style.color, `${testId} colour`).toBe('rgb(255, 255, 255)');
+  expect(Number(style.weight), `${testId} weight`).toBeGreaterThanOrEqual(700);
+}
+
+/**
+ * After "Next district": the city map is back with the just-solved district celebrating (badge toast under the HUD,
+ * never over it) and the next district pre-selected (panel open, district pressed); focus is on the city heading.
+ */
+export async function expectCityArrival(page: Page, opts: { readonly badge?: string; readonly selected: number; readonly selectedName: string }): Promise<void> {
+  await expect(page.getByTestId('city-map')).toBeVisible();
+  await expect(page.locator('main h1')).toHaveText('Quantum City');
+  await expect(page.locator('main h1')).toBeFocused();
+  if (opts.badge !== undefined) {
+    const toast = page.getByTestId('toast-badge');
+    await expect(toast).toContainText(`${opts.badge} earned!`);
+    const hud = await page.locator('.city-hud').boundingBox();
+    const box = await toast.boundingBox();
+    expect(hud).not.toBeNull();
+    expect(box).not.toBeNull();
+    if (hud !== null && box !== null) expect(box.y, 'the badge toast sits below the HUD').toBeGreaterThanOrEqual(hud.y + hud.height - 1);
+  }
+  await expect(page.getByTestId('city-panel')).toBeVisible();
+  await expect(page.getByTestId('city-panel')).toContainText(opts.selectedName);
+  await expect(page.getByTestId(`mission-${String(opts.selected)}`)).toHaveAttribute('aria-pressed', 'true');
+}
+
+/** The result overlay of a failed dispatch: Try again is the primary button, the city a ghost one. */
+export async function expectFailedResultActions(page: Page): Promise<void> {
+  await expectPrimaryButton(page, 'result-retry');
+  await expect(page.getByTestId('result-next')).toHaveText('Back to the city');
+  const ghost = await page.getByTestId('result-next').evaluate((el) => getComputedStyle(el).backgroundColor);
+  expect(ghost).toBe('rgba(0, 0, 0, 0)');
+}
+
+/** The three tutorial callouts read 1 → 2 → 3 from top to bottom (and in DOM order on compact layouts). */
+export async function expectTutorialOrder(page: Page): Promise<void> {
+  const tops = await page.evaluate(() => [1, 2, 3].map((n) => document.querySelector(`[data-testid="tutorial-callout-${String(n)}"]`)?.getBoundingClientRect().top ?? NaN));
+  expect(tops[0]).toBeLessThan(tops[1] ?? NaN);
+  expect(tops[1]).toBeLessThan(tops[2] ?? NaN);
+  const domOrder = await page.evaluate(() => {
+    const els = [1, 2, 3].map((n) => document.querySelector(`[data-testid="tutorial-callout-${String(n)}"]`));
+    if (els.some((e) => e === null)) return false;
+    return (els[0]!.compareDocumentPosition(els[1]!) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0 && (els[1]!.compareDocumentPosition(els[2]!) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+  });
+  expect(domOrder, 'callouts 1, 2, 3 follow each other in the DOM').toBe(true);
+}
+
 /** City → district panel → Dispatch! → (skip the truck) → briefing. */
 export async function goToDistrict(page: Page, index: number): Promise<void> {
   await page.getByTestId(`mission-${String(index)}`).click();

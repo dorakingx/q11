@@ -1,5 +1,5 @@
 /// <reference lib="dom" />
-import { expect, expectNoHorizontalOverflow, goToDistrict, openCity, seedSave, sprayAndSkip, startChallenge, test } from './helpers';
+import { expect, expectCityArrival, expectFailedResultActions, expectNoHorizontalOverflow, expectPrimaryButton, goToDistrict, openCity, seedSave, sprayAndSkip, startChallenge, test } from './helpers';
 
 /** Every district end to end in order (sequential unlock, no free roam), through training where it exists. */
 test('all six districts are playable end to end in order, with tap-to-predict in the propagation lessons', async ({ page }) => {
@@ -12,8 +12,13 @@ test('all six districts are playable end to end in order, with tap-to-predict in
   await page.getByTestId('block-1').click();
   await sprayAndSkip(page);
   await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'restored');
+  await expect(page.getByTestId('result-next')).toHaveText('Next district');
+  await expectPrimaryButton(page, 'result-next');
   await page.getByTestId('result-next').click();
-  await expect(page.getByTestId('briefing')).toBeVisible();
+  // Next district → the city celebrates Rowhouse Lane and pre-selects Harbor Bridge; Dispatch! from there.
+  await expectCityArrival(page, { badge: 'Alarm Reader', selected: 2, selectedName: 'Harbor Bridge' });
+  await expect(page.getByTestId('mission-1')).toHaveAttribute('data-status', 'solved');
+  await goToDistrict(page, 2);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Harbor Bridge');
 
   // 2 · Harbor Bridge (CNOT): training asks for a prediction before each gate step; challenge XZ → YY.
@@ -22,6 +27,7 @@ test('all six districts are playable end to end in order, with tap-to-predict in
   await expect(page.getByTestId('training-next')).toBeDisabled();
   await page.getByTestId('block-1').click();
   await expect(page.getByTestId('predict-reaction')).toContainText('Yes! House 1 burns after this gate.');
+  await expect(page.getByTestId('predict-reaction')).toBeFocused();
   await expect(page.getByTestId('training-caption')).toContainText('After gate 1 of 1: XX');
   await page.getByTestId('training-next').click(); // lesson 2 (IZ → ZZ)
   await expect(page.getByTestId('predict-prompt')).toBeVisible();
@@ -37,6 +43,8 @@ test('all six districts are playable end to end in order, with tap-to-predict in
   await expect(page.locator('[data-house="0"][data-house-state="restored"]')).toHaveCount(1);
   await expect(page.locator('[data-house="1"][data-house-state="restored"]')).toHaveCount(1);
   await page.getByTestId('result-next').click();
+  await expectCityArrival(page, { badge: 'Gate Tracker', selected: 3, selectedName: 'Conversion Lab' });
+  await goToDistrict(page, 3);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Conversion Lab');
 
   // 3 · Conversion Lab (H, CNOT, H): a miss on bare wires is a missed prediction, never a silent failure; retry works.
@@ -55,8 +63,10 @@ test('all six districts are playable end to end in order, with tap-to-predict in
   await page.getByTestId('block-0').click();
   await page.getByTestId('block-1').click();
   await sprayAndSkip(page);
-  await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'logical-failure');
+  await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'prediction-miss');
+  await expect(page.getByTestId('result-title')).toHaveText('Prediction missed');
   await expect(page.locator('.memory-tower')).toHaveCount(0); // bare wires: no beacon, no "silent failure" wording
+  await expectFailedResultActions(page);
   await page.getByTestId('result-details').locator('summary').click();
   await expect(page.getByTestId('verdict-label')).toHaveText('Prediction missed — fires left on the wires');
   await expect(page.getByTestId('residual')).toHaveText('IY');
@@ -69,6 +79,8 @@ test('all six districts are playable end to end in order, with tap-to-predict in
   await sprayAndSkip(page);
   await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'restored');
   await page.getByTestId('result-next').click();
+  await expectCityArrival(page, { badge: 'Colour Switcher', selected: 4, selectedName: 'Central District' });
+  await goToDistrict(page, 4);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Central District');
 
   // 4 · Central District: detector highlight, then X on house 4.
@@ -84,6 +96,8 @@ test('all six districts are playable end to end in order, with tap-to-predict in
   await sprayAndSkip(page);
   await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'restored');
   await page.getByTestId('result-next').click();
+  await expectCityArrival(page, { badge: 'Blind Dispatcher', selected: 5, selectedName: 'Market Square' });
+  await goToDistrict(page, 5);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Market Square');
 
   // 5 · Market Square: red on 1, blue on 7 → restored.
@@ -95,6 +109,8 @@ test('all six districts are playable end to end in order, with tap-to-predict in
   await sprayAndSkip(page);
   await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'restored');
   await page.getByTestId('result-next').click();
+  await expectCityArrival(page, { badge: 'Two-Colour Chief', selected: 6, selectedName: 'Old Town' });
+  await goToDistrict(page, 6);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Old Town');
 
   // 6 · Old Town: the protocol call → silent failure, still counts as the chapter badge; next → summary.
@@ -103,6 +119,7 @@ test('all six districts are playable end to end in order, with tap-to-predict in
   await sprayAndSkip(page);
   await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'logical-failure');
   await expect(page.locator('.logical-chain')).toHaveAttribute('data-chain', '1,2,3');
+  await expect(page.getByTestId('result-next')).toHaveText('Summary');
   await page.getByTestId('result-next').click();
   await expect(page.getByTestId('summary')).toBeVisible();
   await expect(page.locator('.badge-item[data-earned="true"]')).toHaveCount(6);

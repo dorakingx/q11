@@ -27,6 +27,18 @@ export function outcomeKey(kind: VerdictKind, hasChecks: boolean): Key {
   return hasChecks ? 'result.outcome.logicalError' : 'result.outcome.propagationMiss';
 }
 
+/**
+ * Result buttons (dispatch overlay, Why? footer, result screen): a completed mission moves on ("Next district",
+ * "Summary" after the old town, "Back to the city" in the guided first run); a failed one keeps "Try again" as the
+ * primary action and offers the city as a ghost button. NEXT_MISSION itself always returns to the city (reducer).
+ */
+export function resultActions(t: Translate, debrief: Pick<Debrief, 'score'>, isLast: boolean, tutorialActive: boolean): { readonly nextLabel: string; readonly primary: 'next' | 'retry' } {
+  const completed = debrief.score.completed;
+  if (tutorialActive) return { nextLabel: t('result.city'), primary: completed ? 'next' : 'retry' };
+  if (!completed) return { nextLabel: t('result.city'), primary: 'retry' };
+  return { nextLabel: isLast ? t('result.summary') : t('result.next'), primary: 'next' };
+}
+
 /** Mirrors src/game/scoring resultHeading (kept in English there) as result.heading.* keys. */
 export function resultHeadingKey(score: Score): Key {
   if (score.stars === 3) return 'result.heading.flawless';

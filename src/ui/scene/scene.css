@@ -5,21 +5,34 @@
  */
 
 /* ------------------------------------------------------------------ scene */
+/* .scene = header band (result badges) + .scene-board (the SVG with its aspect ratio and the hit areas) */
 .scene {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   width: 100%;
-  max-width: var(--scene-max, 560px);
+  max-width: var(--scene-max, 600px);
   margin: 0 auto;
-  border-radius: var(--radius-lg);
-  background: var(--ground);
-  box-shadow: 0 2px 0 var(--shadow);
-  overflow: visible;
   font-family: var(--font);
   color: var(--ink);
 }
 .scene-bridge,
 .scene-lab {
   --scene-max: 760px;
+}
+.scene-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+}
+.scene-board {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  background: var(--ground);
+  box-shadow: 0 2px 0 var(--shadow);
+  overflow: visible;
 }
 .scene-svg {
   position: absolute;
@@ -118,9 +131,7 @@ button.block:focus-visible > .crew-preview {
 }
 
 .scene-badge {
-  position: absolute;
-  left: 12px;
-  top: 10px;
+  display: inline-block;
   padding: 4px 12px;
   border: 2px solid var(--outline);
   border-radius: 999px;
@@ -173,6 +184,23 @@ button.block:focus-visible > .crew-preview {
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.4;
+}
+.spray-rules-note {
+  display: block;
+  margin-top: 2px;
+}
+/* visually hidden live region (trucks / impacts / outcome announcements) */
+.spray-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .spray-stepper,
 .why-controls,
@@ -278,6 +306,12 @@ button.block:focus-visible > .crew-preview {
 }
 .result-logical-failure .result-title {
   color: var(--y);
+}
+.result-prediction-miss .result-title {
+  color: var(--x);
+}
+.result-beacon-ok {
+  color: var(--ink-soft);
 }
 .result-stars {
   margin: 4px 0 0;

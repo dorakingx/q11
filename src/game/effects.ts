@@ -3,14 +3,24 @@
  * every per-house outcome is read from the residual the engine computed (and asserted to equal before ⊕ crew),
  * so the pictures can never disagree with the verdict. No randomness, no React, no timers.
  *
- * Timeline (ms, full motion): trucks arrive → for each crew in ascending house order: run, spray, impact →
- * reveal fires nobody sprayed → alarms of the residual → outcome → done. Reduced motion: one frame per event.
+ * Timeline (ms, full motion): trucks arrive → for each crew in ascending house order: run, spray (the sprayed
+ * house's fog lifts and the TRUE fire shows for the whole stream), impact → reveal fires nobody sprayed → alarms of
+ * the residual → outcome → done. Impacts are spaced by `stagger` and the tail starts `hold` after the last impact
+ * so every impact caption holds at least that long. Reduced motion: one frame per event.
  */
 import { bitsToLetter, fromString, getCode, letterAt, letterToBits, support, weight, type PauliLetter } from '../quantum';
 import { getPublicMission } from './missions';
 import type { CrewLetter, Debrief } from './types';
 
-export type ResultType = 'restored' | 'safe-pattern' | 'still-burning' | 'logical-failure';
+/**
+ * The readable results (R9) plus the bare-wire miss:
+ *   restored         residual I — fires out, houses restored
+ *   safe-pattern     non-trivial stabilizer residual — harmless pattern, logical information safe
+ *   still-burning    detectable residual — a fire remains and its alarms ring
+ *   logical-failure  logical error on a code with checks — alarms quiet, the memory beacon shows the flip
+ *   prediction-miss  a miss on bare wires (no checks, so no alarms and no beacon): a fire is still on the wire
+ */
+export type ResultType = 'restored' | 'safe-pattern' | 'still-burning' | 'logical-failure' | 'prediction-miss';
 
 /** What one spray did to one house. */
 export type ImpactEffect = 'extinguished' | 'changed' | 'ignited';
@@ -18,7 +28,8 @@ export type ImpactEffect = 'extinguished' | 'changed' | 'ignited';
 export type EffectEvent =
   | { readonly type: 'trucks-arrive'; readonly t: number; readonly dur: number }
   | { readonly type: 'crew-run'; readonly t: number; readonly dur: number; readonly q: number; readonly crew: CrewLetter }
-  | { readonly type: 'spray-start'; readonly t: number; readonly dur: number; readonly q: number; readonly crew: CrewLetter }
+  /** The hose stream starts: the sprayed house shows its TRUE fire (`before`) from here on. */
+  | { readonly type: 'spray-start'; readonly t: number; readonly dur: number; readonly q: number; readonly crew: CrewLetter; readonly before: PauliLetter }
   | {
       readonly type: 'impact';
       readonly t: number;
@@ -42,16 +53,26 @@ export interface EffectTimeline {
   readonly events: readonly EffectEvent[];
 }
 
+/**
+ * Timing in ms. `stagger` (between crews) and `hold` (from the last impact to the reveal) are both ≥ CAPTION_HOLD so
+ * each impact's caption ("House 4: fire out.") stays on screen at least that long before the next line replaces it.
+ * One crew plays in ≈2.6 s, two crews in ≈3.0 s.
+ */
 export const EFFECT_TIMING = {
-  trucks: 500,
-  run: 450,
-  stagger: 120,
-  sprayAfterRun: 300,
-  spray: 600,
+  trucks: 400,
+  run: 400,
+  stagger: 420,
+  sprayAfterRun: 250,
+  spray: 500,
+  impact: 300,
+  hold: 420,
   reveal: 300,
   alarms: 300,
-  outcome: 500,
+  outcome: 400,
 } as const;
+
+/** Minimum time an impact caption is shown (ms). */
+export const CAPTION_HOLD = 400;
 
 /** Pauli product of two single-qubit letters (XOR of symplectic bits; phase dropped). */
 export function xorLetters(a: PauliLetter, b: PauliLetter): PauliLetter {
@@ -60,15 +81,28 @@ export function xorLetters(a: PauliLetter, b: PauliLetter): PauliLetter {
   return bitsToLetter(p.x ^ r.x, p.z ^ r.z);
 }
 
-/** Classify the four readable results. Verdict comes from the engine (stabilizer membership), never from alarms. */
-export function resultType(debrief: Pick<Debrief, 'verdict' | 'residual'>): ResultType {
+/** Whether the mission's code has alarm stations (unknown mission ids are treated as a code with checks). */
+function hasChecks(missionId: string): boolean {
+  try {
+    return getCode(getPublicMission(missionId).code).checks.length > 0;
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Classify the readable results. The verdict comes from the engine (stabilizer membership), never from alarms; the
+ * code is looked up through the mission id so a miss on bare wires (no checks) is a 'prediction-miss', not a
+ * 'logical-failure' with a beacon.
+ */
+export function resultType(debrief: Pick<Debrief, 'missionId' | 'verdict' | 'residual'>): ResultType {
   switch (debrief.verdict) {
     case 'success':
       return weight(fromString(debrief.residual)) === 0 ? 'restored' : 'safe-pattern';
     case 'detectable':
-      return 'still-burning';
+      return hasChecks(debrief.missionId) ? 'still-burning' : 'prediction-miss';
     case 'logical-error':
-      return 'logical-failure';
+      return hasChecks(debrief.missionId) ? 'logical-failure' : 'prediction-miss';
   }
 }
 
@@ -150,9 +184,9 @@ export function buildEffects(debrief: Debrief, reducedMotion: boolean): EffectTi
       throw new Error(`effects: residual at house ${String(q)} is ${after}, but ${before} ⊕ ${crew} = ${xorLetters(before, crew)}`);
     }
     events.push({ type: 'crew-run', t: run, dur: T.run, q, crew });
-    events.push({ type: 'spray-start', t: spray, dur: T.spray, q, crew });
-    events.push({ type: 'impact', t: impact, dur: T.reveal, q, crew, before, after, effect: impactEffect(before, after) });
-    cursor = Math.max(cursor, impact + T.reveal);
+    events.push({ type: 'spray-start', t: spray, dur: T.spray, q, crew, before });
+    events.push({ type: 'impact', t: impact, dur: T.impact, q, crew, before, after, effect: impactEffect(before, after) });
+    cursor = Math.max(cursor, impact + T.hold);
   });
   const remaining = support(residual).filter((q) => letterAt(crews, q) === 'I');
   events.push({ type: 'reveal-remaining', t: cursor, dur: T.reveal, qs: remaining });

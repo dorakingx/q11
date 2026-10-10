@@ -14,8 +14,8 @@ describe('buildReplay', () => {
     expect(steps.map((s) => s.id)).toEqual(['placed', 'gate-0', 'gate-1', 'gate-2', 'alarms', 'dispatch', 'residual', 'verdict']);
     expect(steps.map((s) => s.fires)).toEqual(['ZI', 'XI', 'XX', 'XZ', 'XZ', 'XZ', 'XZ', 'XZ']);
     expect(steps.map((s) => s.gateCursor)).toEqual([-1, 0, 1, 2, 3, 3, 3, 3]);
-    expect(steps[1]?.caption).toContain('H on block 0: ZI becomes XI');
-    expect(steps[2]?.caption).toContain('CNOT from block 0 to block 1: XI becomes XX');
+    expect(steps[1]?.caption).toContain('H on house 0: ZI becomes XI');
+    expect(steps[2]?.caption).toContain('CNOT from house 0 to house 1: XI becomes XX');
     // crews appear only from the dispatch step on; residual only from the residual step
     expect(steps.slice(0, 5).every((s) => s.crews === null && s.residual === null)).toBe(true);
     expect(steps[5]?.crews).toBe('XZ');
@@ -33,7 +33,7 @@ describe('buildReplay', () => {
     const verdict = evaluate(code, start, crews);
     const steps = buildReplay({ kind: 'dispatch', code, start, circuit: [], crews, verdict });
     expect(steps.map((s) => s.id)).toEqual(['placed', 'alarms', 'dispatch', 'residual', 'verdict']);
-    expect(steps[0]?.caption).toBe('Noise lit a red fire (X) on block 1 and a red fire (X) on block 2.');
+    expect(steps[0]?.caption).toBe('Noise lit a red fire (X) on house 1 and a red fire (X) on house 2.');
     expect(steps[1]?.caption).toMatch(/^Alarms: Z0 rings/);
     expect(steps[1]?.syndrome).toEqual([1, 0, 0, 0, 0, 0, 0, 0]);
     expect(steps[3]?.residual).toBe('XXXIIIIII');
@@ -59,19 +59,27 @@ describe('buildReplay', () => {
     const crews = fromString('XX');
     const steps = buildReplay({ kind: 'propagation', code, start, circuit, crews, verdict: evaluate(code, final, crews) });
     const last = steps[steps.length - 1]?.caption ?? '';
-    expect(last).toContain('leaves a red-and-blue fire (Y) on block 1');
+    expect(last).toContain('leaves a red-and-blue fire (Y) on house 1');
     expect(last).toContain('Bare wires have no stations');
     expect(last).not.toMatch(/Silent failure/);
   });
 
+  it('captions and the what-if never say "block": the kid word is "house"', () => {
+    const code = getCode('rsc3');
+    const start = fromString('IXXIIIIII');
+    const crews = fromString('IIIXIIIII');
+    const steps = buildReplay({ kind: 'dispatch', code, start, circuit: [], crews, verdict: evaluate(code, start, crews) });
+    for (const st of steps) expect(st.caption).not.toMatch(/\bblocks?\b/i);
+  });
+
   it('describe helpers', () => {
-    expect(describeBlocks([])).toBe('no blocks');
-    expect(describeBlocks([3])).toBe('block 3');
-    expect(describeBlocks([0, 1, 2])).toBe('blocks 0, 1 and 2');
+    expect(describeBlocks([])).toBe('no houses');
+    expect(describeBlocks([3])).toBe('house 3');
+    expect(describeBlocks([0, 1, 2])).toBe('houses 0, 1 and 2');
     expect(describeFires(fromString('III'))).toBe('no fires');
-    expect(describeFires(fromString('YII'))).toBe('a red-and-blue fire (Y) on block 0');
-    expect(describeGate({ kind: 'SWAP', a: 0, b: 1 })).toBe('SWAP of blocks 0 and 1');
-    expect(describeGate({ kind: 'CZ', a: 0, b: 1 })).toBe('CZ between blocks 0 and 1');
-    expect(describeGate({ kind: 'S', q: 2 })).toBe('S on block 2');
+    expect(describeFires(fromString('YII'))).toBe('a red-and-blue fire (Y) on house 0');
+    expect(describeGate({ kind: 'SWAP', a: 0, b: 1 })).toBe('SWAP of houses 0 and 1');
+    expect(describeGate({ kind: 'CZ', a: 0, b: 1 })).toBe('CZ between houses 0 and 1');
+    expect(describeGate({ kind: 'S', q: 2 })).toBe('S on house 2');
   });
 });

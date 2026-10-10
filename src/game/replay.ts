@@ -27,27 +27,27 @@ import type { MissionKind, ReplayStep, WhatIf } from './types';
 export function describeGate(g: Gate): string {
   switch (g.kind) {
     case 'H':
-      return `H on block ${String(g.q)}`;
+      return `H on house ${String(g.q)}`;
     case 'S':
-      return `S on block ${String(g.q)}`;
+      return `S on house ${String(g.q)}`;
     case 'CNOT':
-      return `CNOT from block ${String(g.c)} to block ${String(g.t)}`;
+      return `CNOT from house ${String(g.c)} to house ${String(g.t)}`;
     case 'CZ':
-      return `CZ between blocks ${String(g.a)} and ${String(g.b)}`;
+      return `CZ between houses ${String(g.a)} and ${String(g.b)}`;
     case 'SWAP':
-      return `SWAP of blocks ${String(g.a)} and ${String(g.b)}`;
+      return `SWAP of houses ${String(g.a)} and ${String(g.b)}`;
   }
 }
 
 const COLOUR: Readonly<Record<string, string>> = { X: 'red', Z: 'blue', Y: 'red-and-blue' };
 
-/** "a red fire (X) on block 1 and a blue fire (Z) on block 7" */
+/** "a red fire (X) on house 1 and a blue fire (Z) on house 7" */
 export function describeFires(p: Pauli): string {
   const qs = support(p);
   if (qs.length === 0) return 'no fires';
   const parts = qs.map((q) => {
     const l = letterAt(p, q);
-    return `a ${COLOUR[l] ?? ''} fire (${l}) on block ${String(q)}`;
+    return `a ${COLOUR[l] ?? ''} fire (${l}) on house ${String(q)}`;
   });
   if (parts.length === 1) return parts[0] ?? '';
   return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1] ?? ''}`;
@@ -58,7 +58,7 @@ export function describeCrews(p: Pauli): string {
   if (qs.length === 0) return 'no crews';
   const parts = qs.map((q) => {
     const l = letterAt(p, q);
-    return `a ${COLOUR[l] ?? ''} crew (${l}) to block ${String(q)}`;
+    return `a ${COLOUR[l] ?? ''} crew (${l}) to house ${String(q)}`;
   });
   if (parts.length === 1) return parts[0] ?? '';
   return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1] ?? ''}`;
@@ -200,11 +200,11 @@ export interface WhatIfInput {
   readonly decoderVerdict: Verdict;
 }
 
-/** "blocks 0, 1 and 2" */
+/** "houses 0, 1 and 2" */
 export function describeBlocks(qubits: readonly number[]): string {
-  if (qubits.length === 0) return 'no blocks';
-  if (qubits.length === 1) return `block ${String(qubits[0])}`;
-  return `blocks ${qubits.slice(0, -1).join(', ')} and ${String(qubits[qubits.length - 1])}`;
+  if (qubits.length === 0) return 'no houses';
+  if (qubits.length === 1) return `house ${String(qubits[0])}`;
+  return `houses ${qubits.slice(0, -1).join(', ')} and ${String(qubits[qubits.length - 1])}`;
 }
 
 export function buildWhatIf(input: WhatIfInput): WhatIf {
@@ -219,7 +219,7 @@ export function buildWhatIf(input: WhatIfInput): WhatIf {
   if (code.checks.length === 0) {
     explanation = equivalent
       ? `The fire ended as ${trueCrews}; your crews matched it exactly, so the prediction was right.`
-      : `The fire ended as ${trueCrews}. Your crews ${crewStr} leave ${describeFires(verdict.residual)} (${String(weight(verdict.residual))} block${weight(verdict.residual) === 1 ? '' : 's'}); on bare wires every leftover component acts on the data.`;
+      : `The fire ended as ${trueCrews}. Your crews ${crewStr} leave ${describeFires(verdict.residual)} (${String(weight(verdict.residual))} house${weight(verdict.residual) === 1 ? '' : 's'}); on bare wires every leftover component acts on the data.`;
   } else if (equivalent && verdict.kind === 'success') {
     explanation =
       crewStr === decStr
@@ -231,13 +231,13 @@ export function buildWhatIf(input: WhatIfInput): WhatIf {
       explanation += ` The true fires were ${trueCrews}; crews there would differ from yours by a stabilizer as well, so the code treats both dispatches as the same correction.`;
     }
   } else if (equivalent && verdict.kind === 'logical-error') {
-    const fireBlocks = describeBlocks(support(finalFire));
-    const chainBlocks = describeBlocks(support(verdict.residual));
+    const fireHouses = describeBlocks(support(finalFire));
+    const chainHouses = describeBlocks(support(verdict.residual));
     const call =
       crewStr === decStr
         ? `The minimum-weight dispatch for these alarms is ${decStr}, and that is what you sent.`
         : `The minimum-weight dispatch for these alarms is ${decStr}; your ${crewStr} differs from it by a stabilizer, so it is the same call.`;
-    explanation = `${call} The true fire was ${trueCrews}, on ${fireBlocks}: ${String(weight(finalFire))} fires that look, to every station, exactly like one. Your crews plus those fires leave ${toString(verdict.residual)} on ${chainBlocks}, a logical operator that every station sees as an even count. Crews at ${trueCrews} would have worked, but no alarm pattern justified them. Distance 3 means any single fire is always fixed and two fires can fool any dispatcher.`;
+    explanation = `${call} The true fire was ${trueCrews}, on ${fireHouses}: ${String(weight(finalFire))} fires that look, to every station, exactly like one. Your crews plus those fires leave ${toString(verdict.residual)} on ${chainHouses}, a logical operator that every station sees as an even count. Crews at ${trueCrews} would have worked, but no alarm pattern justified them. Distance 3 means any single fire is always fixed and two fires can fool any dispatcher.`;
   } else if (verdict.kind === 'success') {
     explanation = `You succeeded with ${String(weight(crews))} crew(s); the minimum-weight dispatch ${decStr} needs ${String(weight(decoderCrews))} and its verdict is ${OUTCOME_SHORT[decoderVerdict.kind]}.`;
     if (decoderVerdict.kind === 'logical-error') {

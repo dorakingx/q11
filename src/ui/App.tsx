@@ -7,7 +7,6 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import {
   currentMission,
   detectStorage,
-  districtForMission,
   initialState,
   loadSave,
   noneBridge,
@@ -78,9 +77,6 @@ function focusTargetFor(state: GameState, root: HTMLElement): HTMLElement | null
   return root.querySelector<HTMLElement>('main h1[data-focus-target]') ?? root.querySelector<HTMLElement>('main h1');
 }
 
-/** Screens the player leaves to return to the city with a possibly just-solved district. */
-const RESULT_SCREENS: readonly GameState['screen'][] = ['dispatch', 'debrief', 'result'];
-
 export function App({ bridge = noneBridge(), storage = 'local' }: AppProps) {
   const [store] = useState<StorageLike | null>(() => (storage === 'local' ? detectStorage() : null));
   const [state, rawDispatch] = useReducer(reducer, undefined, () => {
@@ -88,7 +84,6 @@ export function App({ bridge = noneBridge(), storage = 'local' }: AppProps) {
     return initialState(save, notice);
   });
   const [resetDialog, setResetDialog] = useState(false);
-  const [recentlySolved, setRecentlySolved] = useState<string | null>(null);
   const prefersReduced = usePrefersReducedMotion();
   const reducedMotion = prefersReduced || state.settings.reducedMotion;
   const contentRef = useRef<HTMLDivElement>(null);
@@ -106,15 +101,10 @@ export function App({ bridge = noneBridge(), storage = 'local' }: AppProps) {
 
   const dispatch = useCallback((a: Action) => {
     // The UI knows about motion preferences; the reducer stays pure and receives the flag on commit / Why?.
-    const action: Action = a.type === 'CONFIRM' || a.type === 'STAND_DOWN_CONFIRM' || a.type === 'OPEN_WHY' ? { ...a, reducedMotion: a.reducedMotion ?? reducedRef.current } : a;
+    const action: Action = a.type === 'CONFIRM' || a.type === 'STAND_DOWN_CONFIRM' || a.type === 'OPEN_WHY' || a.type === 'REPLAY_AUTO' ? { ...a, reducedMotion: a.reducedMotion ?? reducedRef.current } : a;
     const before = stateRef.current;
     const after = reducer(before, action);
     stateRef.current = after;
-    // Leaving a finished dispatch for the city: remember the district so the map plays its restoration moment.
-    if ((action.type === 'NEXT_MISSION' || action.type === 'OPEN_MISSIONS') && after.screen === 'missions') {
-      const solved = RESULT_SCREENS.includes(before.screen) && before.debrief !== null && before.debrief.score.completed ? (districtForMission(before.debrief.missionId)?.id ?? null) : null;
-      setRecentlySolved(solved);
-    }
     rawDispatch(action);
     const name = soundFor(action, before, after);
     if (name !== null) playSound(name, soundRef.current);
@@ -178,7 +168,7 @@ export function App({ bridge = noneBridge(), storage = 'local' }: AppProps) {
 
   return (
     <LanguageProvider language={state.settings.language}>
-      <AppBody state={state} dispatch={dispatch} bridge={bridge} storageMode={storage} store={store} reducedMotion={reducedMotion} recentlySolved={recentlySolved} resetDialog={resetDialog} setResetDialog={setResetDialog} contentRef={contentRef} announcerRef={announcerRef} />
+      <AppBody state={state} dispatch={dispatch} bridge={bridge} storageMode={storage} store={store} reducedMotion={reducedMotion} resetDialog={resetDialog} setResetDialog={setResetDialog} contentRef={contentRef} announcerRef={announcerRef} />
     </LanguageProvider>
   );
 }
@@ -190,21 +180,33 @@ interface AppBodyProps {
   readonly storageMode: 'local' | 'memory';
   readonly store: StorageLike | null;
   readonly reducedMotion: boolean;
-  readonly recentlySolved: string | null;
   readonly resetDialog: boolean;
   readonly setResetDialog: (open: boolean) => void;
   readonly contentRef: React.RefObject<HTMLDivElement>;
   readonly announcerRef: React.RefObject<HTMLDivElement>;
 }
 
-function AppBody({ state, dispatch, bridge, storageMode, store, reducedMotion, recentlySolved, resetDialog, setResetDialog, contentRef, announcerRef }: AppBodyProps) {
+function AppBody({ state, dispatch, bridge, storageMode, store, reducedMotion, resetDialog, setResetDialog, contentRef, announcerRef }: AppBodyProps) {
   const t = useT();
   const mission = currentMission(state);
   const storageLabel = storageMode === 'memory' ? t('settings.storage.qollab') : store === null ? t('settings.storage.memory') : t('settings.storage.local', { key: 'q11.save.v1' });
   const storageNote = storageMode === 'memory' ? t('city.hud.storage.qollab') : store === null ? t('city.hud.storage.memory') : t('city.hud.storage.local');
   const noticeText = state.notice === PROGRESS_RESET_NOTICE ? t('notice.progressReset') : state.notice === RESET_NOTICE ? t('notice.saveReset') : state.notice;
   const props = { state, dispatch, storageLabel };
-  const city = <CityScreen state={state} dispatch={dispatch} storageNote={storageNote} recentlySolved={recentlySolved} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} onTitle={() => dispatch({ type: 'OPEN_TITLE' })} />;
+  // The reducer decides what the city celebrates (`celebrate`) and pre-selects (`citySelect`) after a mission;
+  // the city reports back once the restoration moment + badge toast are over so the moment never replays.
+  const city = (
+    <CityScreen
+      state={state}
+      dispatch={dispatch}
+      storageNote={storageNote}
+      recentlySolved={state.celebrate}
+      initialSelected={state.citySelect}
+      onCelebrated={() => dispatch({ type: 'CELEBRATED' })}
+      onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })}
+      onTitle={() => dispatch({ type: 'OPEN_TITLE' })}
+    />
+  );
   const playProps = mission === null || state.debrief === null ? null : { state, dispatch, mission, debrief: state.debrief, bridge, reducedMotion };
 
   let screen: JSX.Element;

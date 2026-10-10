@@ -5,7 +5,8 @@
  *
  * Flow: title → PLAY → city ('missions'; a fresh save goes straight into the guided first run instead) → briefing →
  * training → challenge (planning: undo/redo/clear) → CONFIRM → 'dispatch' (spray + answer check, progress merged
- * exactly once here) → DISPATCH_DONE/SKIP → OPEN_WHY → 'debrief' (replay) → result → next district / city.
+ * exactly once here) → DISPATCH_DONE/SKIP → OPEN_WHY → 'debrief' (replay) → result → NEXT_MISSION → city again
+ * (`celebrate` = the district just solved, `citySelect` = the next call) — or the summary after a completed Old Town.
  */
 import {
   evaluate,
@@ -22,12 +23,25 @@ import {
   toString,
   type Pauli,
 } from '../quantum';
-import { DISTRICTS, missionStatus } from './city';
+import { DISTRICTS, districtForMission, districtStatus, missionStatus } from './city';
 import { getPublicMission, listPublicMissions, nextMissionId, revealMission } from './missions';
 import { DEFAULT_SETTINGS } from './persistence';
 import { buildReplay, buildWhatIf } from './replay';
 import { outcomeLabel, score } from './scoring';
-import { PLACEMENT_HISTORY_LIMIT, SAVE_VERSION, type Action, type CrewLetter, type Debrief, type GameState, type MissionProgress, type PublicMissionView, type SaveData, type Screen, type StarCount } from './types';
+import {
+  PLACEMENT_HISTORY_LIMIT,
+  SAVE_VERSION,
+  type Action,
+  type CrewLetter,
+  type Debrief,
+  type DebriefAlternative,
+  type GameState,
+  type MissionProgress,
+  type PublicMissionView,
+  type SaveData,
+  type Screen,
+  type StarCount,
+} from './types';
 
 /** The guided first run uses the first district's mission. */
 export const TUTORIAL_MISSION_ID = DISTRICTS[0]?.missionId ?? 'first-alarm';
@@ -52,6 +66,9 @@ export function initialState(save?: SaveData, notice: string | null = null): Gam
     autoPlay: false,
     debrief: null,
     dispatchDone: false,
+    motionReduced: save?.settings.reducedMotion ?? false,
+    celebrate: null,
+    citySelect: null,
     tutorialActive: false,
     tutorialDone: save?.tutorialDone ?? false,
     progress: save?.progress ?? {},
@@ -100,9 +117,23 @@ export function confirmDispatch(missionId: string, placements: Readonly<Record<n
     decoderCrews,
     decoderVerdict,
   });
+  // The Why? alternative: the true-fire crews when the player's call was the decoder's (or succeeded) and the true
+  // fires sit elsewhere; otherwise the decoder's dispatch (bare wires: the crews where the fires really ended).
+  const trueFireCrews = toString(finalFire);
+  const useTrueFires = (equivalent || verdict.kind === 'success') && trueFireCrews !== toString(crews);
+  const altCrews = useTrueFires ? finalFire : decoderCrews;
+  const altVerdict = useTrueFires ? evaluate(code, finalFire, finalFire) : decoderVerdict;
+  const alternative: DebriefAlternative = {
+    crews: toString(altCrews),
+    verdict: altVerdict.kind,
+    kind: useTrueFires ? 'true-fires' : 'decoder',
+    residual: toString(altVerdict.residual),
+    syndromeOfResidual: syndromeToArray(altVerdict.syndrome),
+    logicalFlip: { x: [...altVerdict.logicalFlip.x], z: [...altVerdict.logicalFlip.z] },
+  };
   return {
     missionId,
-    fires: toString(finalFire),
+    fires: trueFireCrews,
     startFires: toString(start),
     crews: toString(crews),
     residual: toString(verdict.residual),
@@ -115,6 +146,7 @@ export function confirmDispatch(missionId: string, placements: Readonly<Record<n
     narrative: m.debrief[verdict.kind],
     steps,
     whatIf,
+    alternative,
   };
 }
 
@@ -169,12 +201,35 @@ function enterBriefing(state: GameState, id: string): GameState {
     dispatchDone: false,
     replayIndex: 0,
     autoPlay: false,
+    // City-only state is spent once a district is entered.
+    celebrate: null,
+    citySelect: null,
   };
 }
 
-/** Leave the guided first run for the city: the tutorial counts as done (completed or skipped). */
+/** Screens that hold a committed dispatch; leaving them for the city may carry a restoration moment. */
+const RESULT_SCREENS: readonly Screen[] = ['dispatch', 'debrief', 'result'];
+
+/**
+ * The city arrival after a committed dispatch: `celebrate` names the district when the mission counts as completed,
+ * `citySelect` the next district in unlock order when it is available (or Free roam is on), otherwise the district
+ * just left (so replaying a solved district lands back on it). Outside the result screens nothing is celebrated or
+ * pre-selected.
+ */
+function cityArrival(state: GameState): Pick<GameState, 'celebrate' | 'citySelect'> {
+  const debrief = state.debrief;
+  if (debrief === null || !RESULT_SCREENS.includes(state.screen)) return { celebrate: null, citySelect: null };
+  const here = districtForMission(debrief.missionId) ?? null;
+  const celebrate = debrief.score.completed ? (here?.id ?? null) : null;
+  const nextId = nextMissionId(debrief.missionId);
+  const next = nextId === null ? null : (districtForMission(nextId) ?? null);
+  const nextOpen = next !== null && (state.settings.freeRoam || districtStatus(next.id, state.progress, false) === 'available');
+  return { celebrate, citySelect: nextOpen ? next.id : (here?.id ?? null) };
+}
+
+/** Leave for the city: the tutorial counts as done (completed or skipped); a finished dispatch brings its celebration. */
 function enterCity(state: GameState): GameState {
-  return { ...state, screen: 'missions', standDownDialog: false, autoPlay: false, tutorialActive: false, tutorialDone: true };
+  return { ...state, screen: 'missions', standDownDialog: false, autoPlay: false, tutorialActive: false, tutorialDone: true, ...cityArrival(state) };
 }
 
 /** A placement change in the planning stage: remember the previous plan (bounded), forget the redo branch. */
@@ -203,13 +258,14 @@ function step(state: GameState, action: Action): GameState {
         ...state,
         progress: action.save.progress,
         settings: action.save.settings,
+        motionReduced: state.motionReduced || action.save.settings.reducedMotion,
         tutorialDone: action.save.tutorialDone,
         notice: action.notice ?? state.notice,
       };
     case 'PLAY':
       // First run: skip the city and go straight into the guided first scene (pick a crew → tap a house → spray).
       if (!state.tutorialDone) return { ...enterBriefing(state, TUTORIAL_MISSION_ID), tutorialActive: true };
-      return { ...state, screen: 'missions', tutorialActive: false };
+      return { ...state, screen: 'missions', tutorialActive: false, celebrate: null, citySelect: null };
     case 'TUTORIAL_SKIP':
       return state.tutorialActive ? enterCity(state) : { ...state, tutorialDone: true };
     case 'OPEN_HOW':
@@ -221,7 +277,9 @@ function step(state: GameState, action: Action): GameState {
     case 'OPEN_MISSIONS':
       return enterCity(state);
     case 'OPEN_TITLE':
-      return { ...state, screen: 'title', standDownDialog: false, autoPlay: false, tutorialActive: false };
+      return { ...state, screen: 'title', standDownDialog: false, autoPlay: false, tutorialActive: false, celebrate: null, citySelect: null };
+    case 'CELEBRATED':
+      return state.celebrate === null ? state : { ...state, celebrate: null };
     case 'SELECT_MISSION': {
       // Districts open in order; locked ones are not selectable (unless Free roam is on). Unknown ids are ignored.
       const status = missionStatus(action.id, state.progress, state.settings.freeRoam);
@@ -288,7 +346,7 @@ function step(state: GameState, action: Action): GameState {
       if (current === state.selected) {
         delete next[action.qubit];
       } else if (current !== undefined) {
-        next[action.qubit] = state.selected; // swap colour on an occupied block (same crew count)
+        next[action.qubit] = state.selected; // swap colour on an occupied house (same crew count)
       } else {
         if (crewCount(state.placements) >= m.budget) return state; // budget enforced
         next[action.qubit] = state.selected;
@@ -340,14 +398,14 @@ function step(state: GameState, action: Action): GameState {
       const m = currentMission(state);
       if (m === null || state.screen !== 'challenge' || state.standDownDialog) return state;
       if (crewCount(state.placements) === 0) return { ...state, standDownDialog: true };
-      return commit(state, m, action.reducedMotion ?? false);
+      return commit(state, m, action.reducedMotion ?? state.settings.reducedMotion);
     }
     case 'STAND_DOWN_CANCEL':
       return { ...state, standDownDialog: false };
     case 'STAND_DOWN_CONFIRM': {
       const m = currentMission(state);
       if (m === null || state.screen !== 'challenge' || !state.standDownDialog) return state;
-      return commit(state, m, action.reducedMotion ?? false);
+      return commit(state, m, action.reducedMotion ?? state.settings.reducedMotion);
     }
     case 'DISPATCH_DONE':
     case 'DISPATCH_SKIP':
@@ -359,7 +417,7 @@ function step(state: GameState, action: Action): GameState {
       const fromDispatch = state.screen === 'dispatch' && state.dispatchDone;
       if (!fromDispatch && state.screen !== 'result') return state;
       const reduced = action.reducedMotion ?? state.settings.reducedMotion;
-      return { ...state, screen: 'debrief', replayIndex: 0, autoPlay: !reduced && state.debrief.steps.length > 1 };
+      return { ...state, screen: 'debrief', replayIndex: 0, motionReduced: reduced, autoPlay: !reduced && state.debrief.steps.length > 1 };
     }
     case 'REPLAY_GOTO': {
       if (state.debrief === null) return state;
@@ -377,9 +435,13 @@ function step(state: GameState, action: Action): GameState {
       return { ...state, replayIndex: Math.max(0, state.replayIndex - 1), autoPlay: false };
     case 'REPLAY_AUTO': {
       if (state.debrief === null) return state;
+      // Reduced motion (the flag passed now, the one remembered at CONFIRM / OPEN_WHY, or the setting): never start the timer.
+      const reduced = (action.reducedMotion ?? false) || state.motionReduced || state.settings.reducedMotion;
+      const on = action.on && !reduced;
+      if (on === state.autoPlay && (!on || state.replayIndex < state.debrief.steps.length - 1)) return state;
       const last = state.debrief.steps.length - 1;
       // Starting auto-play from the end restarts the replay.
-      return { ...state, autoPlay: action.on, replayIndex: action.on && state.replayIndex >= last ? 0 : state.replayIndex };
+      return { ...state, autoPlay: on, replayIndex: on && state.replayIndex >= last ? 0 : state.replayIndex };
     }
     case 'SHOW_RESULT': {
       if (state.debrief === null) return state;
@@ -393,19 +455,21 @@ function step(state: GameState, action: Action): GameState {
       return enterChallenge(state, m);
     }
     case 'NEXT_MISSION': {
-      if (state.missionId === null) return state;
-      if (state.screen !== 'dispatch' && state.screen !== 'debrief' && state.screen !== 'result') return state;
+      if (state.missionId === null || state.debrief === null) return state;
+      if (!RESULT_SCREENS.includes(state.screen)) return state;
       if (state.screen === 'dispatch' && !state.dispatchDone) return state;
-      // The guided first run ends by revealing the city (the player's first look at the map).
-      if (state.tutorialActive) return enterCity(state);
-      const next = nextMissionId(state.missionId);
-      if (next === null) return { ...state, screen: 'summary', autoPlay: false };
-      return enterBriefing(state, next);
+      // A completed last district ends the shift on the summary; everything else returns to the city
+      // (the guided first run ends by revealing the city: the player's first look at the map).
+      if (!state.tutorialActive && nextMissionId(state.missionId) === null && state.debrief.score.completed) {
+        return { ...state, screen: 'summary', autoPlay: false, celebrate: null, citySelect: null };
+      }
+      return enterCity(state);
     }
     case 'SET_SOUND':
       return { ...state, settings: { ...state.settings, sound: action.on } };
     case 'SET_REDUCED_MOTION':
-      return { ...state, settings: { ...state.settings, reducedMotion: action.on } };
+      // Turning reduced motion on stops a running auto-play; the next CONFIRM / OPEN_WHY re-reports the OS preference.
+      return { ...state, settings: { ...state.settings, reducedMotion: action.on }, motionReduced: action.on, autoPlay: action.on ? false : state.autoPlay };
     case 'SET_LANGUAGE':
       return state.settings.language === action.language ? state : { ...state, settings: { ...state.settings, language: action.language } };
     case 'SET_FREE_ROAM':
@@ -434,6 +498,7 @@ function commit(state: GameState, m: PublicMissionView, reducedMotion: boolean):
     debrief,
     dispatchDone: false,
     replayIndex: 0,
+    motionReduced: reducedMotion,
     autoPlay: !reducedMotion && debrief.steps.length > 1,
     progress: mergeProgress(state.progress, m.id, debrief.score.stars, debrief.score.completed),
     tutorialDone: state.tutorialDone || tutorialSolved,

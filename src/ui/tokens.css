@@ -1,4 +1,8 @@
-/* Q11 warm daytime theme tokens (docs/UX_SCREENS.md). Every screen, the city and the scene use these variables. */
+/* Q11 warm daytime theme tokens (docs/UX_SCREENS.md). Every screen, the city and the scene use these variables.
+   Contrast (WCAG): text ≥ 4.5:1 and component borders ≥ 3:1 against the panels — verified with
+   scripts in reports (white on --primary 5.1:1, --danger-text 5.7:1, --line 3.7:1, --ok-text 5.2:1).
+   Focus ring: two-tone — a 3px --focus (dark) ring plus a 6px --focus-halo (orange) halo, so it reads on the sky,
+   the cream panels and the red primary alike. scene.css only knows --focus, so --focus is the dark ring colour. */
 :root {
   color-scheme: light;
   --sky: #dff0ff;
@@ -11,15 +15,21 @@
   --ink-soft: #4a3f39;
   --muted: #6b5f58;
   --outline: #3a2f2a;
-  --line: #d9cdb8;
+  --line: #8d7f72;
+  --line-soft: #d9cdb8;
   --x: #e8432a;
   --z: #2f6fdd;
   --y: #8a4fd6;
   --alarm: #f2b200;
   --ok: #2bb673;
+  --ok-text: #1f7a43;
+  --primary: #c93a22;
+  --primary-hover: #b53219;
+  --danger-text: #b8321b;
   --water: #7fd3ff;
   --water-deep: #3fb6f5;
-  --focus: #ff9b2f;
+  --focus: #3a2f2a;
+  --focus-halo: #ff9b2f;
   --shadow: rgba(58, 47, 42, 0.18);
   --radius: 14px;
   --radius-lg: 20px;

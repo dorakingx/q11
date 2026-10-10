@@ -3,13 +3,17 @@
  * district laid over it, a HUD (stars, badges, storage note, free roam, settings), a selection panel
  * (right column on wide screens, bottom sheet on phones), the truck drive on Dispatch and the restoration
  * moment for a just-solved district. Everything is tap-only, keyboard-reachable and reads by shape + text.
+ *
+ * Celebration contract (App): `recentlySolved` (= GameState.celebrate) starts the restoration + badge toast once,
+ * captured at mount; `onCelebrated` fires exactly once when both have finished or were skipped (or on unmount).
+ * `initialSelected` (= GameState.citySelect) opens the panel on that district without stealing focus from the h1.
  */
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type RefObject } from 'react';
-import { getPublicMission, maxTotalStars, totalStars, type Action, type DistrictStatus, type GameState } from '../../game';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type RefObject } from 'react';
+import { firstAvailable, getPublicMission, maxTotalStars, totalStars, type Action, type DistrictStatus, type GameState } from '../../game';
 import { ART, CITY_H, CITY_W, ChapterBadge, CityBackdrop, DISTRICTS, FireTruck, ROADS, ROAD_START, SmokePlume, districtById, type DistrictBox, type DistrictId, type DistrictVisualState } from '../art';
 import { GearIcon, Q11Mark } from '../glyphs';
 import { missionCopy, plural, useLanguage, useT } from '../i18n';
-import { RESTORE_MS, TOAST_MS, TRAVEL_MS, WHEEL_MS, badgeColour, badgeKey, detectReducedMotion, easeInOut, hitBoxStyle, isDistrictId, neighbourDistrict, pointOnRoad, previousDistrict, statusesOf, type MeasurablePath, type TruckPose } from './geometry';
+import { RESTORE_MS, TOAST_MS, TRAVEL_MS, WHEEL_MS, badgeColour, badgeKey, detectReducedMotion, easeInOut, hitBoxStyle, isDistrictId, neighbourDistrict, pointOnRoad, statusesOf, type MeasurablePath, type TruckPose } from './geometry';
 import './city.css';
 
 export interface CityScreenProps {
@@ -21,10 +25,12 @@ export interface CityScreenProps {
   readonly recentlySolved: string | null;
   readonly onSettings: () => void;
   readonly onTitle: () => void;
+  /** Called once after the restoration moment and the badge toast finished or were skipped (App clears `celebrate`). */
+  readonly onCelebrated?: (() => void) | undefined;
   /** Force reduced motion (tests / App). Otherwise Settings.reducedMotion, the app's data-reduced-motion marker or the OS preference decide. */
   readonly reducedMotion?: boolean;
-  /** Dev / preview only: open the panel on this district at mount. */
-  readonly initialSelected?: DistrictId | null;
+  /** District to pre-select at mount (the panel opens on it; focus stays on the heading). Locked / unknown ids are ignored. */
+  readonly initialSelected?: string | null;
 }
 
 interface Toast {
@@ -33,16 +39,21 @@ interface Toast {
   readonly colour: string | null;
 }
 
-export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSettings, onTitle, reducedMotion, initialSelected = null }: CityScreenProps) {
+/** The bottom-sheet breakpoint (city.css: the panel is fixed to the bottom below this width). */
+const SHEET_MAX_WIDTH = 1024;
+
+export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSettings, onTitle, onCelebrated, reducedMotion, initialSelected = null }: CityScreenProps) {
   const t = useT();
   const lang = useLanguage();
   const statuses = statusesOf(state.progress, state.settings.freeRoam);
   const reducedProp = reducedMotion ?? (state.settings.reducedMotion ? true : undefined);
   const isReduced = useCallback((): boolean => reducedProp ?? detectReducedMotion(), [reducedProp]);
 
-  const restoredId: DistrictId | null = isDistrictId(recentlySolved) && statuses[recentlySolved] === 'solved' ? recentlySolved : null;
+  // The just-solved district is captured once at mount: App may clear `celebrate` while the moment still plays.
+  const [restoredId] = useState<DistrictId | null>(() => (isDistrictId(recentlySolved) && statuses[recentlySolved] === 'solved' ? recentlySolved : null));
+  const validInitial = (id: string | null): DistrictId | null => (isDistrictId(id) && statuses[id] !== 'locked' ? id : null);
 
-  const [selected, setSelected] = useState<DistrictId | null>(() => (initialSelected !== null && statuses[initialSelected] !== 'locked' ? initialSelected : null));
+  const [selected, setSelected] = useState<DistrictId | null>(() => validInitial(initialSelected));
   const [travel, setTravel] = useState<DistrictId | null>(null);
   const [truck, setTruck] = useState<TruckPose | null>(null);
   const [restoring, setRestoring] = useState<boolean>(() => restoredId !== null && !(reducedProp ?? detectReducedMotion()));
@@ -52,6 +63,7 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
     const i = DISTRICTS.findIndex((b) => b.id === restoredId);
     return { kind: 'badge', text: t('city.badgeToast', { badge: t(badgeKey(box.missionId)) }), colour: badgeColour(i) };
   });
+  const [sheetHeight, setSheetHeight] = useState<number | null>(null);
 
   const mainRef = useRef<HTMLElement>(null);
   const panelHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -59,6 +71,13 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
   const roadRef = useRef<SVGPathElement>(null);
   const finishRef = useRef<(() => void) | null>(null);
   const lastFocusedDistrict = useRef<DistrictId | null>(null);
+  /** The panel moves focus to its heading only for a selection the player made (never for `initialSelected`). */
+  const [selectionByUser, setSelectionByUser] = useState(false);
+  const celebration = useRef<'pending' | 'done' | 'none'>(restoredId === null ? 'none' : 'pending');
+  const onCelebratedRef = useRef(onCelebrated);
+  useEffect(() => {
+    onCelebratedRef.current = onCelebrated;
+  }, [onCelebrated]);
 
   /* ---------------------------------------------------------------- toasts */
   useEffect(() => {
@@ -74,14 +93,77 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
     return () => globalThis.clearTimeout(id);
   }, [restoring]);
 
+  // The celebration is over when the smoke has cleared and the badge toast is gone (or both were skipped).
+  const celebrating = restoring || (toast !== null && toast.kind === 'badge');
+  useEffect(() => {
+    if (celebration.current !== 'pending' || celebrating) return;
+    celebration.current = 'done';
+    onCelebratedRef.current?.();
+  }, [celebrating]);
+  // Leaving the city mid-celebration counts as finished (the moment never replays on the next visit).
+  useEffect(
+    () => () => {
+      if (celebration.current !== 'pending') return;
+      celebration.current = 'done';
+      onCelebratedRef.current?.();
+    },
+    [],
+  );
+  const skipCelebration = () => {
+    if (restoring) setRestoring(false);
+    setToast((cur) => (cur !== null && cur.kind === 'badge' ? null : cur));
+  };
+
+  /* ---------------------------------------------------------------- pre-selection (App: citySelect) */
+  // A new pre-selection from the parent replaces the selection during render (no effect, no extra commit).
+  const initialKey = validInitial(initialSelected);
+  const [seenInitial, setSeenInitial] = useState<DistrictId | null>(initialKey);
+  if (initialKey !== seenInitial) {
+    setSeenInitial(initialKey);
+    if (initialKey !== null) {
+      setSelectionByUser(false);
+      setSelected(initialKey);
+    }
+  }
+  useEffect(() => {
+    if (initialKey === null) return;
+    // Bring the district into view once the app has scrolled the new screen to the top.
+    const id = globalThis.setTimeout(() => {
+      const btn = mainRef.current?.querySelector<HTMLElement>(`button[data-district="${initialKey}"]`);
+      if (btn !== null && btn !== undefined && typeof btn.scrollIntoView === 'function') btn.scrollIntoView({ block: 'nearest' });
+    }, 0);
+    return () => globalThis.clearTimeout(id);
+  }, [initialKey]);
+
   /* ---------------------------------------------------------------- selection → panel */
   useEffect(() => {
     if (selected === null) return;
     const panel = panelRef.current;
     if (panel === null) return;
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) panel.scrollIntoView({ block: 'nearest' });
+    if (!selectionByUser) return;
+    if (typeof window !== 'undefined' && window.innerWidth < SHEET_MAX_WIDTH && typeof panel.scrollIntoView === 'function') panel.scrollIntoView({ block: 'nearest' });
     panelHeadingRef.current?.focus({ preventScroll: true });
-  }, [selected]);
+  }, [selected, selectionByUser]);
+
+  /* ---------------------------------------------------------------- bottom sheet: reserve its real height below the map */
+  const panelOpen = selected !== null && travel === null;
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panelOpen || panel === null || typeof window === 'undefined') {
+      setSheetHeight(null);
+      return;
+    }
+    const measure = () => setSheetHeight(window.innerWidth < SHEET_MAX_WIDTH ? Math.ceil(panel.getBoundingClientRect().height) : null);
+    measure();
+    const RO = globalThis.ResizeObserver;
+    const ro = typeof RO === 'function' ? new RO(measure) : null;
+    ro?.observe(panel);
+    window.addEventListener('resize', measure);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [panelOpen, selected]);
 
   /* ---------------------------------------------------------------- truck drive */
   useEffect(() => {
@@ -134,15 +216,16 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
   /* ---------------------------------------------------------------- handlers */
   const select = (id: DistrictId) => {
     if (travel !== null) return;
-    if (restoring) setRestoring(false);
+    skipCelebration();
     const status = statuses[id];
     if (status === 'locked') {
-      const prev = previousDistrict(id);
-      const prevName = prev === null ? '' : missionCopy(prev.missionId, lang).districtName;
-      setToast({ kind: 'locked', text: t('city.locked.hint', { district: prevName }), colour: null });
+      const next = firstAvailable(state.progress);
+      const nextName = next === null ? '' : missionCopy(next.missionId, lang).districtName;
+      setToast({ kind: 'locked', text: t('city.locked.hint', { district: nextName }), colour: null });
       return;
     }
     lastFocusedDistrict.current = id;
+    setSelectionByUser(true);
     setSelected(id);
   };
 
@@ -172,22 +255,11 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
         closePanel();
       }
     }
-    if (restoring) setRestoring(false);
-  };
-
-  const onDistrictKeyDown = (e: KeyboardEvent<HTMLButtonElement>, id: DistrictId) => {
-    let target: DistrictId | null = null;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') target = neighbourDistrict(id, 1);
-    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') target = neighbourDistrict(id, -1);
-    else if (e.key === 'Home') target = DISTRICTS[0]?.id ?? null;
-    else if (e.key === 'End') target = DISTRICTS[DISTRICTS.length - 1]?.id ?? null;
-    if (target === null) return;
-    e.preventDefault();
-    mainRef.current?.querySelector<HTMLElement>(`button[data-district="${target}"]`)?.focus();
+    if (restoring) skipCelebration();
   };
 
   const onMapPointerDown = (_e: PointerEvent<HTMLDivElement>) => {
-    if (restoring) setRestoring(false);
+    if (celebrating) skipCelebration();
   };
 
   /* ---------------------------------------------------------------- derived */
@@ -199,7 +271,6 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
   const stars = totalStars(state.progress);
   const maxStars = maxTotalStars();
   const solvedBoxes = DISTRICTS.filter((b) => statuses[b.id] === 'solved');
-  const panelOpen = selected !== null && travel === null;
   const selectedBox = selected === null ? null : districtById(selected);
   const travelBox = travel === null ? null : districtById(travel);
   const restoredBox = restoredId === null ? null : districtById(restoredId);
@@ -210,18 +281,21 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
     const p = state.progress[box.missionId];
     return p === undefined ? plural(lang, 'mission.notPlayed', m.maxStars, { max: m.maxStars }) : t('mission.starsOf', { stars: p.stars, max: m.maxStars });
   };
+  const mainStyle = sheetHeight === null ? undefined : ({ '--city-sheet-h': `${String(sheetHeight)}px` } as CSSProperties);
 
   return (
-    <main className={`screen screen-city${panelOpen ? ' has-panel' : ''}${travel !== null ? ' is-travelling' : ''}`} ref={mainRef} onKeyDown={onMainKeyDown} aria-busy={travel !== null}>
+    <main className={`screen screen-city${panelOpen ? ' has-panel' : ''}${travel !== null ? ' is-travelling' : ''}`} ref={mainRef} onKeyDown={onMainKeyDown} aria-busy={travel !== null} style={mainStyle}>
       {/* ------------------------------------------------------------ HUD */}
       <header className="city-hud">
-        <button type="button" className="city-brand" onClick={onTitle} aria-label={t('a11y.backToTitle')} data-testid="city-title">
-          <Q11Mark size={40} />
-          <span className="city-brand-text">
+        <div className="city-brand-group">
+          <button type="button" className="city-brand" onClick={onTitle} aria-label={t('a11y.cityBackToTitle')} data-testid="city-title">
+            <Q11Mark size={40} />
             <span className="city-brand-name">{t('app.name')}</span>
-            <h1 className="city-brand-title">{t('city.title')}</h1>
-          </span>
-        </button>
+          </button>
+          <h1 className="city-brand-title" tabIndex={-1} data-focus-target>
+            {t('city.title')}
+          </h1>
+        </div>
         <div className="city-hud-stats">
           <span className="city-stat" data-testid="city-stars">
             <StarIcon filled size={20} />
@@ -243,8 +317,9 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
             })}
           </ul>
           {state.settings.freeRoam ? (
-            <span className="city-pill" data-testid="free-roam" title={t('city.hud.freeRoamOn')}>
-              {t('city.hud.freeRoam')}
+            <span className="city-free-roam" data-testid="free-roam">
+              <span className="city-pill">{t('city.hud.freeRoam')}</span>
+              <span className="city-free-roam-desc">{t('city.hud.freeRoamOn')}</span>
             </span>
           ) : null}
         </div>
@@ -255,6 +330,22 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
           <GearIcon size={24} />
         </button>
       </header>
+
+      {/* toasts sit just below the HUD (never over it) */}
+      <div className="city-toast-anchor">
+        <div className="city-toast-region" role="status" aria-live="polite" aria-atomic="true" data-testid="city-toast-region">
+          {toast !== null ? (
+            <div className={`city-toast is-${toast.kind}`} data-testid={`toast-${toast.kind}`}>
+              {toast.kind === 'badge' ? (
+                <svg viewBox="-26 -58 52 62" width={28} height={33} aria-hidden="true" focusable="false">
+                  <ChapterBadge x={0} y={0} colour={toast.colour ?? ART.crewZ} />
+                </svg>
+              ) : null}
+              <span>{toast.text}</span>
+            </div>
+          ) : null}
+        </div>
+      </div>
 
       <div className="city-body">
         {/* ------------------------------------------------------------ the city */}
@@ -292,6 +383,7 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
               const status = statuses[box.id];
               const m = getPublicMission(box.missionId);
               const copy = missionCopy(box.missionId, lang);
+              // The name starts with the visible chip text ("1 Rowhouse Lane") so label-in-name holds.
               const label = t('city.aria.mission', { n: m.index, name: copy.districtName, status: statusLabel(status), stars: starsText(box) });
               return (
                 <button
@@ -306,7 +398,7 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
                   aria-pressed={selected === box.id}
                   aria-disabled={travel !== null ? true : undefined}
                   onClick={() => select(box.id)}
-                  onKeyDown={(e) => onDistrictKeyDown(e, box.id)}
+                  onKeyDown={(e) => onDistrictKeyDown(e, box.id, mainRef)}
                 >
                   <span className="city-district-name" aria-hidden="true">
                     <span className="city-district-n">{m.index}</span>
@@ -338,22 +430,19 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
           </div>
         </div>
       ) : null}
-
-      {/* ------------------------------------------------------------ toasts */}
-      <div className="city-toast-region" role="status" aria-live="polite" aria-atomic="true" data-testid="city-toast-region">
-        {toast !== null ? (
-          <div className={`city-toast is-${toast.kind}`} data-testid={`toast-${toast.kind}`}>
-            {toast.kind === 'badge' ? (
-              <svg viewBox="-26 -58 52 62" width={28} height={33} aria-hidden="true" focusable="false">
-                <ChapterBadge x={0} y={0} colour={toast.colour ?? ART.crewZ} />
-              </svg>
-            ) : null}
-            <span>{toast.text}</span>
-          </div>
-        ) : null}
-      </div>
     </main>
   );
+}
+
+function onDistrictKeyDown(e: KeyboardEvent<HTMLButtonElement>, id: DistrictId, mainRef: RefObject<HTMLElement>) {
+  let target: DistrictId | null = null;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') target = neighbourDistrict(id, 1);
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') target = neighbourDistrict(id, -1);
+  else if (e.key === 'Home') target = DISTRICTS[0]?.id ?? null;
+  else if (e.key === 'End') target = DISTRICTS[DISTRICTS.length - 1]?.id ?? null;
+  if (target === null) return;
+  e.preventDefault();
+  mainRef.current?.querySelector<HTMLElement>(`button[data-district="${target}"]`)?.focus();
 }
 
 /* ------------------------------------------------------------------ selection panel */

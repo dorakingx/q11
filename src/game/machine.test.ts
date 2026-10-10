@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fromString, getCode, getMission, letterAt } from '../quantum';
+import { evaluate, fromString, getCode, getMission, letterAt, syndromeToArray, toString } from '../quantum';
 import { DISTRICTS } from './city';
 import { confirmDispatch, crewCount, initialState, placementsToPauli, PROGRESS_RESET_NOTICE, reducer, toSave, totalStars, TUTORIAL_MISSION_ID } from './machine';
 import { listPublicMissions, maxTotalStars, missionMaxStars } from './missions';
@@ -159,19 +159,26 @@ describe('district progression', () => {
     expect(reducer(s, { type: 'SET_FREE_ROAM', on: false })).toBe(s); // unchanged → same reference
   });
 
-  it('NEXT_MISSION walks the districts in order and ends on the summary', () => {
+  it('NEXT_MISSION returns to the city with the next district pre-selected, and ends on the summary after Old Town', () => {
     let s = toChallenge('two-kinds-of-trouble');
     s = place(s, { 1: 'X', 6: 'Z' });
     s = confirmAndFinish(s);
     s = reducer(s, { type: 'NEXT_MISSION' });
+    expect(s.screen).toBe('missions');
+    expect(s.celebrate).toBe('market');
+    expect(s.citySelect).toBe('old-town');
+    expect(s.debrief).not.toBeNull(); // the debrief stays until the next briefing
+    s = reducer(s, { type: 'SELECT_MISSION', id: 'silent-failure' });
     expect(s.screen).toBe('briefing');
-    expect(s.missionId).toBe('silent-failure');
+    expect(s.celebrate).toBeNull();
+    expect(s.citySelect).toBeNull();
     s = run(s, { type: 'START_MISSION' });
     s = place(s, { 0: 'X' });
     s = confirmAndFinish(s);
     s = reducer(s, { type: 'SHOW_RESULT' });
     s = reducer(s, { type: 'NEXT_MISSION' });
     expect(s.screen).toBe('summary');
+    expect(s.celebrate).toBeNull();
   });
 });
 
@@ -398,7 +405,17 @@ describe('full flow of every mission', () => {
       expect(s.screen).toBe('result');
       expect(s.progress[m.id]?.attempts).toBe(1);
       s = reducer(s, { type: 'NEXT_MISSION' });
-      expect(s.screen).toBe(m.index === 6 ? 'summary' : 'briefing');
+      // Every completed mission returns to the city (the next call pre-selected); a completed Old Town ends the shift.
+      const here = DISTRICTS[m.index - 1];
+      const next = DISTRICTS[m.index];
+      if (m.index === 6) {
+        expect(s.screen).toBe('summary');
+      } else {
+        expect(s.screen).toBe('missions');
+        expect(s.celebrate).toBe(here?.id);
+        expect(s.citySelect).toBe(next?.id);
+      }
+      expect(s.progress[m.id]?.attempts).toBe(1);
     });
 
     it(`${m.id}: a wrong dispatch is not a success and Try again restarts the same mission`, () => {
@@ -450,11 +467,11 @@ describe('full flow of every mission', () => {
     expect(b.score.stars).toBe(1);
     expect(b.whatIf.equivalentToDecoder).toBe(true);
     expect(b.whatIf.explanation).toContain('is XIIIIIIII; your IIIXIIIII differs from it by a stabilizer, so it is the same call');
-    expect(b.whatIf.explanation).toContain('leave IXXXIIIII on blocks 1, 2 and 3');
+    expect(b.whatIf.explanation).toContain('leave IXXXIIIII on houses 1, 2 and 3');
     const c = confirmDispatch('silent-failure', { 0: 'X' });
     expect(c.whatIf.explanation).toContain('is XIIIIIIII, and that is what you sent');
-    expect(c.whatIf.explanation).toContain('leave XXXIIIIII on blocks 0, 1 and 2');
-    expect(c.whatIf.explanation).toContain('on blocks 1 and 2: 2 fires');
+    expect(c.whatIf.explanation).toContain('leave XXXIIIIII on houses 0, 1 and 2');
+    expect(c.whatIf.explanation).toContain('on houses 1 and 2: 2 fires');
   });
 
   it('mission 5: Z on block 6 or 7 are equivalent corrections (stabilizer twins); no counterfactual when crews equal the true fires', () => {
@@ -477,8 +494,8 @@ describe('full flow of every mission', () => {
     const d = confirmDispatch('color-switch', { 0: 'X', 1: 'X' }); // true end state XZ
     expect(d.verdict).toBe('logical-error');
     expect(d.verdictLabel).toBe('Prediction missed — fires left on the wires');
-    expect(d.steps[d.steps.length - 1]?.caption).toMatch(/leaves a red-and-blue fire \(Y\) on block 1/);
-    expect(d.whatIf.explanation).toContain('leave a red-and-blue fire (Y) on block 1 (1 block)');
+    expect(d.steps[d.steps.length - 1]?.caption).toMatch(/leaves a red-and-blue fire \(Y\) on house 1/);
+    expect(d.whatIf.explanation).toContain('leave a red-and-blue fire (Y) on house 1 (1 house)');
     const ok = confirmDispatch('color-switch', { 0: 'X', 1: 'Z' });
     expect(ok.verdictLabel).toBe('Logical qubit safe');
   });
@@ -562,6 +579,188 @@ describe('replay controls', () => {
     expect(s.replayIndex).toBe(0);
     s = reducer(s, { type: 'REPLAY_PREV' });
     expect(s.replayIndex).toBe(0);
+  });
+});
+
+describe('city arrival contract (celebrate / citySelect / CELEBRATED)', () => {
+  /** Progress with the first `n` districts solved (3 stars each) and free roam off. */
+  function solvedUpTo(n: number): GameState {
+    const progress = Object.fromEntries(DISTRICTS.slice(0, n).map((d) => [d.missionId, { stars: 3 as const, attempts: 1, completed: true }]));
+    return run(initialState(openSave({ settings: DEFAULT_SETTINGS, progress })), { type: 'PLAY' });
+  }
+
+  it('fresh state and PLAY carry no celebration or pre-selection', () => {
+    expect(initialState()).toMatchObject({ celebrate: null, citySelect: null });
+    expect(openState()).toMatchObject({ screen: 'missions', celebrate: null, citySelect: null });
+  });
+
+  it('success → city: celebrate = the solved district, citySelect = the next district (now available), attempts counted once', () => {
+    let s = toChallenge('first-alarm', solvedUpTo(0));
+    s = place(s, { 1: 'X' });
+    s = confirmAndFinish(s);
+    expect(s.progress['first-alarm']?.attempts).toBe(1);
+    s = reducer(s, { type: 'NEXT_MISSION' });
+    expect(s.screen).toBe('missions');
+    expect(s.celebrate).toBe('station-row');
+    expect(s.citySelect).toBe('bridge');
+    expect(s.progress['first-alarm']).toEqual({ stars: 3, attempts: 1, completed: true });
+    // The city reports the toast finished: celebrate clears, the pre-selection stays; a second CELEBRATED is a no-op.
+    const done = reducer(s, { type: 'CELEBRATED' });
+    expect(done.celebrate).toBeNull();
+    expect(done.citySelect).toBe('bridge');
+    expect(reducer(done, { type: 'CELEBRATED' })).toBe(done);
+  });
+
+  it('failure → city: nothing to celebrate, citySelect = the current district (the next one is still locked)', () => {
+    let s = toChallenge('first-alarm', solvedUpTo(0));
+    s = place(s, { 0: 'X' });
+    s = confirmAndFinish(s);
+    expect(s.debrief?.score.completed).toBe(false);
+    for (const via of [{ type: 'NEXT_MISSION' } as const, { type: 'OPEN_MISSIONS' } as const]) {
+      const city = reducer(s, via);
+      expect(city.screen).toBe('missions');
+      expect(city.celebrate).toBeNull();
+      expect(city.citySelect).toBe('station-row');
+      expect(reducer(city, { type: 'SELECT_MISSION', id: 'red-forward-blue-backward' })).toBe(city); // never a locked briefing
+    }
+    // Why? → result → Next: the same arrival.
+    const viaResult = run(s, { type: 'OPEN_WHY' }, { type: 'SHOW_RESULT' }, { type: 'NEXT_MISSION' });
+    expect(viaResult).toMatchObject({ screen: 'missions', celebrate: null, citySelect: 'station-row' });
+  });
+
+  it('OPEN_MISSIONS from a finished (or still playing) dispatch, the debrief and the result celebrates a completed mission', () => {
+    let s = toChallenge('blind-dispatch', solvedUpTo(3));
+    s = place(s, { 4: 'X' });
+    const playing = reducer(s, { type: 'CONFIRM' });
+    expect(reducer(playing, { type: 'NEXT_MISSION' })).toBe(playing); // not while the spray plays
+    expect(reducer(playing, { type: 'OPEN_MISSIONS' })).toMatchObject({ screen: 'missions', celebrate: 'central', citySelect: 'market' });
+    const done = reducer(playing, { type: 'DISPATCH_DONE' });
+    expect(reducer(done, { type: 'OPEN_MISSIONS' })).toMatchObject({ screen: 'missions', celebrate: 'central', citySelect: 'market' });
+    const why = reducer(done, { type: 'OPEN_WHY' });
+    expect(reducer(why, { type: 'OPEN_MISSIONS' })).toMatchObject({ screen: 'missions', celebrate: 'central', citySelect: 'market' });
+    const result = reducer(why, { type: 'SHOW_RESULT' });
+    expect(reducer(result, { type: 'OPEN_MISSIONS' })).toMatchObject({ screen: 'missions', celebrate: 'central', citySelect: 'market' });
+    expect(reducer(result, { type: 'NEXT_MISSION' })).toMatchObject({ screen: 'missions', celebrate: 'central', citySelect: 'market' });
+  });
+
+  it('OPEN_MISSIONS from the briefing / training / challenge celebrates nothing and pre-selects nothing', () => {
+    const briefing = reducer(openState(), { type: 'SELECT_MISSION', id: 'blind-dispatch' });
+    expect(reducer(briefing, { type: 'OPEN_MISSIONS' })).toMatchObject({ screen: 'missions', celebrate: null, citySelect: null });
+    const challenge = toChallenge('blind-dispatch');
+    expect(reducer(place(challenge, { 4: 'X' }), { type: 'OPEN_MISSIONS' })).toMatchObject({ screen: 'missions', celebrate: null, citySelect: null });
+  });
+
+  it('replaying a solved district: the next district is already solved, so the city pre-selects the district just played', () => {
+    let s = toChallenge('first-alarm', solvedUpTo(2));
+    s = place(s, { 1: 'X' });
+    s = confirmAndFinish(s);
+    s = reducer(s, { type: 'NEXT_MISSION' });
+    expect(s).toMatchObject({ screen: 'missions', celebrate: 'station-row', citySelect: 'station-row' });
+  });
+
+  it('free roam: the next district is pre-selected even when it would otherwise be locked or is solved', () => {
+    let s = toChallenge('first-alarm'); // openState = free roam
+    s = place(s, { 1: 'X' });
+    s = confirmAndFinish(s);
+    expect(reducer(s, { type: 'NEXT_MISSION' })).toMatchObject({ screen: 'missions', celebrate: 'station-row', citySelect: 'bridge' });
+    let m5 = toChallenge('two-kinds-of-trouble'); // districts 1–4 unsolved, free roam on
+    m5 = place(m5, { 1: 'X', 7: 'Z' });
+    m5 = confirmAndFinish(m5);
+    expect(reducer(m5, { type: 'NEXT_MISSION' })).toMatchObject({ screen: 'missions', celebrate: 'market', citySelect: 'old-town' });
+  });
+
+  it('Old Town: completed → summary; not completed → city with Old Town pre-selected', () => {
+    let s = toChallenge('silent-failure');
+    s = place(s, { 0: 'X' }); // optimal, unlucky: completed
+    s = confirmAndFinish(s);
+    expect(s.debrief?.score.completed).toBe(true);
+    expect(reducer(s, { type: 'NEXT_MISSION' })).toMatchObject({ screen: 'summary', celebrate: null, citySelect: null });
+    let bad = toChallenge('silent-failure');
+    bad = place(bad, { 4: 'X' }); // wrong house: still burning, not completed
+    bad = confirmAndFinish(bad);
+    expect(bad.debrief?.score.completed).toBe(false);
+    expect(reducer(bad, { type: 'NEXT_MISSION' })).toMatchObject({ screen: 'missions', celebrate: null, citySelect: 'old-town' });
+  });
+
+  it('the guided first run: Next reveals the city celebrating Rowhouse Lane with Harbor Bridge pre-selected', () => {
+    let s = run(fresh(), { type: 'PLAY' }, { type: 'START_MISSION' }, { type: 'START_CHALLENGE' });
+    s = place(s, { 1: 'X' });
+    s = confirmAndFinish(s);
+    s = reducer(s, { type: 'NEXT_MISSION' });
+    expect(s).toMatchObject({ screen: 'missions', tutorialActive: false, tutorialDone: true, celebrate: 'station-row', citySelect: 'bridge' });
+  });
+
+  it('OPEN_TITLE and the next briefing drop the city state; overlays keep it', () => {
+    let s = toChallenge('first-alarm', solvedUpTo(0));
+    s = place(s, { 1: 'X' });
+    s = run(confirmAndFinish(s), { type: 'NEXT_MISSION' });
+    expect(s.celebrate).toBe('station-row');
+    const settings = reducer(s, { type: 'OPEN_SETTINGS' });
+    expect(settings.celebrate).toBe('station-row');
+    expect(reducer(settings, { type: 'CLOSE_OVERLAY' })).toMatchObject({ screen: 'missions', celebrate: 'station-row', citySelect: 'bridge' });
+    expect(reducer(s, { type: 'OPEN_TITLE' })).toMatchObject({ celebrate: null, citySelect: null });
+    expect(reducer(s, { type: 'SELECT_MISSION', id: 'red-forward-blue-backward' })).toMatchObject({ screen: 'briefing', celebrate: null, citySelect: null });
+  });
+});
+
+describe('Debrief.alternative (computed at commit)', () => {
+  it('true-fire crews when the call was decoder-equivalent and the fires sit elsewhere (mission 5 Z6 vs the true Z7; mission 6 unlucky)', () => {
+    const a = confirmDispatch('two-kinds-of-trouble', { 1: 'X', 6: 'Z' });
+    expect(a.alternative).toEqual({ crews: 'IXIIIIIZI', verdict: 'success', kind: 'true-fires', residual: 'IIIIIIIII', syndromeOfResidual: [0, 0, 0, 0, 0, 0, 0, 0], logicalFlip: { x: [false], z: [false] } });
+    const u = confirmDispatch('silent-failure', { 0: 'X' });
+    expect(u.alternative).toMatchObject({ crews: 'IXXIIIIII', verdict: 'success', kind: 'true-fires', residual: 'IIIIIIIII' });
+  });
+
+  it("decoder crews otherwise: a miss (blind dispatch X5), a lucky guess (mission 6 X1 X2) and the player's own exact call", () => {
+    const miss = confirmDispatch('blind-dispatch', { 5: 'X' });
+    expect(miss.alternative).toMatchObject({ crews: 'IIIIXIIII', verdict: 'success', kind: 'decoder', residual: 'IIIIIIIII' });
+    const lucky = confirmDispatch('silent-failure', { 1: 'X', 2: 'X' });
+    expect(lucky.alternative).toMatchObject({ crews: 'XIIIIIIII', verdict: 'logical-error', kind: 'decoder', residual: 'XXXIIIIII', syndromeOfResidual: [0, 0, 0, 0, 0, 0, 0, 0], logicalFlip: { x: [true], z: [false] } });
+    const exact = confirmDispatch('blind-dispatch', { 4: 'X' });
+    expect(exact.alternative).toMatchObject({ crews: exact.crews, verdict: 'success', kind: 'decoder' });
+  });
+
+  it('bare wires: the alternative is the crews where the fires really ended, evaluated by the engine', () => {
+    const d = confirmDispatch('color-switch', { 0: 'X', 1: 'X' });
+    expect(d.alternative).toEqual({ crews: 'XZ', verdict: 'success', kind: 'decoder', residual: 'II', syndromeOfResidual: [], logicalFlip: { x: [false, false], z: [false, false] } });
+    const ok = confirmDispatch('color-switch', { 0: 'X', 1: 'Z' });
+    expect(ok.alternative).toMatchObject({ crews: 'XZ', kind: 'decoder' });
+  });
+
+  it('is honest: residual = crews ⊕ fires and the verdict is the engine evaluation of that residual', () => {
+    for (const m of listPublicMissions()) {
+      for (const placements of [placementsOf(getMission(m.id).expected.minWeightCorrection), {}, { 0: m.allowed[0] ?? 'X' }]) {
+        const d = confirmDispatch(m.id, placements);
+        const code = getCode(m.code);
+        const alt = d.alternative;
+        const check = evaluate(code, fromString(d.fires), fromString(alt.crews));
+        expect(alt.residual).toBe(toString(check.residual));
+        expect(alt.verdict).toBe(check.kind);
+        expect(alt.syndromeOfResidual).toEqual(syndromeToArray(check.syndrome));
+      }
+    }
+  });
+});
+
+describe('reduced motion never auto-plays', () => {
+  it('REPLAY_AUTO is refused with the action flag, the flag remembered at CONFIRM / OPEN_WHY, or the setting', () => {
+    let s = toChallenge('first-alarm');
+    s = place(s, { 1: 'X' });
+    const reduced = run(reducer(s, { type: 'CONFIRM', reducedMotion: true }), { type: 'DISPATCH_DONE' }, { type: 'OPEN_WHY', reducedMotion: true });
+    expect(reduced.screen).toBe('debrief');
+    expect(reduced.autoPlay).toBe(false);
+    expect(reducer(reduced, { type: 'REPLAY_AUTO', on: true })).toBe(reduced); // remembered flag → no-op
+    const full = run(reducer(s, { type: 'CONFIRM', reducedMotion: false }), { type: 'DISPATCH_DONE' }, { type: 'OPEN_WHY', reducedMotion: false });
+    expect(full.autoPlay).toBe(true);
+    const paused = reducer(full, { type: 'REPLAY_AUTO', on: false });
+    expect(paused.autoPlay).toBe(false);
+    expect(reducer(paused, { type: 'REPLAY_AUTO', on: true }).autoPlay).toBe(true);
+    expect(reducer(paused, { type: 'REPLAY_AUTO', on: true, reducedMotion: true }).autoPlay).toBe(false); // flag on the action
+    const setting = { ...paused, settings: { ...paused.settings, reducedMotion: true } };
+    expect(reducer(setting, { type: 'REPLAY_AUTO', on: true }).autoPlay).toBe(false);
+    // Turning the setting on mid-replay stops a running auto-play.
+    expect(reducer(full, { type: 'SET_REDUCED_MOTION', on: true }).autoPlay).toBe(false);
+    expect(reducer(full, { type: 'SET_REDUCED_MOTION', on: true }).motionReduced).toBe(true);
   });
 });
 

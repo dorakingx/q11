@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { confirmDispatch, getPublicMission, resultType, type CrewLetter } from '../../game';
 import { fromString, support } from '../../quantum';
 import { Scene } from './Scene';
-import { deriveSceneKind, sceneGeometry, houseBox, defaultHouseVariant } from './geometry';
+import { boxesIntersect, crewBox, crewSpot, detectorBox, deriveSceneKind, flameBox, sceneGeometry, houseBox, houseDrawnBox, defaultHouseVariant, TOWER_STRIP } from './geometry';
 
 const RSC3 = getPublicMission('two-kinds-of-trouble');
 
@@ -131,6 +131,43 @@ describe('Scene · keyboard and labels', () => {
     expect(screen.getByRole('img', { name: 'House 0, watched by Z0' })).toBeInTheDocument();
     const group = screen.getByRole('group');
     expect(group.querySelector('[data-house="1"]')?.getAttribute('data-house-state')).toBe('out');
+  });
+
+  it('grid geometry: crews stand in front of their own house, off neighbours and stations; flames stay off neighbouring houses; the tower has its own strip', () => {
+    for (const kind of ['grid', 'houses-row'] as const) {
+      const geo = sceneGeometry(kind, kind === 'grid' ? 'rsc3' : 'rep3');
+      const variants = Array.from({ length: geo.n }, (_, q) => defaultHouseVariant(kind, q));
+      // Art overlap is judged against the drawn buildings (the hit boxes carry extra padding for fingers).
+      const houses = variants.map((v, q) => houseDrawnBox(geo, q, v));
+      for (let q = 0; q < geo.n; q++) {
+        const crew = crewBox(geo, crewSpot(geo, q));
+        const flame = flameBox(geo, q, variants[q] ?? 'small');
+        // inside the board
+        expect(crew.x).toBeGreaterThanOrEqual(0);
+        expect(flame.y).toBeGreaterThanOrEqual(0);
+        houses.forEach((other, j) => {
+          if (j === q) return;
+          expect(boxesIntersect(crew, other), `${kind}: crew of house ${String(q)} overlaps house ${String(j)}`).toBe(false);
+          expect(boxesIntersect(flame, other), `${kind}: flame of house ${String(q)} overlaps house ${String(j)}`).toBe(false);
+        });
+        geo.detectors.forEach((d, i) => expect(boxesIntersect(crew, detectorBox(geo, i)), `${kind}: crew of house ${String(q)} overlaps station ${d.id}`).toBe(false));
+        // The crew stands within its own house's slot (in front of the door), never in a neighbour's column.
+        const own = houseBox(geo, q, variants[q] ?? 'small');
+        expect(crew.x).toBeGreaterThanOrEqual(own.x);
+        expect(crew.x + crew.w).toBeLessThanOrEqual(own.x + own.w);
+      }
+      // The memory beacon stands in the reserved strip to the right of every house and detector.
+      const tower = geo.tower;
+      expect(tower).not.toBeNull();
+      if (tower === null) return;
+      const towerBox = { x: tower.x - 44 * tower.scale, y: tower.y - 200 * tower.scale, w: 88 * tower.scale, h: 200 * tower.scale };
+      houses.forEach((h, j) => expect(boxesIntersect(towerBox, h), `${kind}: tower overlaps house ${String(j)}`).toBe(false));
+      geo.detectors.forEach((d) => expect(d.lamp.x + 20).toBeLessThan(towerBox.x));
+      expect(towerBox.x + towerBox.w).toBeLessThanOrEqual(geo.width);
+      expect(geo.width).toBe((kind === 'grid' ? 400 : 400) + TOWER_STRIP);
+    }
+    // Tall houses (whose flame reaches above the row line) only stand in the top row of the grid.
+    for (let q = 3; q < 9; q++) expect(defaultHouseVariant('grid', q)).not.toBe('tall');
   });
 
   it('every house hit box is at least 48 px at phone width (375 − 2 × 16 gutter) or enlarged by the CSS floor', () => {

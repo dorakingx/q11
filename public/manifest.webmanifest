@@ -1,13 +1,13 @@
 {
   "name": "Q11 — Quantum Emergency Response",
   "short_name": "Q11",
-  "description": "Read the alarms, dispatch the firefighters, protect the logical qubit.",
+  "description": "Read the alarms, send the crews, keep the quantum city safe.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
-  "theme_color": "#0b1a33",
-  "background_color": "#0b1a33",
+  "theme_color": "#dff0ff",
+  "background_color": "#f6efe0",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },

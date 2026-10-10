@@ -16,9 +16,10 @@ main.screen-city {
   overflow-x: clip;
 }
 main.screen-city * { box-sizing: border-box; }
-.screen-city button { font: inherit; color: inherit; cursor: pointer; }
+/* :where() keeps this reset at element specificity so .city-btn / .city-btn-primary set their own font and colour */
+:where(.screen-city) button { font: inherit; color: inherit; cursor: pointer; }
 .screen-city button:focus-visible,
-.screen-city [tabindex]:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.screen-city [tabindex]:focus-visible { outline: 3px solid var(--focus); outline-offset: 0; box-shadow: 0 0 0 6px var(--focus-halo); }
 
 /* ------------------------------------------------------------------ HUD */
 .city-hud {
@@ -36,9 +37,8 @@ main.screen-city * { box-sizing: border-box; }
 @media (min-width: 768px) {
   .city-hud { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'brand stats gear' 'storage storage storage'; }
 }
+.city-brand-group { grid-area: brand; justify-self: start; display: flex; align-items: center; gap: 2px; min-width: 0; }
 .city-brand {
-  grid-area: brand;
-  justify-self: start;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -49,9 +49,10 @@ main.screen-city * { box-sizing: border-box; }
   min-height: var(--tap);
   text-align: left;
 }
-.city-brand-text { display: flex; flex-direction: column; line-height: 1.1; }
-.city-brand-name { font-weight: 800; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--muted); }
-.city-brand-title { margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--ink); }
+.city-brand-name { font-weight: 900; font-size: 1rem; letter-spacing: 0.08em; color: var(--z); }
+.city-brand-title { margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--ink); line-height: 1.1; padding: 2px 6px; border-radius: 8px; }
+.city-brand-title:focus { outline: none; }
+.city-brand-title:focus-visible { outline: 3px solid var(--focus); outline-offset: 0; box-shadow: 0 0 0 6px var(--focus-halo); }
 .city-hud-stats {
   grid-area: stats;
   display: flex;
@@ -85,11 +86,13 @@ main.screen-city * { box-sizing: border-box; }
 .city-badges-empty { color: var(--muted); font-size: 0.85rem; font-weight: 700; }
 .city-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }
 .city-badge svg { display: block; }
+.city-free-roam { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; }
+.city-free-roam-desc { font-size: 0.85rem; font-weight: 700; color: var(--ink-soft); }
 .city-pill {
   display: inline-flex;
   align-items: center;
   background: var(--ok);
-  color: #fff;
+  color: var(--ink);
   border: 2px solid var(--outline);
   border-radius: 999px;
   padding: 4px 10px;
@@ -179,7 +182,9 @@ main.screen-city * { box-sizing: border-box; }
 .city-district.is-locked .city-district-name { color: var(--muted); background: rgba(246, 239, 224, 0.9); }
 .city-district.is-locked .city-district-n { background: var(--muted); }
 .city-district.is-solved .city-district-name { border-color: var(--ok); }
-.city-district.is-solved .city-district-n { background: var(--ok); }
+.city-district.is-solved .city-district-n { background: var(--ok-text); }
+/* the bridge's label sits under the span (above it the smoke plume and the river bank would cover it) */
+.city-district[data-district='bridge'] .city-district-name { top: 100%; transform: translate(-50%, 16%); }
 /* right-edge districts: hug the box's right edge so long (Japanese) names never leave the map */
 .city-district[data-district='market'] .city-district-name,
 .city-district[data-district='old-town'] .city-district-name { left: auto; right: 0; transform: translate(0, -112%); }
@@ -189,6 +194,7 @@ main.screen-city * { box-sizing: border-box; }
   .city-district-name { padding: 2px; font-size: 13px; }
   .city-district[data-district='market'] .city-district-name,
   .city-district[data-district='old-town'] .city-district-name { left: 50%; right: auto; transform: translate(-50%, -112%); }
+  .city-district[data-district='bridge'] .city-district-name { transform: translate(-50%, 10%); }
 }
 
 /* ------------------------------------------------------------------ selection panel */
@@ -221,7 +227,7 @@ main.screen-city * { box-sizing: border-box; }
   background: var(--panel-2);
 }
 .city-status.is-available { background: var(--alarm); color: var(--ink); }
-.city-status.is-solved { background: var(--ok); color: #fff; }
+.city-status.is-solved { background: var(--ok); color: var(--ink); }
 .city-status.is-locked { background: var(--line); color: var(--ink-soft); }
 .city-stars { display: inline-flex; gap: 2px; }
 .city-stars-text { font-size: 0.85rem; color: var(--ink-soft); }
@@ -248,15 +254,17 @@ main.screen-city * { box-sizing: border-box; }
   font-weight: 800;
   font-size: 1rem;
 }
-.city-btn-primary {
+.screen-city .city-btn-primary {
   flex: 1 1 auto;
   min-height: 52px;
   font-size: 1.15rem;
-  background: var(--x);
+  font-weight: 800;
+  background: var(--primary);
   border-color: var(--outline);
   color: #fff;
   box-shadow: 0 3px 0 var(--outline);
 }
+.screen-city .city-btn-primary:hover { background: var(--primary-hover); }
 .city-btn-primary:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--outline); }
 .city-btn-ghost { background: transparent; border-color: var(--line); color: var(--ink-soft); }
 .city-btn[aria-disabled='true'] { opacity: 0.6; }
@@ -277,7 +285,8 @@ main.screen-city * { box-sizing: border-box; }
   }
   .city-panel.is-open .city-panel-inner { padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
   .city-panel.is-open .city-panel-actions { padding-bottom: 4px; }
-  main.screen-city.has-panel { padding-bottom: min(62vh, 520px); }
+  /* the map keeps its room below the sheet: the sheet's measured height (CityScreen sets --city-sheet-h) or the cap */
+  main.screen-city.has-panel { padding-bottom: calc(var(--city-sheet-h, min(62vh, 520px)) + 12px); }
 }
 
 /* ------------------------------------------------------------------ truck travel overlay */
@@ -305,7 +314,9 @@ main.screen-city * { box-sizing: border-box; }
 .city-travel-text { font-weight: 700; }
 
 /* ------------------------------------------------------------------ toasts */
-.city-toast-region { position: fixed; left: 50%; top: 12px; transform: translateX(-50%); z-index: 50; pointer-events: none; max-width: calc(100vw - 32px); }
+/* toasts hang from an empty anchor right under the HUD, so they never cover the stars / badges / settings */
+.city-toast-anchor { position: relative; height: 0; margin-top: -6px; z-index: 30; }
+.city-toast-region { position: absolute; left: 50%; top: 0; transform: translateX(-50%); z-index: 30; pointer-events: none; max-width: calc(100vw - 32px); }
 .city-toast {
   display: inline-flex;
   align-items: center;

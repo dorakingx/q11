@@ -329,9 +329,22 @@ describe('missionCopy', () => {
     expect(enC.detailsTitle).toMatch(/^Details/);
   });
 
-  it('reactionFor maps the four board results to the four reactions', () => {
+  it('reactionFor maps the four board results to the four reactions; a bare-wire prediction miss reuses the "fire left on the wire" line', () => {
     const c = missionCopy('silent-failure', 'en');
     expect(RESULT_TYPES.map((r) => reactionFor(c, r))).toEqual([c.reactions.restored, c.reactions.safePattern, c.reactions.stillBurning, c.reactions.logicalFailure]);
+    const bridge = missionCopy('red-forward-blue-backward', 'en');
+    expect(reactionFor(bridge, 'prediction-miss')).toBe(bridge.reactions.logicalFailure);
+    expect(reactionFor(bridge, 'prediction-miss')).toMatch(/prediction missed/);
+    expect(en['result.type.predictionMiss.title']).toBe('Prediction missed');
+    expect(ja['result.type.predictionMiss.title']).toBe('予想がはずれた');
+    expect(en['result.type.predictionMiss.body']).not.toMatch(/beacon|alarm station|silent/i);
+    // Central District: a blue crew on a red fire makes a Y fire (never "cannot touch").
+    expect(missionCopy('blind-dispatch', 'en').reactions.stillBurning).toMatch(/turns it into a Y fire/);
+    expect(missionCopy('blind-dispatch', 'en').reactions.stillBurning).not.toMatch(/cannot touch/);
+    expect(missionCopy('blind-dispatch', 'ja').reactions.stillBurning).toContain('Y の火');
+    // The summary scopes "single fires are always caught" to the surface-code districts.
+    expect(en['summary.lead']).toMatch(/surface-code districts a single fire is always caught/);
+    expect(ja['summary.lead']).toContain('表面符号の地区');
     expect(reactionFor(c, 'logical-failure')).toMatch(/Investigation complete/);
     expect(reactionFor(missionCopy('silent-failure', 'ja'), 'logical-failure')).toContain('調査完了');
   });
@@ -341,6 +354,9 @@ describe('missionCopy', () => {
     expect(missionCopy('silent-failure', 'en').whyShort).toMatch(/distance 3/);
     expect(missionCopy('silent-failure', 'ja').whyShort).toMatch(/警報だけでは決められない/);
     expect(missionCopy('silent-failure', 'ja').whyShort).toMatch(/距離 3/);
+    // Causality runs the right way: indistinguishable alarms → undecidable; distance 3 → one fire always fixed, two can fool.
+    expect(missionCopy('silent-failure', 'ja').whyShort).not.toMatch(/決められないので、/);
+    expect(missionCopy('silent-failure', 'ja').whyShort).toMatch(/火 1 つまで.*火 2 つ/);
     expect(missionCopy('blind-dispatch', 'en').lessonOneLiner).toBe('Red stations (Z checks) notice red fires; blue stations (X checks) notice blue fires.');
   });
 });

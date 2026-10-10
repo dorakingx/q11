@@ -4,8 +4,8 @@
 export const MISSION_IDS = ['first-alarm', 'red-forward-blue-backward', 'color-switch', 'blind-dispatch', 'two-kinds-of-trouble', 'silent-failure'] as const;
 export type MissionId = (typeof MISSION_IDS)[number];
 
-/** The four board-readable results (docs/UX_REDESIGN.md R9; `resultType()` in src/game/effects.ts). */
-export type ResultType = 'restored' | 'safe-pattern' | 'still-burning' | 'logical-failure';
+/** The four board-readable results (docs/UX_REDESIGN.md R9) plus the bare-wire miss (`resultType()` in src/game/effects.ts). */
+export type ResultType = 'restored' | 'safe-pattern' | 'still-burning' | 'logical-failure' | 'prediction-miss';
 
 /** Two short sentences per result, no blame. */
 export interface Reactions {

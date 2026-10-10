@@ -1,12 +1,15 @@
 /**
- * ResultOverlay — the four readable results (R9) as a card beside/below the scene: big title, the district's
- * reaction line, the one-line quantum-rules note, stars out of max, Why? / Try again / Next and a Details fold.
+ * ResultOverlay — the readable results (R9) as a card beside/below the scene: big title, the district's
+ * reaction line, the result's one-line body, the quantum-rules + one-shot notes, stars out of max, Why? / Try again /
+ * Next and a Details fold. Logical failure adds the memory-beacon line (flip + pattern); a success in a beacon
+ * district says the beacon is steady. A prediction miss (bare wires) has no beacon, no chain and no alarms: it is a
+ * fire left on the wire, nothing more.
  * It is a region whose heading receives focus (tabIndex -1, data-focus-target), not a dialog: the scene behind it
  * stays readable and reachable.
  */
 import { useId, type ReactNode } from 'react';
 import { fromString, support } from '../../quantum';
-import type { Debrief, ResultType } from '../../game';
+import { districtForMission, type Debrief, type ResultType } from '../../game';
 import { CheckMark, Flame, MemoryTower } from '../art';
 import { reactionFor, useT, type MissionCopy } from '../i18n';
 import { RESULT_BODY_KEY, RESULT_TITLE_KEY } from './captions';
@@ -36,7 +39,10 @@ export function ResultOverlay(props: ResultOverlayProps) {
   const anomaly = result === 'logical-failure' ? anomalyLetter(debrief.logicalFlip) : null;
   const starsText = props.maxStars === 1 ? t('result.starsOf.one', { stars: props.stars }) : t('result.starsOf.other', { stars: props.stars, max: props.maxStars });
   const beaconText = anomaly === 'Y' ? t('result.beacon.logicalXZ') : anomaly === 'X' ? t('result.beacon.logicalX') : anomaly === 'Z' ? t('result.beacon.logicalZ') : null;
+  const hasBeacon = districtForMission(debrief.missionId)?.hasBeacon ?? false;
+  const beaconSteady = hasBeacon && (result === 'restored' || result === 'safe-pattern');
   const firstLetter = letterOf(debrief.residual, pattern[0] ?? 0);
+  const flameLetter = firstLetter === 'I' ? 'X' : firstLetter;
   return (
     <section
       className={`result-overlay result-${result}${props.className === undefined ? '' : ` ${props.className}`}`}
@@ -48,8 +54,9 @@ export function ResultOverlay(props: ResultOverlayProps) {
         <span className="result-icon" aria-hidden="true">
           <svg viewBox="-40 -100 80 100" width="56" height="70" focusable="false">
             {result === 'restored' ? <CheckMark x={0} y={-20} scale={1.4} /> : null}
-            {result === 'safe-pattern' ? <Flame letter={firstLetter === 'I' ? 'X' : firstLetter} x={0} y={-4} scale={0.95} ghost /> : null}
-            {result === 'still-burning' ? <Flame letter={firstLetter === 'I' ? 'X' : firstLetter} x={0} y={-4} scale={0.95} residual /> : null}
+            {result === 'safe-pattern' ? <Flame letter={flameLetter} x={0} y={-4} scale={0.95} ghost /> : null}
+            {result === 'still-burning' ? <Flame letter={flameLetter} x={0} y={-4} scale={0.95} residual /> : null}
+            {result === 'prediction-miss' ? <Flame letter={flameLetter} x={0} y={-4} scale={0.95} /> : null}
             {result === 'logical-failure' ? <MemoryTower x={0} y={0} scale={0.5} anomaly={anomaly} /> : null}
           </svg>
         </span>
@@ -78,7 +85,14 @@ export function ResultOverlay(props: ResultOverlayProps) {
           <strong>{beaconText}</strong> {t('result.beacon.pattern', { pattern: debrief.residual })}
         </p>
       ) : null}
-      <p className="result-rules">{t('spray.quantumRules')}</p>
+      {beaconSteady ? (
+        <p className="result-beacon result-beacon-ok" data-testid="result-beacon-ok">
+          {t('result.beacon.ok')}
+        </p>
+      ) : null}
+      <p className="result-rules">
+        {t('spray.quantumRules')} <span className="spray-rules-note">{t('spray.oneShot')}</span>
+      </p>
       <div className="result-actions">
         <button type="button" className="btn" data-testid="result-why" onClick={props.onWhy}>
           {t('dispatch.why')}
@@ -94,6 +108,7 @@ export function ResultOverlay(props: ResultOverlayProps) {
         <summary>{t('details.show')}</summary>
         <div className="result-details-body">
           {result === 'safe-pattern' ? <p>{t('result.type.safePattern.details', { residual: debrief.residual })}</p> : null}
+          {result === 'logical-failure' || hasBeacon ? <p className="muted">{t('result.beacon.note')}</p> : null}
           {props.children}
         </div>
       </details>

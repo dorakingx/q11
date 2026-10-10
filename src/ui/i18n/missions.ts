@@ -46,7 +46,10 @@ export function debriefNarrative(id: string, verdict: VerdictKindKey, lang: Lang
   return lang === 'ja' ? fixtureCopyJa(id).debrief[verdict] : enText;
 }
 
-/** Picks the two-sentence reaction for a board result type (`resultType()` in src/game/effects.ts). */
+/**
+ * Picks the two-sentence reaction for a board result type (`resultType()` in src/game/effects.ts). A prediction miss
+ * only happens on the bare-wire districts, whose `logicalFailure` reaction already describes the fire left on the wire.
+ */
 export function reactionFor(copy: MissionCopy, result: ResultType): string {
   switch (result) {
     case 'restored':
@@ -56,6 +59,7 @@ export function reactionFor(copy: MissionCopy, result: ResultType): string {
     case 'still-burning':
       return copy.reactions.stillBurning;
     case 'logical-failure':
+    case 'prediction-miss':
       return copy.reactions.logicalFailure;
   }
 }

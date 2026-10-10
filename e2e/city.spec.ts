@@ -1,20 +1,37 @@
 /// <reference lib="dom" />
-import { expect, expectNoHorizontalOverflow, openCity, readSave, SAVE_KEY, screenshot, seedSave, stepSprayToEnd, test } from './helpers';
+import { expect, expectNoHorizontalOverflow, expectPrimaryButton, openCity, readSave, SAVE_KEY, screenshot, seedSave, stepSprayToEnd, test } from './helpers';
 
 test('city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district', async ({ page }, info) => {
   await seedSave(page, { progress: { 'first-alarm': { stars: 3, attempts: 1, completed: true } } });
   await openCity(page);
+  // Focus lands on the city heading (outside the brand button, whose name starts with its visible text).
+  await expect(page.locator('main h1')).toHaveText('Quantum City');
+  await expect(page.locator('main h1')).toBeFocused();
+  await expect(page.getByTestId('city-title')).toHaveAccessibleName('Q11 Quantum City — back to title');
+  await expect(page.getByTestId('mission-1')).toHaveAccessibleName('1 Rowhouse Lane — Safe, 3 of 3 stars');
   await expect(page.getByTestId('mission-1')).toHaveAttribute('data-status', 'solved');
   await expect(page.getByTestId('mission-2')).toHaveAttribute('data-status', 'available');
   await expect(page.getByTestId('mission-4')).toHaveAttribute('data-status', 'locked');
-  // Locked: a toast, no navigation.
+  // Locked: a toast naming the next open district (below the HUD), no navigation.
   await page.getByTestId('mission-4').click();
-  await expect(page.getByTestId('toast-locked')).toContainText('Finish Conversion Lab first to open this road.');
+  await expect(page.getByTestId('toast-locked')).toContainText('Districts open in order — Harbor Bridge is next.');
+  const hud = await page.locator('.city-hud').boundingBox();
+  const toast = await page.getByTestId('toast-locked').boundingBox();
+  expect(toast?.y ?? 0).toBeGreaterThanOrEqual((hud?.y ?? 0) + (hud?.height ?? 0) - 1);
   await expect(page.getByTestId('city-panel')).toBeHidden();
-  // Available: panel with the kid goal; Dispatch! → truck travel overlay → Skip → briefing.
+  // Available: panel with the kid goal; Dispatch! is the white-on-red primary; → truck travel overlay → Skip → briefing.
   await page.getByTestId('mission-2').click();
   await expect(page.getByTestId('city-panel')).toBeVisible();
   await expect(page.getByTestId('city-panel')).toContainText('Watch the fire cross the bridge gate');
+  await expectPrimaryButton(page, 'dispatch-go');
+  const goFont = await page.getByTestId('dispatch-go').evaluate((el) => getComputedStyle(el).fontSize);
+  expect(parseFloat(goFont)).toBeCloseTo(18.4, 0);
+  if ((page.viewportSize()?.width ?? 1280) < 1024) {
+    // Phone / tablet bottom sheet: the page reserves the sheet's real height so the map is never covered.
+    const sheet = await page.getByTestId('city-panel').boundingBox();
+    const reserved = await page.evaluate(() => parseFloat(getComputedStyle(document.querySelector('main.screen-city') as HTMLElement).paddingBottom));
+    expect(reserved).toBeGreaterThanOrEqual((sheet?.height ?? 0) - 1);
+  }
   if (info.project.name === 'desktop-chromium') await screenshot(page, 'city-panel-1280x800');
   await page.getByTestId('dispatch-go').click();
   await expect(page.getByTestId('travel-overlay')).toBeVisible();

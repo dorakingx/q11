@@ -2,10 +2,11 @@
  * Dev-only preview of the scene components (scene-preview.html). Not part of the production build.
  * Sections: challenge fog + detector highlight + plan markers · lanes (bridge / lab) · live SprayPlayer for the four
  * scenarios · frozen mid-animation frames · the four ResultOverlays · WhyCompare.
- * Every debrief here comes from the real engine (`confirmDispatch`), every timeline from `buildEffects`.
+ * Every debrief here comes from the real engine through the reducer (CONFIRM), every timeline from `buildEffects`:
+ * like the app, the preview never calls confirmDispatch / revealMission itself.
  */
 import { useMemo, useState, type ReactNode } from 'react';
-import { buildEffects, confirmDispatch, getPublicMission, resultType, type CrewLetter, type Debrief } from '../../game';
+import { DEFAULT_SETTINGS, buildEffects, getPublicMission, initialState, reducer, resultType, type CrewLetter, type Debrief } from '../../game';
 import { fromString, support } from '../../quantum';
 import { LanguageProvider, missionCopy, useT, type Lang } from '../i18n';
 import { ResultOverlay } from './ResultOverlay';
@@ -31,8 +32,19 @@ const SCENARIOS: readonly Scenario[] = [
   { id: 'logical-failure', title: 'Silent failure · X0 (logical failure)', missionId: 'silent-failure', placements: { 0: 'X' } },
 ];
 
+/** Play the scenario through the reducer (free roam, tutorial done) and take the Debrief it committed. */
 function debriefFor(s: Scenario): Debrief {
-  return confirmDispatch(s.missionId, s.placements);
+  let st = initialState({ version: 2, progress: {}, settings: { ...DEFAULT_SETTINGS, freeRoam: true }, tutorialDone: true });
+  st = reducer(st, { type: 'PLAY' });
+  st = reducer(st, { type: 'SELECT_MISSION', id: s.missionId });
+  st = reducer(st, { type: 'START_CHALLENGE' });
+  for (const [q, letter] of Object.entries(s.placements)) {
+    st = reducer(st, { type: 'SELECT_LETTER', letter });
+    st = reducer(st, { type: 'TOGGLE_BLOCK', qubit: Number(q) });
+  }
+  st = reducer(st, { type: 'CONFIRM' });
+  if (st.debrief === null) throw new Error(`preview: ${s.id} did not commit`);
+  return st.debrief;
 }
 
 function qs(): URLSearchParams {
@@ -307,16 +319,8 @@ function WhySection() {
       <label className="preview-check">
         <input type="checkbox" checked={reduced} onChange={(e) => setReduced(e.target.checked)} /> reduced motion
       </label>
-      <WhyCompare key={`a-${String(reduced)}`} codeId={m.code} circuit={m.circuit} mine={d} alternative={{ crews: d.fires, verdict: 'success', label: 'Crews on the true fires' }} reducedMotion={reduced} missionCopy={missionCopy(m.id, 'en')} />
-      <WhyCompare
-        key={`b-${String(reduced)}`}
-        codeId={m6.code}
-        circuit={m6.circuit}
-        mine={d6}
-        alternative={{ crews: d6.whatIf.trueFireCrews ?? d6.fires, verdict: 'success', label: 'Crews on the true fires' }}
-        reducedMotion={reduced}
-        missionCopy={missionCopy(m6.id, 'en')}
-      />
+      <WhyCompare key={`a-${String(reduced)}`} codeId={m.code} circuit={m.circuit} mine={d} reducedMotion={reduced} missionCopy={missionCopy(m.id, 'en')} />
+      <WhyCompare key={`b-${String(reduced)}`} codeId={m6.code} circuit={m6.circuit} mine={d6} reducedMotion={reduced} missionCopy={missionCopy(m6.id, 'en')} />
     </Section>
   );
 }

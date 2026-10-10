@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fromString, getCode, getMission, letterAt, support, syndrome, syndromeToArray, weight } from '../quantum';
-import { buildEffects, EFFECT_TIMING, houseOutcome, logicalPatternSupport, remainingAlarms, resultType, xorLetters, type EffectEvent } from './effects';
+import { buildEffects, CAPTION_HOLD, EFFECT_TIMING, houseOutcome, logicalPatternSupport, remainingAlarms, resultType, xorLetters, type EffectEvent } from './effects';
 import { confirmDispatch } from './machine';
 import { listPublicMissions } from './missions';
 import type { CrewLetter, Debrief } from './types';
@@ -172,9 +172,33 @@ describe('resultType — the four readable results (verdict by stabilizer member
     expect(d.fires).toBe('XZ');
     expect(houseOutcome(d, 0)).toEqual({ kind: 'sprayed', crew: 'X', before: 'X', after: 'I', effect: 'extinguished' });
     expect(houseOutcome(d, 1)).toEqual({ kind: 'sprayed', crew: 'X', before: 'Z', after: 'Y', effect: 'changed' });
-    expect(resultType(d)).toBe('logical-failure'); // bare wires: any leftover acts on the data
+    expect(resultType(d)).toBe('prediction-miss'); // bare wires: any leftover acts on the data, with no alarms and no beacon
     const impacts = buildEffects(d, false).events.filter((e) => e.type === 'impact');
     expect(impacts.map((e) => (e.type === 'impact' ? e.before : null))).toEqual(['X', 'Z']);
+    // spray-start carries the true fire the crew meets, so the frame can lift the fog as the stream starts
+    const sprays = buildEffects(d, false).events.filter((e) => e.type === 'spray-start');
+    expect(sprays.map((e) => (e.type === 'spray-start' ? e.before : null))).toEqual(['X', 'Z']);
+  });
+
+  it("prediction-miss: a miss on bare wires (bridge / lab) is never a 'logical-failure'; the code is looked up by mission id, never from alarms", () => {
+    const bridge = confirmDispatch('red-forward-blue-backward', { 0: 'X', 1: 'Y' }); // true YY → residual ZI
+    expect(bridge.verdict).toBe('logical-error');
+    expect(bridge.residual).toBe('ZI');
+    expect(resultType(bridge)).toBe('prediction-miss');
+    expect(remainingAlarms(bridge)).toEqual([]);
+    const lab = confirmDispatch('color-switch', { 0: 'Z', 1: 'Z' }); // true XZ → residual YI
+    expect(resultType(lab)).toBe('prediction-miss');
+    const standDown = confirmDispatch('red-forward-blue-backward', {});
+    expect(resultType(standDown)).toBe('prediction-miss');
+    // The outcome event carries the same classification.
+    const outcome = buildEffects(bridge, false).events.find((e) => e.type === 'outcome');
+    expect(outcome?.type === 'outcome' ? outcome.result : null).toBe('prediction-miss');
+    // Bare-wire successes keep their surface-code names; grid misses keep theirs.
+    expect(resultType(confirmDispatch('red-forward-blue-backward', { 0: 'Y', 1: 'Y' }))).toBe('restored');
+    expect(resultType(confirmDispatch('silent-failure', { 0: 'X' }))).toBe('logical-failure');
+    expect(resultType(confirmDispatch('blind-dispatch', { 0: 'X' }))).toBe('still-burning');
+    // A debrief whose mission id is unknown is treated as a code with checks (the four surface-code types).
+    expect(resultType({ missionId: 'no-such-mission', verdict: 'logical-error', residual: 'XX' })).toBe('logical-failure');
   });
 
   it('houseOutcome / buildEffects throw if a debrief ever disagreed with before ⊕ crew', () => {
@@ -187,7 +211,7 @@ describe('resultType — the four readable results (verdict by stabilizer member
 });
 
 describe('buildEffects timeline', () => {
-  it('timing: trucks 500 ms, runs staggered 120 ms, spray 300 ms after the run, impact 600 ms after the spray; tail follows the last impact', () => {
+  it('timing: trucks, staggered runs, spray after the run, impact after the spray; the tail starts `hold` after the last impact', () => {
     const d = confirmDispatch('two-kinds-of-trouble', { 1: 'X', 6: 'Z' });
     const tl = buildEffects(d, false);
     const T = EFFECT_TIMING;
@@ -201,20 +225,28 @@ describe('buildEffects timeline', () => {
     const impacts = byType('impact');
     const lastImpact = T.trucks + T.stagger + T.sprayAfterRun + T.spray;
     expect(impacts.map((e) => e.t)).toEqual([T.trucks + T.sprayAfterRun + T.spray, lastImpact]);
+    expect(impacts.every((e) => e.dur === T.impact)).toBe(true);
     const reveal = byType('reveal-remaining')[0];
-    expect(reveal?.t).toBe(lastImpact + T.reveal);
-    expect(byType('alarms')[0]?.t).toBe(lastImpact + 2 * T.reveal);
-    expect(byType('outcome')[0]?.t).toBe(lastImpact + 2 * T.reveal + T.alarms);
-    expect(byType('done')[0]?.t).toBe(lastImpact + 2 * T.reveal + T.alarms + T.outcome);
+    expect(reveal?.t).toBe(lastImpact + T.hold);
+    expect(byType('alarms')[0]?.t).toBe(lastImpact + T.hold + T.reveal);
+    expect(byType('outcome')[0]?.t).toBe(lastImpact + T.hold + T.reveal + T.alarms);
+    expect(byType('done')[0]?.t).toBe(lastImpact + T.hold + T.reveal + T.alarms + T.outcome);
     expect(tl.durationMs).toBe(byType('done')[0]?.t);
-    // Two crews play in well under 3 s.
+    // Two crews play in ≤ 3 s; one crew well under.
     expect(tl.durationMs).toBeLessThanOrEqual(3000);
-    // Chronological order even where the second crew's run starts before the first crew's impact.
+    expect(buildEffects(confirmDispatch('blind-dispatch', { 4: 'X' }), false).durationMs).toBeLessThanOrEqual(2700);
+    // Every impact caption holds ≥ CAPTION_HOLD: impacts are spaced by `stagger` and the tail waits `hold` after the last one.
+    expect(T.stagger).toBeGreaterThanOrEqual(CAPTION_HOLD);
+    expect(T.hold).toBeGreaterThanOrEqual(CAPTION_HOLD);
+    const im = impacts.map((e) => e.t);
+    for (let i = 1; i < im.length; i++) expect((im[i] ?? 0) - (im[i - 1] ?? 0)).toBeGreaterThanOrEqual(CAPTION_HOLD);
+    expect((reveal?.t ?? 0) - (im[im.length - 1] ?? 0)).toBeGreaterThanOrEqual(CAPTION_HOLD);
+    // Chronological order: the second crew starts running after the first crew's stream is on, before its impact.
     expect(types(tl.events)).toEqual([
       'trucks-arrive',
       'crew-run',
-      'crew-run',
       'spray-start',
+      'crew-run',
       'spray-start',
       'impact',
       'impact',
@@ -276,9 +308,10 @@ describe('buildEffects timeline', () => {
         // The outcome shown is the engine's: success ⇔ stabilizer membership; alarms alone never decide it.
         const outcome = tl.events.find((e) => e.type === 'outcome');
         const result = outcome?.type === 'outcome' ? outcome.result : null;
+        const wires = getCode(m.code).checks.length === 0;
         if (d.verdict === 'success') expect(result === 'restored' || result === 'safe-pattern').toBe(true);
-        if (d.verdict === 'detectable') expect(result).toBe('still-burning');
-        if (d.verdict === 'logical-error') expect(result).toBe('logical-failure');
+        if (d.verdict === 'detectable') expect(result).toBe(wires ? 'prediction-miss' : 'still-burning');
+        if (d.verdict === 'logical-error') expect(result).toBe(wires ? 'prediction-miss' : 'logical-failure');
       }
       // The min-weight dispatch of Silent Failure is a logical failure with every alarm quiet: the beacon's case.
       if (m.id === 'silent-failure') {

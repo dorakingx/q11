@@ -113,7 +113,24 @@ export interface WhatIf {
   readonly trueFireCrews: string | null;
 }
 
-/** Full reveal after Confirm. Only exists in the 'debrief' / 'result' screens. */
+/**
+ * The "other way" shown next to the player's spray in the Why? comparison, evaluated by the engine at commit
+ * (so the UI never has to call confirmDispatch / revealMission itself).
+ *   decoder     the minimum-weight dispatch for the public alarms (bare wires: the crews where the fires really ended)
+ *   true-fires  the crews that sit exactly on the propagated true fires (mission 6 style counterfactual)
+ * kind = 'true-fires' when the player's dispatch is decoder-equivalent or successful and the true-fire crews differ
+ * from what the player sent; otherwise 'decoder' (which may equal the player's crews: then they were the smallest call).
+ */
+export interface DebriefAlternative {
+  readonly crews: string;
+  readonly verdict: VerdictKind;
+  readonly kind: 'decoder' | 'true-fires';
+  readonly residual: string;
+  readonly syndromeOfResidual: readonly number[];
+  readonly logicalFlip: { readonly x: readonly boolean[]; readonly z: readonly boolean[] };
+}
+
+/** Full reveal after Confirm. Only exists in the 'dispatch' / 'debrief' / 'result' screens. */
 export interface Debrief {
   readonly missionId: string;
   /** TRUE fire after propagation (what the crews actually met). */
@@ -132,6 +149,8 @@ export interface Debrief {
   readonly narrative: string;
   readonly steps: readonly ReplayStep[];
   readonly whatIf: WhatIf;
+  /** The alternative correction for the Why? comparison, computed by the engine at commit. */
+  readonly alternative: DebriefAlternative;
 }
 
 export interface MissionProgress {
@@ -190,6 +209,15 @@ export interface GameState {
   readonly debrief: Debrief | null;
   /** 'dispatch' screen: the spray timeline has finished (or was skipped) and the result overlay may show. */
   readonly dispatchDone: boolean;
+  /**
+   * The UI's reduced-motion flag as last reported on CONFIRM / OPEN_WHY (OS preference or the setting). While true,
+   * REPLAY_AUTO never starts the timer-driven replay (R12: no timer-based auto-play under reduced motion).
+   */
+  readonly motionReduced: boolean;
+  /** City: district id whose restoration moment + badge toast the city must play (cleared by CELEBRATED). */
+  readonly celebrate: string | null;
+  /** City: district id the map pre-selects on arrival (the next call, or the district just left). */
+  readonly citySelect: string | null;
   /** The guided first run is in progress (PLAY on a fresh save jumps straight into first-alarm). */
   readonly tutorialActive: boolean;
   /** Persisted: the guided first run was completed (success) or skipped. */
@@ -238,10 +266,18 @@ export type Action =
   | { type: 'REPLAY_GOTO'; index: number }
   | { type: 'REPLAY_PREV' }
   | { type: 'REPLAY_NEXT' }
-  | { type: 'REPLAY_AUTO'; on: boolean }
+  /** Auto-play is refused (stays off) under reduced motion: the flag here, the one remembered at CONFIRM / OPEN_WHY, or the setting. */
+  | { type: 'REPLAY_AUTO'; on: boolean; reducedMotion?: boolean }
   | { type: 'SHOW_RESULT' }
   | { type: 'TRY_AGAIN' }
+  /**
+   * Leave a finished dispatch / the debrief / the result for the city: `celebrate` is set when the mission counts as
+   * completed, `citySelect` points at the next district in unlock order when it is open (else the current one).
+   * After a completed Old Town the summary opens instead. Never enters a briefing.
+   */
   | { type: 'NEXT_MISSION' }
+  /** The city finished (or skipped) the restoration moment + badge toast: clears `celebrate`. */
+  | { type: 'CELEBRATED' }
   | { type: 'SET_SOUND'; on: boolean }
   | { type: 'SET_REDUCED_MOTION'; on: boolean }
   | { type: 'SET_LANGUAGE'; language: Language }

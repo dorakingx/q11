@@ -36,7 +36,9 @@ export function staticHouseState(input: StaticStateInput, q: number): HouseState
     const result = input.result;
     if (r !== 'I') {
       if (result === 'safe-pattern') return { kind: 'ghost', letter: r };
-      if (result === 'logical-failure') return { kind: 'fire', letter: r };
+      // Logical failure: the leftover pattern is plain fire (alarms quiet). Prediction miss (bare wires): a plain fire too —
+      // there are no stations, so the "still rings" outline would be a lie.
+      if (result === 'logical-failure' || result === 'prediction-miss') return { kind: 'fire', letter: r };
       return { kind: 'residual', letter: r };
     }
     if (fire !== 'I' || crew !== 'I') return result === null ? { kind: 'out' } : { kind: 'restored' };

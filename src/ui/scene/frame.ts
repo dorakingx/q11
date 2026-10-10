@@ -4,6 +4,11 @@
  * state, the detector bits, where the truck and each firefighter are, how far each hose stream reaches, splashes
  * and the result badge. Every "after" state is read from the timeline events — never recomputed here (R7, R13).
  *
+ * Readability (fog missions): a house's fog lifts the moment its hose stream starts, showing the TRUE fire the crew
+ * is spraying for the whole stream; the splash lands at impact and the after-state follows. Houses nobody sprays
+ * stay fogged until 'reveal-remaining'. The detectors show the true fire's alarms from the first frame and switch
+ * to the residual's alarms at the 'alarms' event.
+ *
  * Reduced motion uses the same function on the reduced timeline (one unit of time per event): the stepper shows
  * `computeFrame(reduced, step + 1, { strict: true })`, i.e. every event up to `step` completed and nothing after.
  */
@@ -38,7 +43,7 @@ export interface SplashFrame {
 
 export interface SceneFrame {
   readonly houses: readonly HouseState[];
-  /** Alarm bits shown on the detectors; null = not read yet (all quiet drawing). */
+  /** Alarm bits shown on the detectors; null = no stations / nothing to show (all quiet drawing). */
   readonly syndrome: readonly number[] | null;
   readonly truck: TruckFrame | null;
   readonly crews: readonly CrewFrame[];
@@ -57,11 +62,13 @@ export interface SceneFrame {
 }
 
 export interface FrameOptions {
-  /** Pre-impact state of every house: fog (dispatch missions) or the propagated true fire (propagation missions). */
+  /** Pre-spray state of every house: fog (dispatch missions) or the propagated true fire (propagation missions). */
   readonly preState: (q: number) => HouseState;
   /** Engine residual letter at q (Debrief.residual): what still burns after every spray. */
   readonly residualAt: (q: number) => PauliLetter;
   readonly n: number;
+  /** Alarm bits of the TRUE fire (Debrief.syndromeOfFires), shown until the 'alarms' event; null/omitted = quiet. */
+  readonly initialSyndrome?: readonly number[] | null;
   /** `strict`: an event with t === time has NOT started (reduced-motion stepper). Default false. */
   readonly strict?: boolean;
 }
@@ -78,7 +85,7 @@ function fireState(letter: PauliLetter): HouseState {
   return letter === 'I' ? { kind: 'normal' } : { kind: 'fire', letter };
 }
 
-/** Fraction of the impact event during which the true "before" fire flashes before the after-state appears. */
+/** Fraction of the impact event during which the splash lands on the still-true fire before the after-state appears. */
 export const IMPACT_FLASH = 0.4;
 
 export function computeFrame(timeline: EffectTimeline, time: number, opts: FrameOptions): SceneFrame {
@@ -90,7 +97,7 @@ export function computeFrame(timeline: EffectTimeline, time: number, opts: Frame
   const streams: StreamFrame[] = [];
   const splashes: SplashFrame[] = [];
   let truck: TruckFrame | null = null;
-  let syndrome: readonly number[] | null = null;
+  let syndrome: readonly number[] | null = opts.initialSyndrome ?? null;
   let outcome: ResultType | null = null;
   let revealed = false;
   let done = false;
@@ -113,6 +120,9 @@ export function computeFrame(timeline: EffectTimeline, time: number, opts: Frame
       case 'spray-start':
         crews.set(e.q, { q: e.q, crew: e.crew, progress: 1, pose: 'spray' });
         streams.push({ q: e.q, progress: p });
+        // The sprayed house drops its fog: the crew (and the player) see the true fire for the whole stream.
+        touched.add(e.q);
+        houses[e.q] = fireState(e.before);
         break;
       case 'impact': {
         touched.add(e.q);

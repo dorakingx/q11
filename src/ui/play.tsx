@@ -4,7 +4,7 @@
  * overlay) and Why? (debrief: your spray vs. the alternative + the step-by-step replay under Details).
  * The Challenge view receives ONLY a PublicMissionView and the live plan — never the true error.
  */
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react';
 import { getCode, fromString, letterAt, syndrome as syndromeOf, syndromeToArray, propagate, toString as pauliToString } from '../quantum';
 import {
   buildEffects,
@@ -26,7 +26,7 @@ import {
 import { debriefNarrative, missionCopy, trainingCaption, useLanguage, useT, type Key } from './i18n';
 import { AlarmList, Details, Dialog, HelmetIcon, Legend, Palette, Stars, TopBar } from './panels';
 import { ResultOverlay, Scene, SprayPlayer, WhyCompare, type SceneOutcome } from './scene';
-import { alarmSummary, fireLabel, outcomeKey, QUALITY_KEY, stepTitle } from './text';
+import { alarmSummary, fireLabel, outcomeKey, QUALITY_KEY, resultActions, stepTitle } from './text';
 
 interface PlayProps {
   readonly state: GameState;
@@ -34,6 +34,33 @@ interface PlayProps {
 }
 
 const SOURCE_KEY: Readonly<Record<CloudResultOk['source'], Key>> = { 'local-simulator': 'cloud.source.local', 'cached-cloud': 'cloud.source.cached', 'live-cloud': 'cloud.source.live' };
+
+/** Phones and tablets (≤1023px): one-column play layout, bottom action bar, tutorial stepper strip. */
+const COMPACT_QUERY = '(max-width: 1023px)';
+
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState<boolean>(() => {
+    try {
+      return globalThis.matchMedia?.(query).matches ?? false;
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    let mq: MediaQueryList | undefined;
+    try {
+      mq = globalThis.matchMedia?.(query);
+    } catch {
+      mq = undefined;
+    }
+    if (mq === undefined) return;
+    const onChange = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq?.removeEventListener('change', onChange);
+  }, [query]);
+  return matches;
+}
+
 
 /* ------------------------------------------------------------------ training */
 
@@ -45,6 +72,11 @@ export function TrainingScreen({ state, dispatch, mission }: PlayProps & { reado
   // Tap-to-predict (R10): on propagation lessons the player taps the house they expect to burn after the next gate
   // BEFORE the step reveals. The reveal is the engine's next frame; the reaction compares the tap with that frame.
   const [prediction, setPrediction] = useState<{ readonly lesson: number; readonly cursor: number; readonly q: number } | null>(null);
+  const reactionRef = useRef<HTMLParagraphElement>(null);
+  // After a prediction tap the reveal is announced AND focused, so keyboard / screen-reader players land on the reaction.
+  useEffect(() => {
+    if (prediction !== null) reactionRef.current?.focus({ preventScroll: true });
+  }, [prediction]);
   const copy = missionCopy(mission.id, lang);
   if (lesson === undefined) return null;
   const code = getCode(mission.code);
@@ -99,7 +131,7 @@ export function TrainingScreen({ state, dispatch, mission }: PlayProps & { reado
             </p>
           ) : null}
           {reaction !== null ? (
-            <p className="predict-reaction" data-testid="predict-reaction" role="status">
+            <p className="predict-reaction" data-testid="predict-reaction" role="status" tabIndex={-1} ref={reactionRef}>
               {reaction}
             </p>
           ) : null}
@@ -112,7 +144,7 @@ export function TrainingScreen({ state, dispatch, mission }: PlayProps & { reado
             {caption}
           </p>
         </section>
-        <aside className="panel">
+        <aside className="panel" aria-label={t('training.lesson')}>
           {code.checks.length > 0 ? <AlarmList codeId={mission.code} syndrome={synd} /> : null}
           <section className="panel-section">
             <h2 className="panel-title">{t('training.lesson')}</h2>
@@ -160,6 +192,12 @@ export interface ChallengeProps {
   readonly dispatch: (a: Action) => void;
 }
 
+const TUTORIAL_STEP_KEY: Readonly<Record<1 | 2 | 3, { readonly title: Key; readonly body: Key }>> = {
+  1: { title: 'tutorial.step1', body: 'tutorial.step1.body' },
+  2: { title: 'tutorial.step2', body: 'tutorial.step2.body' },
+  3: { title: 'tutorial.step3', body: 'tutorial.step3.body' },
+};
+
 function Callout({ step, current, title, body }: { readonly step: 1 | 2 | 3; readonly current: number; readonly title: string; readonly body: string }) {
   const done = step < current;
   const active = step === current;
@@ -176,8 +214,10 @@ function Callout({ step, current, title, body }: { readonly step: 1 | 2 | 3; rea
 }
 
 /**
- * DOM order is alarms → palette → scene → plan → actions (the Tab order); the visual layout (scene left, panel
- * right; scene first on phones) comes from CSS grid areas. The action bar is fixed at the bottom on phones.
+ * Layout. Wide screens (≥1024px): DOM order is alarms → palette → scene → plan → actions (the Tab order); the grid
+ * keeps the scene left and the panels right. In the tutorial the palette comes first so the numbered callouts read
+ * 1 (crew) → 2 (house, under the scene) → 3 (spray) from top to bottom. Compact screens (≤1023px): scene first,
+ * then the crew palette, then the alarms, then the plan; the tutorial callouts form one stepper strip above the scene.
  */
 export function ChallengeScreen({ mission, placements, selected, standDownDialog, highlightedCheck, canUndo, canRedo, tutorialActive, dispatch }: ChallengeProps) {
   const t = useT();
@@ -191,6 +231,7 @@ export function ChallengeScreen({ mission, placements, selected, standDownDialog
   const synd = isWires ? null : mission.syndrome;
   const [crewTapped, setCrewTapped] = useState(false);
   const tutorialStep = !crewTapped ? 1 : used === 0 ? 2 : 3;
+  const compact = useMediaQuery(COMPACT_QUERY);
 
   // Keyboard shortcuts: 1/2/3 select, Backspace recalls the focused house's crew (or clears all), C sprays.
   // Active only while focus is inside this dispatch screen (never from the body, a notice or a dialog).
@@ -231,8 +272,91 @@ export function ChallengeScreen({ mission, placements, selected, standDownDialog
   const startLetters = mission.visibleStart === null ? [] : Array.from(mission.visibleStart).map((l, q) => ({ q, l })).filter((x) => x.l !== 'I');
   const placed = Object.entries(placements).sort(([a], [b]) => Number(a) - Number(b));
 
+  const callout = (step: 1 | 2 | 3) => <Callout step={step} current={tutorialStep} title={t(TUTORIAL_STEP_KEY[step].title)} body={t(TUTORIAL_STEP_KEY[step].body)} />;
+  const alarms = !isWires ? <AlarmList codeId={mission.code} syndrome={synd} compact={getCode(mission.code).checks.length > 4} hint={t('challenge.detector.hint')} /> : null;
+  const palette = (
+    <Palette
+      allowed={mission.allowed}
+      selected={selected}
+      onSelect={(l) => {
+        dispatch({ type: 'SELECT_LETTER', letter: l });
+        setCrewTapped(true);
+      }}
+      callout={tutorialActive && !compact ? callout(1) : undefined}
+    />
+  );
+  const scene = (
+    <Scene
+      codeId={mission.code}
+      circuit={mission.circuit}
+      fires={null}
+      crews={null}
+      placements={placements}
+      residual={null}
+      syndrome={synd}
+      fog={!isWires}
+      interactive
+      onToggle={(q) => dispatch({ type: 'TOGGLE_BLOCK', qubit: q })}
+      selected={selected}
+      budgetReached={budgetReached}
+      highlightedCheck={highlightedCheck}
+      onToggleDetector={isWires ? undefined : (i) => dispatch({ type: 'TOGGLE_DETECTOR_HIGHLIGHT', checkIndex: i })}
+      gateCursor={isWires ? mission.circuit.length : undefined}
+      inputFires={isWires ? mission.visibleStart : null}
+      ariaDescribedBy={descId}
+    />
+  );
+  const caption = (
+    <>
+      <p className="board-caption" id={descId}>
+        {isWires ? t('challenge.startingFire', { fires: startLetters.map((x) => t('challenge.startToken', { letter: x.l, q: x.q })).join(', ') }) : `${t('challenge.fog')} ${alarmSummary(t, mission.code, synd)}`} <span className="muted">{t('challenge.tapHint')}</span>
+      </p>
+      {!isWires && highlightedCheck !== null ? (
+        <p className="muted small" data-testid="detector-watch">
+          {t('challenge.detector.watches', { station: getCode(mission.code).checks[highlightedCheck]?.id ?? '', list: (getCode(mission.code).checks[highlightedCheck]?.qubits ?? []).join(', ') })}
+        </p>
+      ) : null}
+    </>
+  );
+  const plan = (
+    <section className="panel-section plan">
+      <h2 className="panel-title">{t('plan.title')}</h2>
+      <p className="budget" data-testid="budget" aria-live="polite">
+        {t('challenge.crews', { used, budget: mission.budget })}
+        {budgetReached ? <span className="muted"> · {t('challenge.budgetReached')}</span> : null}
+      </p>
+      <ul className="placement-list" aria-label={t('challenge.placed')}>
+        {placed.map(([q, l]) => (
+          <li key={q}>
+            <HelmetIcon letter={l} size={22} /> {t('challenge.placement', { letter: l, q })}
+          </li>
+        ))}
+        {used === 0 ? <li className="muted">{t('plan.empty')}</li> : null}
+      </ul>
+      <p className="muted small">{t('plan.hint')}</p>
+      <div className="plan-tools">
+        <button type="button" className="btn btn-small" onClick={() => dispatch({ type: 'REDO_PLACEMENT' })} disabled={!canRedo} data-testid="redo">
+          {t('plan.redo')}
+        </button>
+        <button type="button" className="btn btn-small" onClick={() => dispatch({ type: 'CLEAR_CREWS' })} disabled={used === 0} data-testid="clear">
+          {t('plan.clear')}
+        </button>
+      </div>
+    </section>
+  );
+  const actions = (
+    <div className="actions action-bar" data-testid="action-bar">
+      <button type="button" className="btn" onClick={() => dispatch({ type: 'UNDO_PLACEMENT' })} disabled={!canUndo} data-testid="undo">
+        {t('plan.undo')}
+      </button>
+      <button type="button" className="btn btn-primary btn-spray" onClick={() => dispatch({ type: 'CONFIRM' })} data-testid="confirm">
+        {t('challenge.spray')}
+      </button>
+    </div>
+  );
+
   return (
-    <main className={`screen screen-play screen-challenge${tutorialActive ? ' is-tutorial' : ''}`} ref={mainRef} data-tutorial={tutorialActive ? 'true' : 'false'}>
+    <main className={`screen screen-play screen-challenge${tutorialActive ? ' is-tutorial' : ''}`} ref={mainRef} data-tutorial={tutorialActive ? 'true' : 'false'} data-layout={compact ? 'compact' : 'wide'}>
       <TopBar
         title={copy.districtName}
         subtitle={isWires ? t('challenge.subtitle.predict') : t('challenge.subtitle.dispatch')}
@@ -249,85 +373,46 @@ export function ChallengeScreen({ mission, placements, selected, standDownDialog
           </button>
         </div>
       ) : null}
-      <div className="play-layout play-layout-challenge">
-        <aside className="panel panel-before">
-          {!isWires ? <AlarmList codeId={mission.code} syndrome={synd} compact={getCode(mission.code).checks.length > 4} hint={t('challenge.detector.hint')} /> : null}
-          <Palette
-            allowed={mission.allowed}
-            selected={selected}
-            onSelect={(l) => {
-              dispatch({ type: 'SELECT_LETTER', letter: l });
-              setCrewTapped(true);
-            }}
-            callout={tutorialActive ? <Callout step={1} current={tutorialStep} title={t('tutorial.step1')} body={t('tutorial.step1.body')} /> : undefined}
-          />
-        </aside>
-        <section className="board-col" aria-label={t('challenge.board')}>
-          {tutorialActive ? <Callout step={2} current={tutorialStep} title={t('tutorial.step2')} body={t('tutorial.step2.body')} /> : null}
-          <Scene
-            codeId={mission.code}
-            circuit={mission.circuit}
-            fires={null}
-            crews={null}
-            placements={placements}
-            residual={null}
-            syndrome={synd}
-            fog={!isWires}
-            interactive
-            onToggle={(q) => dispatch({ type: 'TOGGLE_BLOCK', qubit: q })}
-            selected={selected}
-            budgetReached={budgetReached}
-            highlightedCheck={highlightedCheck}
-            onToggleDetector={isWires ? undefined : (i) => dispatch({ type: 'TOGGLE_DETECTOR_HIGHLIGHT', checkIndex: i })}
-            gateCursor={isWires ? mission.circuit.length : undefined}
-            inputFires={isWires ? mission.visibleStart : null}
-            ariaDescribedBy={descId}
-          />
-          <p className="board-caption" id={descId}>
-            {isWires ? t('challenge.startingFire', { fires: startLetters.map((x) => t('challenge.startToken', { letter: x.l, q: x.q })).join(', ') }) : `${t('challenge.fog')} ${alarmSummary(t, mission.code, synd)}`} <span className="muted">{t('challenge.tapHint')}</span>
-          </p>
-          {!isWires && highlightedCheck !== null ? (
-            <p className="muted small" data-testid="detector-watch">
-              {t('challenge.detector.watches', { station: getCode(mission.code).checks[highlightedCheck]?.id ?? '', list: (getCode(mission.code).checks[highlightedCheck]?.qubits ?? []).join(', ') })}
-            </p>
-          ) : null}
-        </section>
-        <aside className="panel panel-after">
-          <section className="panel-section plan">
-            <h2 className="panel-title">{t('plan.title')}</h2>
-            <p className="budget" data-testid="budget" aria-live="polite">
-              {t('challenge.crews', { used, budget: mission.budget })}
-              {budgetReached ? <span className="muted"> · {t('challenge.budgetReached')}</span> : null}
-            </p>
-            <ul className="placement-list" aria-label={t('challenge.placed')}>
-              {placed.map(([q, l]) => (
-                <li key={q}>
-                  <HelmetIcon letter={l} size={22} /> {t('challenge.placement', { letter: l, q })}
-                </li>
-              ))}
-              {used === 0 ? <li className="muted">{t('plan.empty')}</li> : null}
-            </ul>
-            <p className="muted small">{t('plan.hint')}</p>
-            <div className="plan-tools">
-              <button type="button" className="btn btn-small" onClick={() => dispatch({ type: 'REDO_PLACEMENT' })} disabled={!canRedo} data-testid="redo">
-                {t('plan.redo')}
-              </button>
-              <button type="button" className="btn btn-small" onClick={() => dispatch({ type: 'CLEAR_CREWS' })} disabled={used === 0} data-testid="clear">
-                {t('plan.clear')}
-              </button>
-            </div>
+      {compact ? (
+        <div className="play-layout play-layout-challenge is-compact">
+          <section className="board-col" aria-label={t('challenge.board')}>
+            {tutorialActive ? (
+              <ol className="tutorial-strip" data-testid="tutorial-strip" aria-label={t('a11y.tutorialSteps')}>
+                <li>{callout(1)}</li>
+                <li>{callout(2)}</li>
+                <li>{callout(3)}</li>
+              </ol>
+            ) : null}
+            {scene}
+            {caption}
           </section>
-          {tutorialActive ? <Callout step={3} current={tutorialStep} title={t('tutorial.step3')} body={t('tutorial.step3.body')} /> : null}
-          <div className="actions action-bar" data-testid="action-bar">
-            <button type="button" className="btn" onClick={() => dispatch({ type: 'UNDO_PLACEMENT' })} disabled={!canUndo} data-testid="undo">
-              {t('plan.undo')}
-            </button>
-            <button type="button" className="btn btn-primary btn-spray" onClick={() => dispatch({ type: 'CONFIRM' })} data-testid="confirm">
-              {t('challenge.spray')}
-            </button>
-          </div>
-        </aside>
-      </div>
+          <aside className="panel panel-before" aria-label={t('a11y.alarmsAndCrews')}>
+            {palette}
+            {alarms}
+          </aside>
+          <aside className="panel panel-after" aria-label={t('plan.title')}>
+            {plan}
+            {actions}
+          </aside>
+        </div>
+      ) : (
+        <div className="play-layout play-layout-challenge">
+          <aside className="panel panel-before" aria-label={t('a11y.alarmsAndCrews')}>
+            {tutorialActive ? palette : alarms}
+            {tutorialActive ? alarms : palette}
+          </aside>
+          <section className="board-col" aria-label={t('challenge.board')}>
+            {scene}
+            {tutorialActive ? callout(2) : null}
+            {caption}
+          </section>
+          <aside className="panel panel-after" aria-label={t('plan.title')}>
+            {plan}
+            {tutorialActive ? callout(3) : null}
+            {actions}
+          </aside>
+        </div>
+      )}
       {standDownDialog ? (
         <Dialog title={t('challenge.standDown.title')} confirmLabel={t('challenge.standDown.confirm')} cancelLabel={t('challenge.standDown.cancel')} onConfirm={() => dispatch({ type: 'STAND_DOWN_CONFIRM' })} onCancel={() => dispatch({ type: 'STAND_DOWN_CANCEL' })}>
           <p>{t('challenge.standDown.body')}</p>
@@ -414,15 +499,24 @@ export function DispatchScreen(props: DispatchProps) {
   const timeline = useMemo(() => buildEffects(debrief, reducedMotion), [debrief, reducedMotion]);
   const onDone = useCallback(() => dispatch({ type: 'DISPATCH_DONE' }), [dispatch]);
   const isLast = mission.index === listPublicMissions().length;
-  const nextLabel = state.tutorialActive ? t('result.city') : isLast ? t('result.summary') : t('result.next');
+  const { nextLabel, primary } = resultActions(t, debrief, isLast, state.tutorialActive);
   const isLanes = mission.kind === 'propagation';
+  const hasChecks = getCode(mission.code).checks.length > 0;
   return (
     <main className="screen screen-play screen-dispatch" data-dispatch-done={state.dispatchDone ? 'true' : 'false'}>
       <TopBar title={copy.districtName} subtitle={t('dispatch.subtitle')} onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} />
       {!state.dispatchDone ? (
-        <div className="dispatch-stage">
-          <SprayPlayer key={`${debrief.missionId}:${debrief.crews}:${String(state.progress[mission.id]?.attempts ?? 0)}`} codeId={mission.code} circuit={mission.circuit} debrief={debrief} timeline={timeline} reducedMotion={reducedMotion} onDone={onDone} missionCopy={copy} />
-          <p className="muted small">{t('dispatch.answerCheck.note')}</p>
+        <div className={`dispatch-live${hasChecks ? ' has-alarms' : ''}`} data-testid="dispatch-live">
+          <div className="dispatch-stage">
+            <SprayPlayer key={`${debrief.missionId}:${debrief.crews}:${String(state.progress[mission.id]?.attempts ?? 0)}`} codeId={mission.code} circuit={mission.circuit} debrief={debrief} timeline={timeline} reducedMotion={reducedMotion} onDone={onDone} missionCopy={copy} />
+            <p className="muted small">{t('dispatch.answerCheck.note')}</p>
+          </div>
+          {/* The alarms the player planned against stay in view while the crews spray (public bits, nothing new revealed). */}
+          {hasChecks ? (
+            <aside className="dispatch-alarms" aria-label={t('alarms.title')} data-testid="dispatch-alarms">
+              <AlarmList codeId={mission.code} syndrome={mission.syndrome} compact={getCode(mission.code).checks.length > 4} />
+            </aside>
+          ) : null}
         </div>
       ) : (
         <div className="scene-stage" data-testid="dispatch-result">
@@ -453,6 +547,7 @@ export function DispatchScreen(props: DispatchProps) {
             onRetry={() => dispatch({ type: 'TRY_AGAIN' })}
             onNext={() => dispatch(state.tutorialActive ? { type: 'OPEN_MISSIONS' } : { type: 'NEXT_MISSION' })}
             nextLabel={nextLabel}
+            className={primary === 'retry' ? 'is-primary-retry' : undefined}
           >
             <ResultDetails {...props}>
               <div className="actions">
@@ -484,10 +579,16 @@ export function DebriefScreen(props: DispatchProps) {
   if (step === undefined) return null;
   const last = debrief.steps.length - 1;
   const isLanes = mission.kind === 'propagation';
-  const alternative =
-    debrief.whatIf.trueFireCrews !== null
-      ? { crews: debrief.whatIf.trueFireCrews, verdict: 'success' as const, label: t('why.trueFires') }
-      : { crews: debrief.whatIf.decoderCrews, verdict: debrief.whatIf.decoderVerdict, label: t('why.decoder') };
+  // The alternative correction was computed by the reducer at commit (never confirmDispatch / revealMission here).
+  const alt = debrief.alternative;
+  const alternative = { crews: alt.crews, verdict: alt.verdict, label: alt.kind === 'true-fires' ? t('why.trueFires') : t('why.decoder') };
+  // WhyCompare disables Skip once the clock has finished; keep keyboard focus on the group by moving it to Replay both.
+  const onWhyClick = (e: ReactMouseEvent<HTMLElement>) => {
+    const target = e.target instanceof HTMLElement ? e.target : null;
+    if (target === null || target.closest('[data-testid="why-skip"]') === null) return;
+    const root = e.currentTarget;
+    globalThis.setTimeout(() => root.querySelector<HTMLElement>('[data-testid="why-replay"]')?.focus(), 0);
+  };
   const residualP = fromString(debrief.residual);
   const residualHouses = Array.from({ length: code.n }, (_, q) => q).filter((q) => letterAt(residualP, q) !== 'I');
   const logicalText =
@@ -499,10 +600,11 @@ export function DebriefScreen(props: DispatchProps) {
           ? t('debrief.logical.missed', { houses: residualHouses.join(', ') })
           : t('debrief.logical.flipped', { ops: [debrief.logicalFlip.x.some(Boolean) ? 'X̄' : null, debrief.logicalFlip.z.some(Boolean) ? 'Z̄' : null].filter(Boolean).join(` ${t('common.and')} `) });
   const isLast = mission.index === listPublicMissions().length;
+  const { nextLabel } = resultActions(t, debrief, isLast, state.tutorialActive);
   return (
     <main className="screen screen-play screen-debrief">
       <TopBar title={copy.districtName} subtitle={t('why.title')} onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} />
-      <section className="why-section" aria-labelledby="why-h">
+      <section className="why-section" aria-label={t('why.comparison')} data-testid="why-section" onClick={onWhyClick}>
         <h2 id="why-h" className="section-h" tabIndex={-1} data-focus-target data-testid="why-heading">
           {t('why.title')}
         </h2>
@@ -553,7 +655,7 @@ export function DebriefScreen(props: DispatchProps) {
               </ol>
             </div>
           </section>
-          <aside className="panel">
+          <aside className="panel" aria-label={t('debrief.report')}>
             <section className="panel-section">
               <h2 className="panel-title">{t('debrief.report')}</h2>
               <dl className="facts">
@@ -614,7 +716,7 @@ export function DebriefScreen(props: DispatchProps) {
           {t('debrief.tryAgain')}
         </button>
         <button type="button" className="btn btn-ghost" onClick={() => dispatch(state.tutorialActive ? { type: 'OPEN_MISSIONS' } : { type: 'NEXT_MISSION' })} data-testid="debrief-next">
-          {state.tutorialActive ? t('result.city') : isLast ? t('result.summary') : t('debrief.nextMission')}
+          {nextLabel}
         </button>
       </div>
     </main>

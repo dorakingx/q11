@@ -1,14 +1,14 @@
 [
   {
     "allowed": ["X"],
-    "briefing": "Welcome to dispatch. Three city blocks stand in a row with two alarm stations between them. Our arsonist, Noise, only lights red fires here (X errors). A station rings when exactly one of its two blocks is burning. Read the alarms, then send one red crew.",
+    "briefing": "Welcome to dispatch. Three houses stand in a row with two alarm stations between them. Our arsonist, Noise, only lights red fires here (X errors). A station rings when exactly one of its two houses is burning. Read the alarms, then send one red crew.",
     "budget": 1,
     "challenge": {
       "circuit": [],
       "error": "IXI"
     },
     "code": "rep3",
-    "debrief": {"detectable": "At least one station is still ringing: either the original fire is still burning, or a crew lit a new one on a safe block. Replay the original alarms: both stations rang, and block 1 is the only block they share.", "logical-error": "Every alarm is quiet, yet the pattern left behind is a full logical flip (XXX). A crew sent to a safe block starts a fire of its own, so silence alone never proves safety. Compare your dispatch with the alarms in the replay.", "success": "Both stations rang, and block 1 is the only block they share. Your red crew met the fire head on, and two red flames cancel (X·X = I). The logical qubit is safe."},
+    "debrief": {"detectable": "At least one station is still ringing: either the original fire is still burning, or a crew lit a new one on a safe house. Replay the original alarms: both stations rang, and house 1 is the only house they share.", "logical-error": "Every alarm is quiet, yet the pattern left behind is a full logical flip (XXX). A crew sent to a safe house starts a fire of its own, so silence alone never proves safety. Compare your dispatch with the alarms in the replay.", "success": "Both stations rang, and house 1 is the only house they share. Your red crew met the fire head on, and two red flames cancel (X·X = I). The logical qubit is safe."},
     "expected": {
       "minWeightCorrection": "IXI",
       "minWeightVerdict": "success",
@@ -21,7 +21,7 @@
     "title": "First Alarm",
     "training": [
       {
-        "caption": "A red fire (X) on block 0. Station Z0 watches blocks 0 and 1, sees exactly one fire, and rings. Station Z1 watches blocks 1 and 2, sees none, and stays quiet.",
+        "caption": "A red fire (X) on house 0. Station Z0 watches houses 0 and 1, sees exactly one fire, and rings. Station Z1 watches houses 1 and 2, sees none, and stays quiet.",
         "circuit": [],
         "error": "XII"
       }
@@ -38,7 +38,7 @@
       "error": "XZ"
     },
     "code": "trivial2",
-    "debrief": {"detectable": "This lesson has no alarm stations, so a ringing alarm cannot occur here.", "logical-error": "There are no alarm stations on bare wires, so any fire you missed, or lit by mistake, acts directly on the data. Check both colours on each block: a Y fire needs both a red and a blue component to put it out.", "success": "Red went forward and blue went backward at the same time, so XZ became YY: a red-and-blue fire on both blocks. Your crews matched every component, and nothing remains."},
+    "debrief": {"detectable": "This lesson has no alarm stations, so a ringing alarm cannot occur here.", "logical-error": "There are no alarm stations on bare wires, so any fire you missed, or lit by mistake, acts directly on the data. Check both colours on each house: a Y fire needs both a red and a blue component to put it out.", "success": "Red went forward and blue went backward at the same time, so XZ became YY: a red-and-blue fire on both houses. Your crews matched every component, and nothing remains."},
     "expected": {
       "minWeightCorrection": "YY",
       "minWeightVerdict": "success",
@@ -79,7 +79,7 @@
       "error": "ZI"
     },
     "code": "trivial2",
-    "debrief": {"detectable": "This lesson has no alarm stations, so a ringing alarm cannot occur here.", "logical-error": "One of the fires ended up with a different colour, or on a different block, than you dispatched for. Replay the circuit: H swaps colours only on its own wire, and CNOT copies red forward and blue backward.", "success": "ZI turned into XI at the first Hadamard, copied forward to XX through the CNOT, and the final Hadamard on block 1 turned that copy blue: XZ. You traced the whole path."},
+    "debrief": {"detectable": "This lesson has no alarm stations, so a ringing alarm cannot occur here.", "logical-error": "One of the fires ended up with a different colour, or on a different house, than you dispatched for. Replay the circuit: H swaps colours only on its own wire, and CNOT copies red forward and blue backward.", "success": "ZI turned into XI at the first Hadamard, copied forward to XX through the CNOT, and the final Hadamard on house 1 turned that copy blue: XZ. You traced the whole path."},
     "expected": {
       "minWeightCorrection": "XZ",
       "minWeightVerdict": "success",
@@ -92,7 +92,7 @@
     "title": "Color Switch",
     "training": [
       {
-        "caption": "Colour switch: a Hadamard turns the red fire (X) on block 0 into a blue one (Z). XI becomes ZI.",
+        "caption": "Colour switch: a Hadamard turns the red fire (X) on house 0 into a blue one (Z). XI becomes ZI.",
         "circuit": [
           {"kind": "H", "q": 0}
         ],
@@ -110,14 +110,14 @@
   },
   {
     "allowed": ["X", "Z"],
-    "briefing": "Welcome to the surface code district: nine blocks and eight alarm stations. Red stations (Z checks, diamonds) notice red fires; blue stations (X checks, squares) notice blue fires. This time the fire is hidden. Read the alarms and send one crew.",
+    "briefing": "Welcome to the surface code district: nine houses and eight alarm stations. Red stations (Z checks, diamonds) notice red fires; blue stations (X checks, squares) notice blue fires. This time the fire is hidden. Read the alarms and send one crew.",
     "budget": 1,
     "challenge": {
       "circuit": [],
       "error": "IIIIXIIII"
     },
     "code": "rsc3",
-    "debrief": {"detectable": "Alarms are still ringing. A red crew on a block that was not burning starts a new fire, and a blue crew cannot put out a red fire at all. Match the crew colour to the station type, then find the block that every ringing station shares.", "logical-error": "The alarms went quiet, but the pattern left behind acts as a logical operator on the encoded qubit. With one hidden fire and one crew this cannot happen in this district; Silent Failure shows when it does.", "success": "Stations Z0 and Z1 both rang, and block 4 is the only block they share. One red crew, fire out, logical qubit safe."},
+    "debrief": {"detectable": "Alarms are still ringing. A red crew on a house that was not burning starts a new fire, and a blue crew cannot put out a red fire at all. Match the crew colour to the station type, then find the house that every ringing station shares.", "logical-error": "The alarms went quiet, but the pattern left behind acts as a logical operator on the encoded qubit. With one hidden fire and one crew this cannot happen in this district; Silent Failure shows when it does.", "success": "Stations Z0 and Z1 both rang, and house 4 is the only house they share. One red crew, fire out, logical qubit safe."},
     "expected": {
       "minWeightCorrection": "IIIIXIIII",
       "minWeightVerdict": "success",
@@ -130,7 +130,7 @@
     "title": "Blind Dispatch",
     "training": [
       {
-        "caption": "A red fire (X) on block 0 rings only station Z0, which watches blocks 0, 1, 3 and 4. A fire on block 3 alone would ring exactly the same station, so a crew sent to block 3 is just as good a fix: the two dispatches differ by a stabilizer (the X2 station's own pattern), which the code does not care about.",
+        "caption": "A red fire (X) on house 0 rings only station Z0, which watches houses 0, 1, 3 and 4. A fire on house 3 alone would ring exactly the same station, so a crew sent to house 3 is just as good a fix: the two dispatches differ by a stabilizer (the X2 station's own pattern), which the code does not care about.",
         "circuit": [],
         "error": "XIIIIIIII"
       }
@@ -138,14 +138,14 @@
   },
   {
     "allowed": ["X", "Z"],
-    "briefing": "Two fires this time, and they may be different colours. Red stations only ever notice red fires and blue stations only blue ones, so read the two alarm maps separately. You have two crews of any colour, and each block takes at most one crew.",
+    "briefing": "Two fires this time, and they may be different colours. Red stations only ever notice red fires and blue stations only blue ones, so read the two alarm maps separately. You have two crews of any colour, and each house takes at most one crew.",
     "budget": 2,
     "challenge": {
       "circuit": [],
       "error": "IXIIIIIZI"
     },
     "code": "rsc3",
-    "debrief": {"detectable": "Some stations are still ringing. Remember that a red station never sees a blue fire: solve the red alarms and the blue alarms as two separate puzzles, one crew colour each.", "logical-error": "Every alarm is quiet but the leftover pattern is a logical operator: your crews and the fires together form a chain across the district instead of cancelling. The replay shows where the chain runs.", "success": "Red stations Z0 and Z2 share only block 1. Blue station X1 rang alone, which points at its boundary pair, blocks 6 and 7; a blue crew on either one works, because the two choices differ by a stabilizer. Two colours, two fires, both out."},
+    "debrief": {"detectable": "Some stations are still ringing. Remember that a red station never sees a blue fire: solve the red alarms and the blue alarms as two separate puzzles, one crew colour each.", "logical-error": "Every alarm is quiet but the leftover pattern is a logical operator: your crews and the fires together form a chain across the district instead of cancelling. The replay shows where the chain runs.", "success": "Red stations Z0 and Z2 share only house 1. Blue station X1 rang alone, which points at its boundary pair, houses 6 and 7; a blue crew on either one works, because the two choices differ by a stabilizer. Two colours, two fires, both out."},
     "expected": {
       "minWeightCorrection": "IXIIIIZII",
       "minWeightVerdict": "success",
@@ -167,7 +167,7 @@
       "error": "IXXIIIIII"
     },
     "code": "rsc3",
-    "debrief": {"detectable": "Stations are still ringing, so the smallest silencing crew was not sent. Protocol for a lone Z0 alarm is one red crew on block 0 or block 3 (equivalent choices); replay the alarms and compare.", "logical-error": "That was the optimal call. Only Z0 rang, and the best explanation of one alarm is one fire, on block 0 or block 3 (the two differ by a stabilizer, so either crew is the same call). But Noise lit two fires, on blocks 1 and 2. Your crew plus those two fires form a red chain across the top of the district — X on blocks 0, 1, 2 or the equivalent chain through block 3 — a logical X, which every station sees as an even count and so cannot detect. This code has distance 3: any single fire is always fixed, but two fires can fool any dispatcher, because no alarm pattern justified sending crews to blocks 1 and 2. That is why real machines use bigger codes.", "success": "You put out both fires, on blocks 1 and 2. Honest question: how did you know? The alarms were identical to a single fire on block 0 or block 3, so this was a guess that happened to land. Protocol would still send one crew to block 0 or block 3, and this mission awards one star at most: the alarms alone cannot win it."},
+    "debrief": {"detectable": "Stations are still ringing, so the smallest silencing crew was not sent. Protocol for a lone Z0 alarm is one red crew on house 0 or house 3 (equivalent choices); replay the alarms and compare.", "logical-error": "That was the optimal call. Only Z0 rang, and the best explanation of one alarm is one fire, on house 0 or house 3 (the two differ by a stabilizer, so either crew is the same call). But Noise lit two fires, on houses 1 and 2. Your crew plus those two fires form a red chain across the top of the district — X on houses 0, 1, 2 or the equivalent chain through house 3 — a logical X, which every station sees as an even count and so cannot detect. This code has distance 3: any single fire is always fixed, but two fires can fool any dispatcher, because no alarm pattern justified sending crews to houses 1 and 2. That is why real machines use bigger codes.", "success": "You put out both fires, on houses 1 and 2. Honest question: how did you know? The alarms were identical to a single fire on house 0 or house 3, so this was a guess that happened to land. Protocol would still send one crew to house 0 or house 3, and this mission awards one star at most: the alarms alone cannot win it."},
     "expected": {
       "minWeightCorrection": "XIIIIIIII",
       "minWeightVerdict": "logical-error",

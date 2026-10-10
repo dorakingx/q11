@@ -8,7 +8,8 @@ import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { buildEffects, confirmDispatch, getPublicMission, resultType, type CrewLetter, type Debrief, type EffectTimeline } from '../../game';
 import { fromString, letterAt, support } from '../../quantum';
-import { missionCopy } from '../i18n';
+import { missionCopy, translator } from '../i18n';
+import { announcementAt, captionAt } from './captions';
 import { computeFrame, finalFrame } from './frame';
 import { ResultOverlay } from './ResultOverlay';
 import { Scene } from './Scene';
@@ -31,15 +32,25 @@ function setup(key: keyof typeof CASES, reducedMotion = false): { debrief: Debri
 }
 
 describe('computeFrame · house states follow the timeline', () => {
-  it('blind dispatch correct: fog → flash of the true X → out → restored; fog lifts at reveal; alarms quiet', () => {
+  it('blind dispatch correct: fog → true X shown from the spray start → splash → out → restored; other fog lifts at reveal; alarms live from the start', () => {
     const { debrief, timeline, n } = setup('correct');
     const opts = frameOptionsFor(debrief, n, 'dispatch');
     const impact = timeline.events.find((e) => e.type === 'impact');
-    if (impact?.type !== 'impact') throw new Error('no impact');
+    const spray = timeline.events.find((e) => e.type === 'spray-start');
+    if (impact?.type !== 'impact' || spray?.type !== 'spray-start') throw new Error('no impact / spray');
     expect(impact).toMatchObject({ q: 4, crew: 'X', before: 'X', after: 'I', effect: 'extinguished' });
+    // Before the stream: every house fogged, the detectors already show the TRUE fire's alarms (Z0 and Z1 ring).
+    const start = computeFrame(timeline, spray.t - 1, opts);
+    expect(start.houses.every((h) => h.kind === 'fog')).toBe(true);
+    expect(start.syndrome).toEqual(debrief.syndromeOfFires);
+    expect(start.syndrome).toEqual([1, 1, 0, 0, 0, 0, 0, 0]);
+    // The stream starts: the sprayed house drops its fog and shows the true X for the whole stream; the rest stay fogged.
+    const streaming = computeFrame(timeline, spray.t + 10, opts);
+    expect(streaming.houses[4]).toEqual({ kind: 'fire', letter: 'X' });
+    expect(streaming.houses.filter((h) => h.kind === 'fog')).toHaveLength(8);
+    expect(streaming.syndrome).toEqual(debrief.syndromeOfFires);
     const before = computeFrame(timeline, impact.t - 1, opts);
-    expect(before.houses[4]).toEqual({ kind: 'fog' });
-    expect(before.houses.every((h) => h.kind === 'fog')).toBe(true);
+    expect(before.houses[4]).toEqual({ kind: 'fire', letter: 'X' });
     expect(before.streams).toHaveLength(1);
     expect(before.streams[0]?.progress ?? 0).toBeGreaterThan(0.99);
     const flash = computeFrame(timeline, impact.t + 10, opts);
@@ -55,6 +66,11 @@ describe('computeFrame · house states follow the timeline', () => {
     expect(revealed.houses.filter((h) => h.kind === 'fog')).toHaveLength(0);
     expect(revealed.streams).toHaveLength(0);
     expect(revealed.crews).toEqual([{ q: 4, crew: 'X', progress: 1, pose: 'idle' }]);
+    // The alarms switch to the residual's at the 'alarms' event (not before).
+    const alarms = timeline.events.find((e) => e.type === 'alarms');
+    if (alarms?.type !== 'alarms') throw new Error('no alarms');
+    expect(computeFrame(timeline, alarms.t - 1, opts).syndrome).toEqual(debrief.syndromeOfFires);
+    expect(computeFrame(timeline, alarms.t, opts).syndrome).toEqual(debrief.syndromeOfResidual);
     const end = finalFrame(timeline, opts);
     expect(end.outcome).toBe('restored');
     expect(end.syndrome).toEqual(debrief.syndromeOfResidual);
@@ -71,7 +87,8 @@ describe('computeFrame · house states follow the timeline', () => {
     expect(impact).toMatchObject({ q: 5, before: 'I', after: 'X', effect: 'ignited' });
     const afterImpact = computeFrame(timeline, impact.t + impact.dur - 1, opts);
     expect(afterImpact.houses[5]).toEqual({ kind: 'fire', letter: 'X' });
-    expect(afterImpact.houses[4]).toEqual({ kind: 'fog' });
+    expect(afterImpact.houses[4]).toEqual({ kind: 'fog' }); // never sprayed: fogged until the reveal
+    expect(afterImpact.syndrome).toEqual(debrief.syndromeOfFires);
     const reveal = timeline.events.find((e) => e.type === 'reveal-remaining');
     if (reveal?.type !== 'reveal-remaining') throw new Error('no reveal');
     expect(reveal.qs).toEqual([4]);
@@ -186,11 +203,14 @@ describe('SprayPlayer · clock, captions, onDone', () => {
     expect(screen.getByTestId('spray-caption')).toHaveTextContent('red (X) crew sprays house 4.');
     expect(container.querySelector('.firefighter')?.getAttribute('data-pose')).toBe('spray');
     expect(container.querySelector('.stream')).not.toBeNull();
-    expect(state(4)).toBe('fog');
+    expect(state(4)).toBe('fire'); // the fog lifts as the stream starts: the true X is what the crew sprays
+    expect(state(0)).toBe('fog');
+    // The detectors show the true fire's alarms from the start (not dark).
+    expect(container.querySelectorAll('.detector[data-ringing="true"]')).toHaveLength(2);
     const impact = at('impact');
     tick(impact.t - at('spray-start').t + 20);
-    expect(screen.getByTestId('spray-caption')).toHaveTextContent('Splash!');
-    expect(state(4)).toBe('fire'); // the true letter flashes
+    expect(screen.getByTestId('spray-caption')).toHaveTextContent('Splash! House 4: fire out.');
+    expect(state(4)).toBe('fire'); // the splash lands on the true fire
     expect(container.querySelector('.splash')).not.toBeNull();
     tick(impact.dur * 0.6);
     expect(screen.getByTestId('spray-caption')).toHaveTextContent('House 4: fire out.');
@@ -199,6 +219,7 @@ describe('SprayPlayer · clock, captions, onDone', () => {
     expect(screen.getByTestId('spray-caption')).toHaveTextContent('The alarms read again.');
     expect(state(4)).toBe('restored');
     expect(state(0)).toBe('normal');
+    expect(container.querySelectorAll('.detector[data-ringing="true"]')).toHaveLength(0); // the residual rings nothing
     tick(at('outcome').t - at('alarms').t);
     expect(screen.getByTestId('spray-caption')).toHaveTextContent('Fires out, houses restored');
     expect(onDone).not.toHaveBeenCalled();
@@ -293,7 +314,10 @@ describe('SprayPlayer · clock, captions, onDone', () => {
     expect(state(4)).toBe('restored');
     expect(screen.getByTestId('spray-caption')).toHaveTextContent('House 4: fire out.');
     fireEvent.click(screen.getByTestId('spray-prev'));
-    expect(state(4)).toBe('fog');
+    expect(state(4)).toBe('fire'); // spray complete, impact not yet: the true fire under the stream
+    fireEvent.click(screen.getByTestId('spray-prev'));
+    fireEvent.click(screen.getByTestId('spray-prev'));
+    expect(state(4)).toBe('fog'); // before the stream
     for (let i = 0; i < timeline.events.length; i++) fireEvent.click(screen.getByTestId('spray-next'));
     expect(screen.getByTestId('spray-next')).toBeDisabled();
     expect(onDone).toHaveBeenCalledTimes(1);
@@ -363,20 +387,76 @@ describe('ResultOverlay · four types', () => {
     expect(container.querySelector('.memory-tower')?.getAttribute('data-anomaly')).toBe('X');
     expect(container.querySelector('.logical-chain')).not.toBeNull();
   });
+
+  it('prediction miss (bridge): its own title and body, a plain flame, no beacon line, no chain, faded start badges on the lanes', () => {
+    const debrief = confirmDispatch('red-forward-blue-backward', { 0: 'X', 1: 'Y' }); // true YY → residual ZI
+    const m = getPublicMission(debrief.missionId);
+    const result = resultType(debrief);
+    expect(result).toBe('prediction-miss');
+    const outcome = { result, logicalFlip: debrief.logicalFlip, patternQubits: support(fromString(debrief.residual)), beacon: false };
+    const { container } = render(
+      <div className="scene-stage">
+        <Scene codeId={m.code} circuit={m.circuit} fires={debrief.fires} crews={debrief.crews} residual={debrief.residual} syndrome={debrief.syndromeOfResidual} interactive={false} outcome={outcome} gateCursor={m.circuit.length} inputFires={debrief.startFires} />
+        <ResultOverlay debrief={debrief} result={result} missionCopy={missionCopy(m.id, 'en')} stars={debrief.score.stars} maxStars={debrief.score.maxStars} onWhy={noop} onRetry={noop} onNext={noop} nextLabel="Next district" />
+      </div>,
+    );
+    expect(screen.getByTestId('result-overlay')).toHaveAttribute('data-result', 'prediction-miss');
+    expect(screen.getByTestId('result-title')).toHaveTextContent('Prediction missed');
+    expect(screen.getByText('A fire is still on the wire. Bare wires have no code and no alarms, so every leftover fire acts straight on the information.')).toBeInTheDocument();
+    expect(screen.getByTestId('result-reaction')).toHaveTextContent(missionCopy(m.id, 'en').reactions.logicalFailure);
+    expect(screen.queryByTestId('result-beacon')).toBeNull();
+    expect(screen.queryByTestId('result-beacon-ok')).toBeNull();
+    expect(screen.getByTestId('result-overlay').textContent).not.toMatch(/Silent failure|beacon/i);
+    expect(container.querySelector('.memory-tower')).toBeNull();
+    expect(container.querySelector('.logical-chain')).toBeNull();
+    expect(container.querySelector('[data-house="0"]')?.getAttribute('data-house-state')).toBe('fire');
+    expect(container.querySelector('[data-house="1"]')?.getAttribute('data-house-state')).toBe('restored');
+    // Input tokens become faded "start" badges once the outcome is reached.
+    const starts = container.querySelectorAll('.lane-start');
+    expect(starts).toHaveLength(2);
+    starts.forEach((g) => expect(g.getAttribute('data-faded')).toBe('true'));
+    expect(container.querySelectorAll('.lane-start-badge')).toHaveLength(2);
+    expect(container.querySelector('.lane-start-badge')?.textContent).toBe('start');
+  });
+
+  it('Old Town success: the beacon-steady line and the note; the safe badge sits in the scene header, not over the board', () => {
+    const debrief = confirmDispatch('silent-failure', { 1: 'X', 2: 'X' });
+    const m = getPublicMission(debrief.missionId);
+    const result = resultType(debrief);
+    expect(result).toBe('restored');
+    const { container } = render(
+      <div className="scene-stage">
+        <Scene codeId={m.code} circuit={m.circuit} fires={debrief.fires} crews={debrief.crews} residual={debrief.residual} syndrome={debrief.syndromeOfResidual} interactive={false} outcome={{ result, logicalFlip: debrief.logicalFlip, patternQubits: [], beacon: true }} />
+        <ResultOverlay debrief={debrief} result={result} missionCopy={missionCopy(m.id, 'en')} stars={debrief.score.stars} maxStars={debrief.score.maxStars} onWhy={noop} onRetry={noop} onNext={noop} nextLabel="Next district" />
+      </div>,
+    );
+    expect(screen.getByTestId('result-beacon-ok')).toHaveTextContent('Memory beacon steady: the stored information is intact.');
+    expect(within(screen.getByTestId('result-details')).getByText('The beacon appears only at result time. During play, only the alarms can be read.')).toBeInTheDocument();
+    expect(container.querySelector('.memory-tower')?.getAttribute('data-anomaly')).toBe('none');
+    expect(screen.getByText('Each spray is one correction. Spraying longer or twice does nothing extra.')).toBeInTheDocument();
+    // Safe pattern: the badge lives in the header band above the board.
+    const safe = confirmDispatch('two-kinds-of-trouble', { 1: 'X', 6: 'Z' });
+    const m5 = getPublicMission(safe.missionId);
+    const r2 = render(<Scene codeId={m5.code} circuit={m5.circuit} fires={safe.fires} crews={safe.crews} residual={safe.residual} syndrome={safe.syndromeOfResidual} interactive={false} outcome={{ result: resultType(safe), logicalFlip: safe.logicalFlip, patternQubits: support(fromString(safe.residual)), beacon: false }} />);
+    const header = within(r2.container).getByTestId('scene-header');
+    expect(within(header).getByTestId('badge-safe')).toHaveTextContent('Logical qubit safe');
+    expect(header.nextElementSibling?.classList.contains('scene-board')).toBe(true);
+  });
 });
 
 describe('WhyCompare', () => {
-  it('renders two scenes for the player and the true-fire alternative, with the equivalence caption', () => {
+  it('renders two scenes for the player and the true-fire alternative (from debrief.alternative), with the equivalence caption', () => {
     const { debrief } = setup('twoKinds');
     const m = getPublicMission(debrief.missionId);
-    // The decoder picks the same Z6 as the player here, so the honest alternative is the true-fire dispatch (Z7).
+    // The decoder picks the same Z6 as the player here, so the reducer's alternative is the true-fire dispatch (Z7).
     expect(debrief.whatIf.decoderCrews).toBe(debrief.crews);
-    const { container } = render(
-      <WhyCompare codeId={m.code} circuit={m.circuit} mine={debrief} alternative={{ crews: debrief.fires, verdict: 'success', label: 'decoder' }} reducedMotion missionCopy={missionCopy(m.id, 'en')} />,
-    );
+    expect(debrief.alternative).toMatchObject({ kind: 'true-fires', crews: debrief.fires, verdict: 'success' });
+    const { container } = render(<WhyCompare codeId={m.code} circuit={m.circuit} mine={debrief} reducedMotion missionCopy={missionCopy(m.id, 'en')} />);
     expect(container.querySelectorAll('[data-scene]')).toHaveLength(2);
+    expect(screen.getByTestId('why-compare')).toHaveAttribute('data-alternative', 'true-fires');
+    expect(screen.getByTestId('why-compare')).toHaveAttribute('data-relation', 'equivalent');
     expect(within(screen.getByTestId('why-mine')).getByRole('heading', { name: 'Your spray' })).toBeInTheDocument();
-    expect(within(screen.getByTestId('why-alt')).getByRole('heading', { name: 'The other way · decoder' })).toBeInTheDocument();
+    expect(within(screen.getByTestId('why-alt')).getByRole('heading', { name: 'The other way · Crews on the true fires' })).toBeInTheDocument();
     expect(screen.getByTestId('why-explanation')).toHaveTextContent('differ only by a harmless pattern');
     // one shared stepper drives both scenes
     for (let i = 0; i < 12; i++) fireEvent.click(screen.getByTestId('why-next'));
@@ -386,15 +466,95 @@ describe('WhyCompare', () => {
     expect(houses(screen.getByTestId('why-alt')).filter((s) => s === 'restored')).toHaveLength(2);
   });
 
-  it('silent failure vs the true-fire crews: the alternative is computed honestly by the engine', () => {
+  it('silent failure vs the true-fire crews: undecidable (both residuals ring nothing, verdicts differ) → "alarms alone cannot decide"', () => {
     const { debrief } = setup('silent');
     const m = getPublicMission(debrief.missionId);
-    const alt = debrief.whatIf.trueFireCrews ?? debrief.fires;
-    render(<WhyCompare codeId={m.code} circuit={m.circuit} mine={debrief} alternative={{ crews: alt, verdict: 'success', label: 'true fires' }} reducedMotion={false} missionCopy={missionCopy(m.id, 'en')} />);
+    expect(debrief.alternative).toMatchObject({ kind: 'true-fires', crews: 'IXXIIIIII', verdict: 'success' });
+    render(<WhyCompare codeId={m.code} circuit={m.circuit} mine={debrief} reducedMotion={false} missionCopy={missionCopy(m.id, 'en')} />);
+    expect(screen.getByTestId('why-compare')).toHaveAttribute('data-relation', 'undecidable');
     expect(screen.getByTestId('why-explanation')).toHaveTextContent('Both fire patterns ring exactly the same alarms. Alarms alone cannot decide.');
+    expect(screen.getByTestId('why-explanation')).not.toHaveTextContent('harmless pattern');
     expect(screen.getByText('Nobody could have known from the alarms. That is the lesson, not a mistake.')).toBeInTheDocument();
     expect(within(screen.getByTestId('why-mine')).getByText('→ Silent failure — logical qubit flipped')).toBeInTheDocument();
     expect(within(screen.getByTestId('why-alt')).getByText('→ Logical qubit safe')).toBeInTheDocument();
     expect(screen.getByTestId('why-replay')).toBeInTheDocument();
+  });
+
+  it('a lucky guess (mission 6 X1 X2) compares with the decoder call, which silently fails: undecidable, but no "no blame" line for a success', () => {
+    const debrief = confirmDispatch('silent-failure', { 1: 'X', 2: 'X' });
+    const m = getPublicMission(debrief.missionId);
+    expect(debrief.alternative).toMatchObject({ kind: 'decoder', crews: 'XIIIIIIII', verdict: 'logical-error' });
+    render(<WhyCompare codeId={m.code} circuit={m.circuit} mine={debrief} reducedMotion missionCopy={missionCopy(m.id, 'en')} />);
+    expect(screen.getByTestId('why-compare')).toHaveAttribute('data-relation', 'undecidable');
+    expect(within(screen.getByTestId('why-alt')).getByRole('heading', { name: 'The other way · The smallest crew that silences every alarm' })).toBeInTheDocument();
+    expect(screen.getByTestId('why-explanation')).toHaveTextContent('Alarms alone cannot decide.');
+    expect(screen.queryByText('Nobody could have known from the alarms. That is the lesson, not a mistake.')).toBeNull();
+  });
+
+  it('identical crews (blind dispatch X4): "exactly the smallest correction for these alarms"', () => {
+    const { debrief } = setup('correct');
+    const m = getPublicMission(debrief.missionId);
+    expect(debrief.alternative.crews).toBe(debrief.crews);
+    render(<WhyCompare codeId={m.code} circuit={m.circuit} mine={debrief} reducedMotion missionCopy={missionCopy(m.id, 'en')} />);
+    expect(screen.getByTestId('why-compare')).toHaveAttribute('data-relation', 'identical');
+    expect(screen.getByTestId('why-explanation')).toHaveTextContent('Your spray is exactly the smallest correction for these alarms.');
+  });
+
+  it('a miss with ringing alarms (blind dispatch X5) is neither equivalent nor undecidable: the district why-line explains', () => {
+    const { debrief } = setup('wrong');
+    const m = getPublicMission(debrief.missionId);
+    render(<WhyCompare codeId={m.code} circuit={m.circuit} mine={debrief} reducedMotion missionCopy={missionCopy(m.id, 'en')} />);
+    expect(screen.getByTestId('why-compare')).toHaveAttribute('data-relation', 'other');
+    expect(screen.getByTestId('why-explanation')).toHaveTextContent(missionCopy(m.id, 'en').whyShort);
+  });
+
+  it('bare wires (lab miss): the alternative is "crews where the fires really ended", the verdict reads as a missed prediction', () => {
+    const debrief = confirmDispatch('color-switch', { 0: 'X', 1: 'X' });
+    const m = getPublicMission(debrief.missionId);
+    expect(resultType(debrief)).toBe('prediction-miss');
+    const { container } = render(<WhyCompare codeId={m.code} circuit={m.circuit} mine={debrief} reducedMotion missionCopy={missionCopy(m.id, 'en')} />);
+    expect(within(screen.getByTestId('why-alt')).getByRole('heading', { name: 'The other way · Crews where the fires really ended' })).toBeInTheDocument();
+    expect(within(screen.getByTestId('why-mine')).getByText('→ Prediction missed — fires left on the wires')).toBeInTheDocument();
+    expect(within(screen.getByTestId('why-alt')).getByText('→ Logical qubit safe')).toBeInTheDocument();
+    expect(screen.getByTestId('why-explanation')).toHaveTextContent(missionCopy(m.id, 'en').whyShort);
+    expect(screen.getByTestId('why-explanation')).not.toHaveTextContent('harmless pattern');
+    for (let i = 0; i < 14; i++) fireEvent.click(screen.getByTestId('why-next'));
+    // No beacon, no chain, no alarms on the wires; the leftover Y fire is a plain fire on house 1.
+    expect(container.querySelector('.memory-tower')).toBeNull();
+    expect(container.querySelector('.logical-chain')).toBeNull();
+    expect(container.querySelectorAll('.detector')).toHaveLength(0);
+    expect(within(screen.getByTestId('why-mine')).getByText((_, el) => el?.getAttribute('data-house') === '1' && el.getAttribute('data-house-state') === 'fire')).toBeInTheDocument();
+  });
+
+  it('live regions announce only the trucks, each impact and the outcome; the visible caption narrates everything', () => {
+    const { debrief, timeline } = setup('twoKinds');
+    const t = translator('en');
+    const ctx = { district: 'Market Square', hasChecks: true };
+    const at = (type: string, nth = 0) => {
+      const e = timeline.events.filter((x) => x.type === type)[nth];
+      if (e === undefined) throw new Error(type);
+      return e;
+    };
+    expect(announcementAt(t, timeline, 0, ctx)).toBe('The trucks arrive at Market Square.');
+    expect(captionAt(t, timeline, at('crew-run').t, ctx)).toMatch(/crew runs to house 1/);
+    expect(announcementAt(t, timeline, at('crew-run').t, ctx)).toBe('The trucks arrive at Market Square.');
+    expect(announcementAt(t, timeline, at('spray-start', 1).t, ctx)).toBe('The trucks arrive at Market Square.');
+    expect(announcementAt(t, timeline, at('impact').t, ctx)).toBe('Splash! House 1: fire out.');
+    expect(announcementAt(t, timeline, at('impact', 1).t, ctx)).toBe('Splash! House 6: a blue (Z) fire started. That house was not burning.');
+    expect(announcementAt(t, timeline, at('alarms').t, ctx)).toBe('Splash! House 6: a blue (Z) fire started. That house was not burning.');
+    expect(announcementAt(t, timeline, at('outcome').t, ctx)).toBe('Safe pattern');
+    expect(announcementAt(t, timeline, timeline.durationMs, ctx)).toBe('Safe pattern');
+    expect(captionAt(t, timeline, timeline.durationMs, ctx)).toBe('All crews reported in.');
+    // Each impact caption holds for at least 400 ms before anything replaces it.
+    const i1 = at('impact');
+    for (let dt = 0; dt < 400; dt += 50) expect(captionAt(t, timeline, i1.t + dt, ctx)).toBe('Splash! House 1: fire out.');
+    const i2 = at('impact', 1);
+    for (let dt = 0; dt < 400; dt += 50) expect(captionAt(t, timeline, i2.t + dt, ctx)).toBe('Splash! House 6: a blue (Z) fire started. That house was not burning.');
+    // The rendered player wires them up: the caption is not a live region, the announcer is.
+    const m = getPublicMission(debrief.missionId);
+    render(<SprayPlayer codeId={m.code} circuit={m.circuit} debrief={debrief} timeline={timeline} reducedMotion onDone={() => undefined} missionCopy={missionCopy(m.id, 'en')} />);
+    expect(screen.getByTestId('spray-caption')).not.toHaveAttribute('aria-live');
+    expect(screen.getByTestId('spray-announcer')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getByTestId('spray-announcer')).toHaveTextContent('The trucks arrive at Market Square.');
   });
 });

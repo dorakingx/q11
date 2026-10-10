@@ -1,5 +1,5 @@
 /// <reference lib="dom" />
-import { allBlocksLargeEnough, expect, expectNoHorizontalOverflow, readSave, screenshot, seedSave, serialisedHouses, stepSprayToEnd, test } from './helpers';
+import { allBlocksLargeEnough, expect, expectNoHorizontalOverflow, expectTutorialOrder, readSave, screenshot, seedSave, serialisedHouses, stepSprayToEnd, test } from './helpers';
 
 test('first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge', async ({ page }, info) => {
   await page.goto('/');
@@ -23,13 +23,31 @@ test('first run: Play → tutorial scene → three taps → spray → result →
   for (const h of houses) expect(h).toBe(houses[0]);
   await allBlocksLargeEnough(page);
   await expectNoHorizontalOverflow(page);
+  // The numbered callouts read 1 → 2 → 3 top to bottom at every width; ≤1023px they form one strip above the scene
+  // and the crew palette comes right after the scene (before the alarms).
+  await expectTutorialOrder(page);
+  const compact = (page.viewportSize()?.width ?? 1280) <= 1023;
+  await expect(page.getByTestId('tutorial-strip')).toHaveCount(compact ? 1 : 0);
+  if (compact) {
+    const order = await page.evaluate(() => {
+      const scene = document.querySelector('[data-scene]');
+      const palette = document.querySelector('[data-testid="palette-X"]');
+      const alarms = document.querySelector('[data-check="Z0"]');
+      if (scene === null || palette === null || alarms === null) return 'missing';
+      const after = (a: Element, b: Element) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+      return after(scene, palette) && after(palette, alarms) ? 'scene-palette-alarms' : 'other';
+    });
+    expect(order).toBe('scene-palette-alarms');
+  }
   if (info.project.name === 'desktop-chromium') await screenshot(page, 'tutorial-1280x800');
 
   await page.getByTestId('palette-X').click();
   await expect(page.getByTestId('tutorial-callout-2')).toHaveAttribute('data-active', 'true');
+  await expect(page.getByTestId('tutorial-callout-1')).toHaveAttribute('data-done', 'true');
   await page.getByTestId('block-1').click();
   await expect(page.getByTestId('budget')).toContainText('Crews: 1 / 1');
   await expect(page.getByTestId('tutorial-callout-3')).toHaveAttribute('data-active', 'true');
+  await expectTutorialOrder(page);
   await page.getByTestId('confirm').click();
 
   // Spray showpiece: header, crew runs, stream, then (on skip) the restored result.
@@ -45,6 +63,7 @@ test('first run: Play → tutorial scene → three taps → spray → result →
   await page.getByTestId('result-next').click();
 
   await expect(page.getByTestId('city-map')).toBeVisible();
+  await expect(page.locator('main h1')).toBeFocused();
   await expect(page.getByTestId('toast-badge')).toContainText('Alarm Reader earned!');
   await expect(page.getByTestId('mission-1')).toHaveAttribute('data-status', 'solved');
   await expect(page.getByTestId('mission-2')).toHaveAttribute('data-status', 'available');
@@ -64,6 +83,7 @@ test('skip tutorial lands on the city; Play afterwards goes to the city, not the
   await expect(page.getByTestId('play')).toHaveText('Play');
   await page.getByTestId('play').click();
   await expect(page.getByTestId('city-map')).toBeVisible();
+  await expect(page.locator('main h1')).toBeFocused();
 });
 
 test('mission 1 can be played with the keyboard only', async ({ page }, info) => {
@@ -111,8 +131,13 @@ test('mission 1 can be played with the keyboard only', async ({ page }, info) =>
     visited.push(await page.evaluate(() => (document.activeElement as HTMLElement | null)?.dataset['testid'] ?? ''));
     if (await page.getByTestId('block-0').evaluate((el) => el === document.activeElement)) break;
   }
-  expect(visited.indexOf('palette-X')).toBeGreaterThanOrEqual(0);
-  expect(visited.indexOf('palette-X')).toBeLessThan(visited.indexOf('block-0'));
+  // Wide layout: alarms → palette → scene; compact (≤1023px): scene → palette → alarms, so the chip comes later.
+  if ((page.viewportSize()?.width ?? 1280) >= 1024) {
+    expect(visited.indexOf('palette-X')).toBeGreaterThanOrEqual(0);
+    expect(visited.indexOf('palette-X')).toBeLessThan(visited.indexOf('block-0'));
+  } else {
+    expect(visited).not.toContain('palette-X');
+  }
   expect(visited).not.toContain('confirm');
   await expect(page.getByTestId('block-0')).toBeFocused();
   await page.keyboard.press('ArrowRight');
@@ -139,6 +164,8 @@ test('language toggle EN → JA changes the headings, document.title and <html l
   await seedSave(page, {});
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Quantum Emergency Response');
+  await expect(page.getByTestId('lang-toggle')).toHaveAccessibleName('Language: EN / JA, switch to 日本語');
+  await expect(page.getByTestId('lang-toggle')).toContainText('EN');
   await page.getByTestId('lang-toggle').click();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('クアンタム・エマージェンシー・レスポンス');
   await expect(page).toHaveTitle('Q11 — クアンタム・エマージェンシー・レスポンス');

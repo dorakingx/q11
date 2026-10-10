@@ -251,17 +251,17 @@ export function LangToggle({ language, onChange, testId = 'lang-toggle' }: { rea
       type="button"
       className="lang-pill"
       onClick={() => onChange(other)}
-      aria-label={t('settings.language.switchTo', { lang: LANGUAGE_NAMES[other] })}
+      aria-label={t('a11y.langPill', { lang: LANGUAGE_NAMES[other] })}
       title={t('title.language', { lang: LANGUAGE_NAMES[language] })}
       data-testid={testId}
       data-language={language}
     >
-      <span className={language === 'en' ? 'lang-opt is-on' : 'lang-opt'} aria-hidden="true">
-        EN
+      {/* visible text "EN / JA" comes first in the accessible name ("Language: EN / JA, switch to …") */}
+      <span className={language === 'en' ? 'lang-opt is-on' : 'lang-opt'}>EN</span>
+      <span className="lang-sep" aria-hidden="true">
+        /
       </span>
-      <span className={language === 'ja' ? 'lang-opt is-on' : 'lang-opt'} aria-hidden="true">
-        JA
-      </span>
+      <span className={language === 'ja' ? 'lang-opt is-on' : 'lang-opt'}>JA</span>
     </button>
   );
 }

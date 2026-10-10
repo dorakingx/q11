@@ -2,8 +2,13 @@
  * Scene — the hero board for every code, drawn with the toy-city art (src/ui/art) and controlled by real HTML
  * buttons laid over the SVG (houses `data-testid="block-{q}"`, detectors `data-testid="detector-{id}"`).
  *
- *   houses-row / grid   rep3 / rsc3 houses + detectors (watch lines/tint on tap), beacon tower at result time
- *   bridge / lab        propagation lanes with gates, travelling fire tokens, a time cursor, a house per lane end
+ *   houses-row / grid   rep3 / rsc3 houses + detectors (watch lines/tint on tap); a reserved strip on the right holds
+ *                       the memory beacon tower at result time
+ *   bridge / lab        propagation lanes with gates, travelling fire tokens, a time cursor, a house per lane end;
+ *                       once the outcome is reached the input tokens fade into "start" badges
+ *
+ * Layout: `.scene` (the labelled group) = an optional header band (the "Logical qubit safe" badge) over the
+ * `.scene-board`, which keeps the SVG's aspect ratio and carries the house / detector hit areas.
  *
  * Secrecy (R8): with `fog` every house renders `{ kind: 'fog' }`, the button markup is identical for every house
  * (only the index and the player's own plan markers differ) and the aria label says nothing but "hidden".
@@ -35,6 +40,7 @@ import {
   WatchLines,
   WatchTint,
   nozzleAt,
+  FONT,
   type HouseState,
   type HouseVariant,
 } from '../art';
@@ -175,7 +181,9 @@ export function Scene(props: SceneProps) {
   const anomaly = props.outcome !== undefined && props.outcome.result === 'logical-failure' ? anomalyLetter(props.outcome.logicalFlip) : null;
   const showTower = props.outcome?.beacon === true && geo.tower !== null;
   const chain = props.outcome?.result === 'logical-failure' ? props.outcome.patternQubits : [];
-  const safeBadge = (frame?.outcome ?? result) === 'safe-pattern';
+  const reached = frame?.outcome ?? result;
+  const safeBadge = reached === 'safe-pattern';
+  const layout = kind === 'grid' ? RSC3_SCENE : REP3_SCENE;
 
   // Static crews (plan markers / committed crews) are only drawn when no spray frame is playing.
   const planned = (q: number): CrewLetter | null => props.placements?.[q] ?? null;
@@ -186,7 +194,6 @@ export function Scene(props: SceneProps) {
   return (
     <div
       className={['scene', `scene-${kind}`, `scene-code-${props.codeId}`, props.className ?? ''].filter(Boolean).join(' ')}
-      style={{ aspectRatio: `${String(geo.width)} / ${String(geo.height)}` }}
       role="group"
       aria-label={groupLabel}
       aria-describedby={props.ariaDescribedBy}
@@ -194,138 +201,155 @@ export function Scene(props: SceneProps) {
       data-scene
       data-scene-kind={kind}
     >
-      <svg className="scene-svg" viewBox={`0 0 ${String(geo.width)} ${String(geo.height)}`} aria-hidden="true" focusable="false">
-        {/* floor */}
-        {geo.lanes !== null ? kind === 'lab' ? <LabLanes geometry={geo.lanes} /> : <BridgeLanes geometry={geo.lanes} /> : <SceneGround layout={kind === 'grid' ? RSC3_SCENE : REP3_SCENE} />}
-        {/* lane gates, cursor and tokens */}
-        {geo.lanes !== null ? <LaneContent geo={geo} circuit={props.circuit} cursor={cursor} fires={frame !== undefined ? null : props.fires} inputFires={props.inputFires ?? null} /> : null}
-        {/* watch tint behind the watched houses */}
-        {watched.map((q) => {
-          const h = geo.houses[q];
-          return h === undefined ? null : (
-            <g key={`tint-${String(q)}`} className="watch-tint" data-watch-q={q}>
-              <WatchTint x={h.x} y={h.y} />
+      {/* header band: result badges live here, never over the board */}
+      {safeBadge ? (
+        <div className="scene-header" data-testid="scene-header">
+          <span className="scene-badge scene-badge-safe" data-testid="badge-safe">
+            {t('result.outcome.success')}
+          </span>
+        </div>
+      ) : null}
+      <div className="scene-board" style={{ aspectRatio: `${String(geo.width)} / ${String(geo.height)}` }}>
+        <svg className="scene-svg" viewBox={`0 0 ${String(geo.width)} ${String(geo.height)}`} aria-hidden="true" focusable="false">
+          {/* floor (house scenes: the ground tile plus the reserved tower strip on the right) */}
+          {geo.lanes !== null ? (
+            kind === 'lab' ? (
+              <LabLanes geometry={geo.lanes} />
+            ) : (
+              <BridgeLanes geometry={geo.lanes} />
+            )
+          ) : (
+            <>
+              <rect className="tower-strip" x={layout.width - 24} y={0} width={geo.width - layout.width + 24} height={geo.height} rx={18} fill={ART.sand} />
+              <SceneGround layout={layout} />
+            </>
+          )}
+          {/* lane gates, cursor and tokens */}
+          {geo.lanes !== null ? (
+            <LaneContent geo={geo} circuit={props.circuit} cursor={cursor} fires={frame !== undefined ? null : props.fires} inputFires={props.inputFires ?? null} startFaded={reached !== null} startLabel={t('result.startBadge')} />
+          ) : null}
+          {/* watch tint behind the watched houses */}
+          {watched.map((q) => {
+            const h = geo.houses[q];
+            return h === undefined ? null : (
+              <g key={`tint-${String(q)}`} className="watch-tint" data-watch-q={q}>
+                <WatchTint x={h.x} y={h.y} />
+              </g>
+            );
+          })}
+          {/* truck */}
+          {frame?.truck !== null && frame?.truck !== undefined ? <TruckActor geo={geo} progress={frame.truck.progress} lights={frame.truck.lights} wheelFrame={frame.truck.wheelFrame} /> : null}
+          {/* logical pattern chain connector (behind the houses, visible in the gaps) */}
+          {chain.length > 0 ? <ChainOutline geo={geo} qubits={chain} variants={variants} part="connector" /> : null}
+          {/* houses, drawn top row first so lower rows overlap correctly */}
+          {geo.houses.map((h, q) => (
+            <g key={`house-${String(q)}`} className={`house house-${states[q]?.kind ?? 'normal'}`} data-house={q} data-house-state={states[q]?.kind ?? 'normal'}>
+              <House x={h.x} y={h.y} tint={q} variant={variants[q] ?? 'small'} state={states[q] ?? { kind: 'normal' }} scale={geo.houseScale} />
             </g>
-          );
-        })}
-        {/* truck */}
-        {frame?.truck !== null && frame?.truck !== undefined ? <TruckActor geo={geo} progress={frame.truck.progress} lights={frame.truck.lights} wheelFrame={frame.truck.wheelFrame} /> : null}
-        {/* logical pattern chain connector (behind the houses, visible in the gaps) */}
-        {chain.length > 0 ? <ChainOutline geo={geo} qubits={chain} variants={variants} part="connector" /> : null}
-        {/* houses, drawn top row first so lower rows overlap correctly */}
-        {geo.houses.map((h, q) => (
-          <g key={`house-${String(q)}`} className={`house house-${states[q]?.kind ?? 'normal'}`} data-house={q} data-house-state={states[q]?.kind ?? 'normal'}>
-            <House x={h.x} y={h.y} tint={q} variant={variants[q] ?? 'small'} state={states[q] ?? { kind: 'normal' }} scale={geo.houseScale} />
-          </g>
-        ))}
-        {/* logical pattern chain outlines (logical failure) */}
-        {chain.length > 0 ? <ChainOutline geo={geo} qubits={chain} variants={variants} part="outline" /> : null}
-        {/* committed / planned crews: firefighter idle beside the house (+ chip when planned) */}
-        {geo.houses.map((h, q) => {
-          const c = committed(q);
-          if (c === null) return null;
-          const spot = crewSpot(geo, q);
-          const isPlan = planned(q) !== null;
-          return (
-            <g key={`crew-${String(q)}`} className={isPlan ? 'crew-marker crew-planned' : 'crew-marker'} data-crew-q={q} data-crew={c}>
-              <Firefighter letter={c} pose="idle" facing={spot.facing} x={spot.x} y={spot.y} scale={geo.crewScale} />
-              {isPlan ? <HelmetChip letter={c} x={h.x - (HOUSE_DIMS[variants[q] ?? 'small'].w / 2 - 4) * geo.houseScale} y={h.y - (HOUSE_DIMS[variants[q] ?? 'small'].h + 2) * geo.houseScale} scale={0.45} /> : null}
+          ))}
+          {/* logical pattern chain outlines (logical failure) */}
+          {chain.length > 0 ? <ChainOutline geo={geo} qubits={chain} variants={variants} part="outline" /> : null}
+          {/* committed / planned crews: firefighter idle beside the house (+ chip when planned) */}
+          {geo.houses.map((h, q) => {
+            const c = committed(q);
+            if (c === null) return null;
+            const spot = crewSpot(geo, q);
+            const isPlan = planned(q) !== null;
+            return (
+              <g key={`crew-${String(q)}`} className={isPlan ? 'crew-marker crew-planned' : 'crew-marker'} data-crew-q={q} data-crew={c}>
+                <Firefighter letter={c} pose="idle" facing={spot.facing} x={spot.x} y={spot.y} scale={geo.crewScale} />
+                {isPlan ? <HelmetChip letter={c} x={h.x - (HOUSE_DIMS[variants[q] ?? 'small'].w / 2 - 4) * geo.houseScale} y={h.y - (HOUSE_DIMS[variants[q] ?? 'small'].h + 2) * geo.houseScale} scale={0.45} /> : null}
+              </g>
+            );
+          })}
+          {/* spray actors */}
+          {frame !== undefined ? <SprayActors geo={geo} frame={frame} variants={variants} /> : null}
+          {/* watch lines on top of the houses */}
+          {highlighted !== null && geo.detectors[highlighted] !== undefined ? (
+            <g className="watch-lines">
+              <WatchLines from={geo.detectors[highlighted].lamp} to={watched.map((q) => geo.houses[q]).filter((h): h is NonNullable<typeof h> => h !== undefined)} />
             </g>
-          );
-        })}
-        {/* spray actors */}
-        {frame !== undefined ? <SprayActors geo={geo} frame={frame} variants={variants} /> : null}
-        {/* watch lines on top of the houses */}
-        {highlighted !== null && geo.detectors[highlighted] !== undefined ? (
-          <g className="watch-lines">
-            <WatchLines from={geo.detectors[highlighted].lamp} to={watched.map((q) => geo.houses[q]).filter((h): h is NonNullable<typeof h> => h !== undefined)} />
-          </g>
-        ) : null}
-        {/* detectors */}
-        {geo.detectors.map((d, i) => (
-          <g key={d.id} className={`detector${ringing(i) ? ' is-ringing' : ''}${highlighted === i ? ' is-highlighted' : ''}`} data-detector={d.id} data-ringing={ringing(i) ? 'true' : 'false'}>
-            <Detector type={d.type} x={d.x} y={d.y} ringing={ringing(i)} highlighted={highlighted === i} scale={geo.detectorScale} />
-          </g>
-        ))}
-        {/* memory beacon (result time only) */}
-        {showTower && geo.tower !== null ? (
-          <g className="memory-tower" data-anomaly={anomaly ?? 'none'}>
-            <MemoryTower x={geo.tower.x} y={geo.tower.y} scale={geo.tower.scale} anomaly={anomaly} lit={anomaly === null} />
-          </g>
-        ) : null}
-        {props.children}
-      </svg>
+          ) : null}
+          {/* detectors */}
+          {geo.detectors.map((d, i) => (
+            <g key={d.id} className={`detector${ringing(i) ? ' is-ringing' : ''}${highlighted === i ? ' is-highlighted' : ''}`} data-detector={d.id} data-ringing={ringing(i) ? 'true' : 'false'}>
+              <Detector type={d.type} x={d.x} y={d.y} ringing={ringing(i)} highlighted={highlighted === i} scale={geo.detectorScale} />
+            </g>
+          ))}
+          {/* memory beacon (result time only), in its reserved slot */}
+          {showTower && geo.tower !== null ? (
+            <g className="memory-tower" data-anomaly={anomaly ?? 'none'}>
+              <MemoryTower x={geo.tower.x} y={geo.tower.y} scale={geo.tower.scale} anomaly={anomaly} lit={anomaly === null} />
+            </g>
+          ) : null}
+          {props.children}
+        </svg>
 
-      {/* house buttons */}
-      {geo.houses.map((_, q) => {
-        const box = houseBox(geo, q, variants[q] ?? 'small');
-        const style = {
-          left: `${String((box.x / geo.width) * 100)}%`,
-          top: `${String((box.y / geo.height) * 100)}%`,
-          width: `${String((box.w / geo.width) * 100)}%`,
-          height: `${String((box.h / geo.height) * 100)}%`,
-        };
-        return (
-          <div key={`slot-${String(q)}`} className="house-slot" style={style}>
-            <HouseButton
-              q={q}
-              state={states[q] ?? { kind: 'normal' }}
-              fog={fog}
-              crew={committed(q)}
-              interactive={props.interactive}
-              selected={props.selected}
-              budgetReached={props.budgetReached ?? false}
-              watchers={fog ? [] : code.checks.filter((c) => c.qubits.includes(q)).map((c) => c.id)}
-              onToggle={props.onToggle}
-              onKeyDown={onKeyDown}
-              tapHint={props.tapHint}
-              t={t}
-            />
-          </div>
-        );
-      })}
-
-      {/* detector buttons */}
-      {geo.detectors.map((d, i) => {
-        const check = code.checks[i];
-        if (check === undefined) return null;
-        const r = 16 * geo.detectorScale + 10;
-        const style = {
-          left: `${String(((d.lamp.x - r) / geo.width) * 100)}%`,
-          top: `${String(((d.lamp.y - r) / geo.height) * 100)}%`,
-          width: `${String(((2 * r) / geo.width) * 100)}%`,
-          height: `${String(((2 * r) / geo.height) * 100)}%`,
-        };
-        const list = check.qubits.join(', ');
-        const label = t(ringing(i) ? 'a11y.stationRinging' : 'a11y.stationQuiet', { station: check.id, list });
-        if (props.onToggleDetector === undefined) {
+        {/* house buttons */}
+        {geo.houses.map((_, q) => {
+          const box = houseBox(geo, q, variants[q] ?? 'small');
+          const style = {
+            left: `${String((box.x / geo.width) * 100)}%`,
+            top: `${String((box.y / geo.height) * 100)}%`,
+            width: `${String((box.w / geo.width) * 100)}%`,
+            height: `${String((box.h / geo.height) * 100)}%`,
+          };
           return (
-            <div key={`det-${d.id}`} className="detector-slot" style={style}>
-              <div className="detector-hit" role="img" aria-label={label} data-detector-id={d.id} />
+            <div key={`slot-${String(q)}`} className="house-slot" style={style}>
+              <HouseButton
+                q={q}
+                state={states[q] ?? { kind: 'normal' }}
+                fog={fog}
+                crew={committed(q)}
+                interactive={props.interactive}
+                selected={props.selected}
+                budgetReached={props.budgetReached ?? false}
+                watchers={fog ? [] : code.checks.filter((c) => c.qubits.includes(q)).map((c) => c.id)}
+                onToggle={props.onToggle}
+                onKeyDown={onKeyDown}
+                tapHint={props.tapHint}
+                t={t}
+              />
             </div>
           );
-        }
-        const on = props.onToggleDetector;
-        return (
-          <div key={`det-${d.id}`} className="detector-slot" style={style}>
-            <button
-              type="button"
-              className={`detector-hit${highlighted === i ? ' is-pressed' : ''}`}
-              aria-label={label}
-              aria-pressed={highlighted === i}
-              data-testid={`detector-${d.id}`}
-              data-detector-id={d.id}
-              onClick={() => on(highlighted === i ? null : i)}
-            />
-          </div>
-        );
-      })}
+        })}
 
-      {safeBadge ? (
-        <span className="scene-badge scene-badge-safe" data-testid="badge-safe">
-          {t('result.outcome.success')}
-        </span>
-      ) : null}
+        {/* detector buttons */}
+        {geo.detectors.map((d, i) => {
+          const check = code.checks[i];
+          if (check === undefined) return null;
+          const r = 16 * geo.detectorScale + 10;
+          const style = {
+            left: `${String(((d.lamp.x - r) / geo.width) * 100)}%`,
+            top: `${String(((d.lamp.y - r) / geo.height) * 100)}%`,
+            width: `${String(((2 * r) / geo.width) * 100)}%`,
+            height: `${String(((2 * r) / geo.height) * 100)}%`,
+          };
+          const list = check.qubits.join(', ');
+          const label = t(ringing(i) ? 'a11y.stationRinging' : 'a11y.stationQuiet', { station: check.id, list });
+          if (props.onToggleDetector === undefined) {
+            return (
+              <div key={`det-${d.id}`} className="detector-slot" style={style}>
+                <div className="detector-hit" role="img" aria-label={label} data-detector-id={d.id} />
+              </div>
+            );
+          }
+          const on = props.onToggleDetector;
+          return (
+            <div key={`det-${d.id}`} className="detector-slot" style={style}>
+              <button
+                type="button"
+                className={`detector-hit${highlighted === i ? ' is-pressed' : ''}`}
+                aria-label={label}
+                aria-pressed={highlighted === i}
+                data-testid={`detector-${d.id}`}
+                data-detector-id={d.id}
+                onClick={() => on(highlighted === i ? null : i)}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -413,7 +437,18 @@ function HouseButton({ q, state, fog, crew, interactive, selected, budgetReached
 
 /* ------------------------------------------------------------------ lanes */
 
-function LaneContent({ geo, circuit, cursor, fires, inputFires }: { readonly geo: SceneGeometry; readonly circuit: Circuit; readonly cursor: number; readonly fires: string | null; readonly inputFires: string | null }) {
+interface LaneContentProps {
+  readonly geo: SceneGeometry;
+  readonly circuit: Circuit;
+  readonly cursor: number;
+  readonly fires: string | null;
+  readonly inputFires: string | null;
+  /** Outcome reached: the input tokens fade into "start" badges so they are not mistaken for leftover fires. */
+  readonly startFaded: boolean;
+  readonly startLabel: string;
+}
+
+function LaneContent({ geo, circuit, cursor, fires, inputFires, startFaded, startLabel }: LaneContentProps) {
   const g = geo.lanes;
   if (g === null) return null;
   const steps = circuit.length;
@@ -430,7 +465,17 @@ function LaneContent({ geo, circuit, cursor, fires, inputFires }: { readonly geo
       {!atOutput ? <line className="time-cursor" x1={tokenX} y1={30} x2={tokenX} y2={g.height - 40} stroke={ART.alarm} strokeWidth={2.5} strokeDasharray="8 6" /> : null}
       {Array.from({ length: g.lanes }, (_, q) => {
         const l = tokenAt(inputFires, q);
-        return l === null ? null : <LaneToken key={`in-${String(q)}`} letter={l} x={g.inX} y={g.laneY(q) - 6} />;
+        if (l === null) return null;
+        return (
+          <g key={`in-${String(q)}`} className={startFaded ? 'lane-start is-faded' : 'lane-start'} data-start-q={q} data-faded={startFaded ? 'true' : 'false'} opacity={startFaded ? 0.45 : 1}>
+            <LaneToken letter={l} x={g.inX} y={g.laneY(q) - 6} />
+            {startFaded ? (
+              <text className="lane-start-badge" x={g.inX} y={g.laneY(q) + 22} textAnchor="middle" fontSize={11} fontWeight={800} fill={ART.inkSoft} fontFamily={FONT} style={{ userSelect: 'none' }}>
+                {startLabel}
+              </text>
+            ) : null}
+          </g>
+        );
       })}
       {!atOutput
         ? Array.from({ length: g.lanes }, (_, q) => {
@@ -545,4 +590,3 @@ function SprayActors({ geo, frame, variants }: { readonly geo: SceneGeometry; re
     </g>
   );
 }
-

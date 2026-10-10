@@ -76,7 +76,9 @@ export const HOUSE_DIMS: Readonly<Record<HouseVariant, { readonly w: number; rea
 export function defaultHouseVariant(kind: SceneKind, q: number): HouseVariant {
   if (kind === 'bridge' || kind === 'lab') return 'small';
   if (kind === 'houses-row') return q === 1 ? 'tall' : 'small';
-  const cycle: readonly HouseVariant[] = ['small', 'shop', 'small', 'tall', 'small', 'small', 'small', 'tall', 'shop'];
+  // Tall houses only in the top row: their roof flame reaches ~27 units above the row line and would overlap the
+  // house in front; a shop is wide, so it sits in the middle column where the street gaps on both sides are free.
+  const cycle: readonly HouseVariant[] = ['tall', 'small', 'tall', 'small', 'shop', 'small', 'small', 'shop', 'small'];
   return cycle[q] ?? 'small';
 }
 
@@ -90,8 +92,12 @@ export function deriveSceneKind(codeId: CodeId, circuit: Circuit): SceneKind {
 const HOUSE_SCALE = 0.85;
 const DETECTOR_SCALE = 0.8;
 const CREW_SCALE = 0.55;
+/** Grid crews stand in the narrow street beside their house, so they are drawn a little smaller. */
+const GRID_CREW_SCALE = 0.5;
 const TRUCK_SCALE = 0.6;
 const LANE_HOUSE_SCALE = 0.6;
+/** Extra ground on the right of the house scenes: a reserved slot for the memory beacon (never crammed into a corner). */
+export const TOWER_STRIP = 64;
 
 function laneBoard(n: number): LaneGeometry {
   const width = 620;
@@ -116,7 +122,7 @@ export function sceneGeometry(kind: SceneKind, codeId: CodeId): SceneGeometry {
     return {
       kind,
       codeId,
-      width: layout.width,
+      width: layout.width + TOWER_STRIP,
       height: layout.height,
       n,
       houses,
@@ -124,8 +130,9 @@ export function sceneGeometry(kind: SceneKind, codeId: CodeId): SceneGeometry {
       detectors: layout.detectors,
       detectorScale: DETECTOR_SCALE,
       truck: { from: { x: -80, y: layout.height - 6 }, stop: { x: 62, y: layout.height - 6 }, facing: 1, scale: TRUCK_SCALE },
-      crewScale: CREW_SCALE,
-      tower: kind === 'grid' ? { x: 368, y: 108, scale: 0.52 } : { x: 368, y: 96, scale: 0.45 },
+      crewScale: kind === 'grid' ? GRID_CREW_SCALE : CREW_SCALE,
+      // The tower stands in the reserved strip, on the ground line of the bottom row, clear of houses and detectors.
+      tower: { x: layout.width + TOWER_STRIP / 2, y: layout.height - 24, scale: 0.5 },
       lanes: null,
     };
   }
@@ -167,11 +174,53 @@ export function houseBox(geo: SceneGeometry, q: number, variant: HouseVariant): 
   };
 }
 
-/** Where a firefighter stands to spray house q (front-left, on the footpath, clear of the detector lamps). */
+/** Extents of the drawn building itself (front face + side face, wall + roof), without the hit-box padding. */
+export function houseDrawnBox(geo: SceneGeometry, q: number, variant: HouseVariant): Box {
+  const h = houseAt(geo, q);
+  const d = HOUSE_DIMS[variant];
+  const s = geo.houseScale;
+  return { x: h.x - (d.w / 2) * s, y: h.y - d.h * s, w: (d.w + d.side) * s, h: d.h * s };
+}
+
+/**
+ * Where a firefighter stands to spray house q: on the footpath in front of the house's door (front-left), inside the
+ * house's own footprint, so the crew never stands on a neighbouring roof or on an alarm station (the stations sit at
+ * the street crossings between houses). Grid crews are drawn smaller and the tall houses stay in the top row, so the
+ * spot is clear of the row in front as well (checked by the geometry test). Lanes: beside the house on the deck.
+ */
 export function crewSpot(geo: SceneGeometry, q: number): CrewSpot {
   const h = houseAt(geo, q);
   if (geo.lanes !== null) return { x: h.x - 44, y: h.y + 4, facing: 1 };
   return { x: h.x - 20, y: h.y + 22, facing: 1 };
+}
+
+/** Approximate drawn extents of an alarm station (lamp ±14 around its centre down to the pole base). */
+export function detectorBox(geo: SceneGeometry, index: number): Box {
+  const d = geo.detectors[index];
+  if (d === undefined) throw new Error(`scene: no detector ${String(index)}`);
+  const r = 18 * geo.detectorScale;
+  return { x: d.lamp.x - r, y: d.lamp.y - r, w: 2 * r, h: d.y - d.lamp.y + r };
+}
+
+/** Approximate drawn extents of a firefighter standing at `spot` (helmet brim ±17, 80 tall at scale 1). */
+export function crewBox(geo: SceneGeometry, spot: CrewSpot): Box {
+  const s = geo.crewScale;
+  return { x: spot.x - 17 * s, y: spot.y - 80 * s, w: 34 * s, h: 80 * s };
+}
+
+/** Approximate drawn extents of the roof flame of house q (the Flame part is 92 tall × ±38 wide at scale 0.62 inside the house). */
+export function flameBox(geo: SceneGeometry, q: number, variant: HouseVariant): Box {
+  const h = houseAt(geo, q);
+  const d = HOUSE_DIMS[variant];
+  const s = geo.houseScale;
+  const flameScale = 0.62 * s;
+  const base = h.y + (-d.h + 14) * s;
+  const dx = variant === 'shop' ? -10 * s : 0;
+  return { x: h.x + dx - 38 * flameScale, y: base - 92 * flameScale, w: 76 * flameScale, h: 92 * flameScale };
+}
+
+export function boxesIntersect(a: Box, b: Box): boolean {
+  return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
 }
 
 /** Where the hose stream lands: the lower half of the roof flame. */

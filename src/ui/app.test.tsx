@@ -124,8 +124,14 @@ describe('App · returning player', () => {
     expect(screen.getByTestId('result')).toHaveTextContent('Flawless dispatch');
     expect(screen.getByTestId('result-attempts')).toHaveTextContent('1');
     await u.click(screen.getByTestId('next-mission'));
-    expect(await screen.findByTestId('briefing')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Harbor Bridge');
+    // Next district returns to the city: the solved district celebrates (badge toast) and the next one is pre-selected.
+    expect(await screen.findByTestId('city-map')).toBeInTheDocument();
+    expect(screen.getByTestId('toast-badge')).toHaveTextContent('Alarm Reader earned!');
+    expect(screen.getByTestId('mission-1')).toHaveAttribute('data-status', 'solved');
+    expect(screen.getByTestId('city-panel')).toBeVisible();
+    expect(within(screen.getByTestId('city-panel')).getByRole('heading', { name: 'Harbor Bridge' })).toBeInTheDocument();
+    expect(screen.getByTestId('mission-2')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveFocus();
     const saved = JSON.parse(localStorage.getItem(SAVE_KEY) ?? '{}') as { version: number; progress: Record<string, { attempts: number }> };
     expect(saved.version).toBe(2);
     expect(saved.progress['first-alarm']?.attempts).toBe(1);

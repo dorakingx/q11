@@ -10,6 +10,7 @@ import { initialState, type Action, type GameState, type MissionProgress, type S
 import { DISTRICT_ORDER } from '../art';
 import { LanguageProvider } from '../i18n';
 import { CityScreen, RESTORE_MS, TRAVEL_MS, badgeKey, statusesOf } from './index';
+import { TOAST_MS } from './geometry';
 
 const solved = (stars: StarCount): MissionProgress => ({ stars, attempts: 1, completed: true });
 
@@ -23,18 +24,30 @@ interface Opts {
   readonly recentlySolved?: string | null;
   readonly reducedMotion?: boolean;
   readonly lang?: 'en' | 'ja';
+  readonly initialSelected?: string | null;
 }
 
-function renderCity({ state = stateWith(), recentlySolved = null, reducedMotion, lang = 'en' }: Opts = {}) {
+function renderCity({ state = stateWith(), recentlySolved = null, reducedMotion, lang = 'en', initialSelected = null }: Opts = {}) {
   const dispatch = vi.fn<(a: Action) => void>();
   const onSettings = vi.fn();
   const onTitle = vi.fn();
+  const onCelebrated = vi.fn();
   const utils = render(
     <LanguageProvider language={lang}>
-      <CityScreen state={state} dispatch={dispatch} storageNote="Progress is saved in this browser." recentlySolved={recentlySolved} onSettings={onSettings} onTitle={onTitle} {...(reducedMotion === undefined ? {} : { reducedMotion })} />
+      <CityScreen
+        state={state}
+        dispatch={dispatch}
+        storageNote="Progress is saved in this browser."
+        recentlySolved={recentlySolved}
+        initialSelected={initialSelected}
+        onCelebrated={onCelebrated}
+        onSettings={onSettings}
+        onTitle={onTitle}
+        {...(reducedMotion === undefined ? {} : { reducedMotion })}
+      />
     </LanguageProvider>,
   );
-  return { ...utils, dispatch, onSettings, onTitle };
+  return { ...utils, dispatch, onSettings, onTitle, onCelebrated };
 }
 
 const selectMissions = (dispatch: ReturnType<typeof vi.fn>) => dispatch.mock.calls.filter((c) => (c[0] as Action).type === 'SELECT_MISSION');
@@ -66,11 +79,11 @@ describe('CityScreen — districts', () => {
       expect(b).toHaveAttribute('data-district', DISTRICT_ORDER[i]);
     });
     expect(screen.getByTestId('mission-1')).toHaveAttribute('data-status', 'solved');
-    expect(screen.getByTestId('mission-1')).toHaveAccessibleName('Mission 1: Rowhouse Lane, Safe, 3 of 3 stars');
+    expect(screen.getByTestId('mission-1')).toHaveAccessibleName('1 Rowhouse Lane — Safe, 3 of 3 stars');
     expect(screen.getByTestId('mission-2')).toHaveAttribute('data-status', 'available');
-    expect(screen.getByTestId('mission-2')).toHaveAccessibleName('Mission 2: Harbor Bridge, Fire reported, not played yet, up to 3 stars');
+    expect(screen.getByTestId('mission-2')).toHaveAccessibleName('2 Harbor Bridge — Fire reported, not played yet, up to 3 stars');
     expect(screen.getByTestId('mission-3')).toHaveAttribute('data-status', 'locked');
-    expect(screen.getByTestId('mission-3')).toHaveAccessibleName(/^Mission 3: Conversion Lab, Locked, /);
+    expect(screen.getByTestId('mission-3')).toHaveAccessibleName(/^3 Conversion Lab — Locked, /);
     expect(screen.getByTestId('mission-6')).toHaveAccessibleName(/up to 1 star$/);
     // the backdrop mirrors the statuses
     expect(map.querySelector('[data-district="station-row"][data-state="solved"]')).not.toBeNull();
@@ -80,20 +93,21 @@ describe('CityScreen — districts', () => {
     expect(screen.getByTestId('mission-3')).toHaveFocus();
   });
 
-  it('free roam opens every district and shows the indicator', () => {
+  it('free roam opens every district and shows the indicator with a visible explanation', () => {
     renderCity({ state: stateWith({}, true) });
     expect(screen.getByTestId('free-roam')).toHaveTextContent('Free roam');
+    expect(screen.getByTestId('free-roam')).toHaveTextContent('every district is open');
     for (let i = 1; i <= 6; i++) expect(screen.getByTestId(`mission-${String(i)}`)).toHaveAttribute('data-status', 'available');
     expect(statusesOf({}, true)['old-town']).toBe('available');
   });
 
-  it('a locked district shows the "finish the previous district" toast and does not dispatch or select', async () => {
+  it('a locked district shows the "districts open in order" toast naming the next open district, and does not dispatch or select', async () => {
     const user = userEvent.setup();
-    const { dispatch } = renderCity();
-    await user.click(screen.getByTestId('mission-3'));
+    const { dispatch } = renderCity({ state: stateWith({ 'first-alarm': solved(3) }) });
+    await user.click(screen.getByTestId('mission-4'));
     const region = screen.getByTestId('city-toast-region');
     expect(region).toHaveAttribute('role', 'status');
-    expect(within(region).getByTestId('toast-locked')).toHaveTextContent('Finish Harbor Bridge first to open this road.');
+    expect(within(region).getByTestId('toast-locked')).toHaveTextContent('Districts open in order — Harbor Bridge is next.');
     expect(dispatch).not.toHaveBeenCalled();
     expect(screen.getByTestId('city-panel')).not.toBeVisible();
   });
@@ -127,6 +141,18 @@ describe('CityScreen — districts', () => {
     expect(screen.getByTestId('mission-1')).toHaveFocus();
   });
 
+  it('initialSelected opens the panel on that district at mount without moving focus; a locked id is ignored', () => {
+    const { unmount } = renderCity({ state: stateWith({ 'first-alarm': solved(3) }), initialSelected: 'bridge' });
+    expect(screen.getByTestId('city-panel')).toBeVisible();
+    expect(within(screen.getByTestId('city-panel')).getByRole('heading', { name: 'Harbor Bridge' })).toBeInTheDocument();
+    expect(screen.getByTestId('mission-2')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('mission-2')).toHaveAttribute('data-status', 'available');
+    expect(within(screen.getByTestId('city-panel')).getByRole('heading', { name: 'Harbor Bridge' })).not.toHaveFocus();
+    unmount();
+    renderCity({ initialSelected: 'lab' });
+    expect(screen.getByTestId('city-panel')).not.toBeVisible();
+  });
+
   it('keyboard: Enter selects, arrows move between districts, Escape closes the panel', async () => {
     const user = userEvent.setup();
     renderCity();
@@ -148,7 +174,10 @@ describe('CityScreen — HUD', () => {
     const user = userEvent.setup();
     const { onSettings, onTitle } = renderCity({ state: stateWith({ 'first-alarm': solved(3), 'red-forward-blue-backward': solved(2) }) });
     expect(screen.getByTestId('city-stars')).toHaveTextContent('5 of 16 stars');
-    expect(screen.getByRole('heading', { level: 1, name: 'Quantum City' })).toBeInTheDocument();
+    const h1 = screen.getByRole('heading', { level: 1, name: 'Quantum City' });
+    expect(h1).toHaveAttribute('data-focus-target');
+    expect(h1.closest('button')).toBeNull(); // the heading is a focus target of its own, not part of the brand button
+    expect(screen.getByTestId('city-title')).toHaveAccessibleName('Q11 Quantum City — back to title');
     const badges = screen.getByTestId('city-badges');
     expect(within(badges).getByText('Alarm Reader')).toBeInTheDocument();
     expect(within(badges).getByText('Gate Tracker')).toBeInTheDocument();
@@ -164,7 +193,7 @@ describe('CityScreen — HUD', () => {
   it('speaks Japanese when the provider says so', () => {
     renderCity({ lang: 'ja' });
     expect(screen.getByRole('heading', { level: 1, name: '量子の街' })).toBeInTheDocument();
-    expect(screen.getByTestId('mission-1')).toHaveAccessibleName(/^ミッション 1：長屋通り \(Rowhouse Lane\)、火事発生、/);
+    expect(screen.getByTestId('mission-1')).toHaveAccessibleName(/^1 長屋通り \(Rowhouse Lane\) — 火事発生、/);
   });
 });
 
@@ -278,33 +307,84 @@ describe('CityScreen — dispatch travel', () => {
 describe('CityScreen — restoration moment', () => {
   beforeEach(stubAnimation);
 
-  it('recentlySolved shows the badge toast (aria-live) and the smoke-clears effect, which ends by itself', () => {
-    renderCity({ state: stateWith({ 'first-alarm': solved(3) }), recentlySolved: 'station-row' });
+  it('recentlySolved shows the badge toast (aria-live, below the HUD) and the smoke-clears effect; onCelebrated fires once both are over', () => {
+    const { onCelebrated } = renderCity({ state: stateWith({ 'first-alarm': solved(3) }), recentlySolved: 'station-row' });
     const region = screen.getByTestId('city-toast-region');
     expect(region).toHaveAttribute('aria-live', 'polite');
     expect(within(region).getByTestId('toast-badge')).toHaveTextContent('Alarm Reader earned!');
+    // DOM order: HUD, then the toast anchor, then the map — the toast can never sit over the stars / settings.
+    const hud = document.querySelector('.city-hud');
+    expect(hud).not.toBeNull();
+    expect((hud?.compareDocumentPosition(region) ?? 0) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByTestId('restore-fx')).toBeInTheDocument();
     act(() => {
       vi.advanceTimersByTime(RESTORE_MS + 50);
     });
     expect(screen.queryByTestId('restore-fx')).toBeNull();
     expect(screen.getByTestId('city-map').querySelector('[data-district="station-row"][data-state="solved"]')).not.toBeNull();
+    expect(onCelebrated).not.toHaveBeenCalled(); // the toast is still up
+    act(() => {
+      vi.advanceTimersByTime(TOAST_MS);
+    });
+    expect(screen.queryByTestId('toast-badge')).toBeNull();
+    expect(onCelebrated).toHaveBeenCalledTimes(1);
+    act(() => {
+      vi.advanceTimersByTime(TOAST_MS);
+    });
+    expect(onCelebrated).toHaveBeenCalledTimes(1);
   });
 
-  it('is skippable by a tap on the map and static under reduced motion', () => {
+  it('the moment keeps playing after the parent clears recentlySolved (App clears `celebrate` on CELEBRATED)', () => {
+    const state = stateWith({ 'first-alarm': solved(3) });
+    const dispatch = vi.fn<(a: Action) => void>();
+    const { rerender } = render(
+      <LanguageProvider language="en">
+        <CityScreen state={state} dispatch={dispatch} storageNote="" recentlySolved="station-row" onSettings={vi.fn()} onTitle={vi.fn()} />
+      </LanguageProvider>,
+    );
+    expect(screen.getByTestId('restore-fx')).toBeInTheDocument();
+    rerender(
+      <LanguageProvider language="en">
+        <CityScreen state={state} dispatch={dispatch} storageNote="" recentlySolved={null} onSettings={vi.fn()} onTitle={vi.fn()} />
+      </LanguageProvider>,
+    );
+    expect(screen.getByTestId('restore-fx')).toBeInTheDocument();
+    expect(screen.getByTestId('toast-badge')).toBeInTheDocument();
+  });
+
+  it('is skippable by a tap on the map (which also reports the celebration) and static under reduced motion', () => {
     const a = renderCity({ state: stateWith({ 'first-alarm': solved(3) }), recentlySolved: 'station-row' });
     fireEvent.pointerDown(screen.getByTestId('city-map').firstElementChild as Element);
     expect(screen.queryByTestId('restore-fx')).toBeNull();
+    expect(screen.queryByTestId('toast-badge')).toBeNull();
+    expect(a.onCelebrated).toHaveBeenCalledTimes(1);
     a.unmount();
-    renderCity({ state: stateWith({ 'first-alarm': solved(3) }), recentlySolved: 'station-row', reducedMotion: true });
+    expect(a.onCelebrated).toHaveBeenCalledTimes(1);
+    const b = renderCity({ state: stateWith({ 'first-alarm': solved(3) }), recentlySolved: 'station-row', reducedMotion: true });
     expect(screen.queryByTestId('restore-fx')).toBeNull();
     expect(screen.getByTestId('toast-badge')).toHaveTextContent('Alarm Reader earned!');
+    expect(b.onCelebrated).not.toHaveBeenCalled();
+    act(() => {
+      vi.advanceTimersByTime(TOAST_MS + 50);
+    });
+    expect(b.onCelebrated).toHaveBeenCalledTimes(1);
   });
 
-  it('ignores a recentlySolved id that is not actually solved', () => {
-    renderCity({ recentlySolved: 'station-row' });
+  it('leaving the city mid-celebration still reports it exactly once', () => {
+    const a = renderCity({ state: stateWith({ 'first-alarm': solved(3) }), recentlySolved: 'station-row' });
+    expect(a.onCelebrated).not.toHaveBeenCalled();
+    a.unmount();
+    expect(a.onCelebrated).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores a recentlySolved id that is not actually solved (nothing to celebrate, nothing reported)', () => {
+    const { onCelebrated } = renderCity({ recentlySolved: 'station-row' });
     expect(screen.queryByTestId('toast-badge')).toBeNull();
     expect(screen.queryByTestId('restore-fx')).toBeNull();
+    act(() => {
+      vi.advanceTimersByTime(TOAST_MS + RESTORE_MS);
+    });
+    expect(onCelebrated).not.toHaveBeenCalled();
   });
 
   it('maps every mission to a badge name key', () => {

@@ -56,7 +56,7 @@ export const MISSIONS_EN: Readonly<Record<MissionId, MissionCopy>> = {
     reactions: {
       restored: 'Both stations went quiet and the middle house is safe. One crew, one fire, perfect.',
       safePattern: 'Something is left, but it is a harmless pattern the code ignores. The stored information is safe.',
-      stillBurning: 'A station still rings. A red crew on a safe house starts a red fire, and a blue crew cannot touch a red one.',
+      stillBurning: 'A station still rings. A red crew on a safe house starts a red fire, and a blue crew on a red fire turns it into a Y fire that rings even more stations.',
       logicalFailure: 'All alarms are quiet, yet the beacon shows a flip. With one fire and one crew that should not happen here, so open Why to see the chain.',
     },
     whyShort: 'Z0 watches houses 0, 1, 3, 4 and Z1 watches 4, 5, 7, 8. Only house 4 is on both lists.',

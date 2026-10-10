@@ -15,7 +15,11 @@ export function missionKindOf(missionId: string, override: MissionKind | undefin
   }
 }
 
-/** Frame options for a debrief: fog before impact on dispatch missions, the propagated true fire on propagation missions. */
+/**
+ * Frame options for a debrief: fog before the spray on dispatch missions, the propagated true fire on propagation
+ * missions; the alarms show the true fire's syndrome from the start (codes with stations) and switch to the
+ * residual's at the 'alarms' event.
+ */
 export function frameOptionsFor(debrief: Debrief, n: number, kind: MissionKind): FrameOptions {
   const fires = fromString(debrief.fires);
   const residual = fromString(debrief.residual);
@@ -24,7 +28,12 @@ export function frameOptionsFor(debrief: Debrief, n: number, kind: MissionKind):
     const l = letterOf(debrief.fires, q);
     return l === 'I' ? { kind: 'normal' } : { kind: 'fire', letter: l };
   };
-  return { n: Math.max(n, fires.n, residual.n), preState, residualAt: (q) => letterOf(debrief.residual, q) };
+  return {
+    n: Math.max(n, fires.n, residual.n),
+    preState,
+    residualAt: (q) => letterOf(debrief.residual, q),
+    initialSyndrome: debrief.syndromeOfFires.length > 0 ? debrief.syndromeOfFires : null,
+  };
 }
 
 /** Result decoration for the end of a spray: the chain is the engine residual's support; beacon for the old town or a logical failure. */
@@ -39,7 +48,16 @@ export function outcomeFor(debrief: Debrief, frame: SceneFrame): SceneOutcome | 
   };
 }
 
-/** Crews string → placements map (the shape confirmDispatch takes). */
+/**
+ * The Why? alternative as a Debrief for the stage: the same true fires with the engine's residual / alarms / flip for
+ * the alternative crews (all computed by the reducer at commit, see Debrief.alternative).
+ */
+export function alternativeDebrief(mine: Debrief): Debrief {
+  const alt = mine.alternative;
+  return { ...mine, crews: alt.crews, residual: alt.residual, syndromeOfResidual: alt.syndromeOfResidual, verdict: alt.verdict, logicalFlip: alt.logicalFlip };
+}
+
+/** Crews string → placements map (the shape the reducer's placements take). */
 export function placementsFromCrews(crews: string): Record<number, CrewLetter> {
   const p = fromString(crews);
   const out: Record<number, CrewLetter> = {};

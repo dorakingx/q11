@@ -1,5 +1,5 @@
 /// <reference lib="dom" />
-import { expect, expectNoHorizontalOverflow, openChallenge, openCity, readSave, seedSave, serialisedHouses, sprayAndSkip, stepSprayToEnd, test } from './helpers';
+import { expect, expectFailedResultActions, expectNoHorizontalOverflow, expectPrimaryButton, openChallenge, openCity, readSave, seedSave, serialisedHouses, sprayAndSkip, stepSprayToEnd, test } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   await seedSave(page, { freeRoam: true });
@@ -24,6 +24,8 @@ test('result 1 — blind dispatch X on house 4: restored (fires out, houses rest
   await expect(page.locator('.detector[data-ringing="true"]')).toHaveCount(0);
   await expect(page.locator('.memory-tower')).toHaveCount(0);
   await expect(page.getByTestId('result-stars')).toHaveAttribute('aria-label', '3 of 3 stars');
+  await expect(page.getByTestId('result-next')).toHaveText('Next district');
+  await expectPrimaryButton(page, 'result-next');
   await page.getByTestId('result-details').locator('summary').click();
   await expect(page.getByTestId('residual')).toHaveText('IIIIIIIII');
   await expect(page.getByTestId('decision')).toContainText('Optimal call');
@@ -44,9 +46,33 @@ test('result 3 — blind dispatch X on house 0: still burning (new red fire, tru
   await expect(page.locator('.detector[data-detector="Z1"]')).toHaveAttribute('data-ringing', 'true');
   await expect(page.locator('.detector[data-detector="Z0"]')).toHaveAttribute('data-ringing', 'false');
   await expect(page.getByTestId('result-stars')).toHaveAttribute('aria-label', '0 of 3 stars');
+  // A failed dispatch keeps Try again as the primary action; the city is a ghost button.
+  await expectFailedResultActions(page);
   await page.getByTestId('result-details').locator('summary').click();
   await expect(page.getByTestId('residual')).toHaveText('XIIIXIIII');
   await expect(page.getByTestId('cloud-empty')).toContainText('No cloud result recorded for this dispatch (recorded dispatches: IIIIXIIII).');
+});
+
+test('prediction miss — Harbor Bridge, red crew on house 0 only: no alarms, no beacon, Try again is the primary action', async ({ page }) => {
+  await openCity(page);
+  await openChallenge(page, 2);
+  await expect(page.locator('.detector')).toHaveCount(0);
+  await page.getByTestId('palette-X').click();
+  await page.getByTestId('block-0').click();
+  await sprayAndSkip(page);
+  await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'prediction-miss');
+  await expect(page.getByTestId('result-title')).toHaveText('Prediction missed');
+  await expect(page.locator('.memory-tower')).toHaveCount(0);
+  await expect(page.locator('.detector')).toHaveCount(0);
+  await expect(page.getByTestId('result-beacon')).toHaveCount(0);
+  await expectFailedResultActions(page);
+  await page.getByTestId('result-details').locator('summary').click();
+  await expect(page.getByTestId('verdict-label')).toHaveText('Prediction missed — fires left on the wires');
+  await expect(page.getByTestId('residual')).toHaveText('ZY');
+  await page.getByTestId('result-next').click();
+  await expect(page.getByTestId('city-map')).toBeVisible();
+  await expect(page.getByTestId('toast-badge')).toHaveCount(0);
+  await expect(page.getByTestId('city-panel')).toContainText('Conversion Lab'); // free roam: the next district is open, so it is pre-selected
 });
 
 test('result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details)', async ({ page }) => {
@@ -95,6 +121,7 @@ test('result 4 — silent failure X on house 0: alarms quiet, the memory beacon 
   await expect(page.getByTestId('why-compare')).toBeVisible();
   await expect(page.getByTestId('why-alt')).toContainText('Crews on the true fires');
   await page.getByTestId('why-skip').click();
+  await expect(page.getByTestId('why-replay')).toBeFocused();
   await expect(page.getByTestId('why-explanation')).toContainText('Alarms alone cannot decide.');
   await expect(page.locator('.why-noblame')).toContainText('Nobody could have known');
   await expect(page.getByTestId('why-mine')).toContainText('Silent failure');
@@ -164,6 +191,9 @@ test('reduced motion: the spray is a stepper with static frames; Why? steps both
   await page.getByTestId('confirm').click();
   await expect(page.getByTestId('spray-player')).toHaveAttribute('data-reduced-motion', 'true');
   await expect(page.getByTestId('spray-step')).toContainText('Frame 1 of');
+  // The alarms the plan was made against stay visible while the crews spray.
+  await expect(page.getByTestId('dispatch-alarms')).toBeVisible();
+  await expect(page.getByTestId('dispatch-alarms').locator('[data-check][data-ringing="1"]')).toHaveCount(2);
   await expect(page.locator('[data-house="4"]')).toHaveAttribute('data-house-state', 'fog');
   await page.getByTestId('spray-next').click(); // crew runs
   await page.getByTestId('spray-next').click(); // water on

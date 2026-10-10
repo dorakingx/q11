@@ -8,7 +8,7 @@ import { BridgeSpan, ChapterBadge, ConversionLab, Detector, House, MemoryTower, 
 import { GearIcon, Q11Mark } from './glyphs';
 import { briefingText, missionCopy, plural, reactionFor, useLanguage, useT } from './i18n';
 import { Details, DetectorIcon, FlameIcon, HelmetIcon, LangToggle, Legend, Stars, TopBar, WaterIcon } from './panels';
-import { badgeNameKey, CODE_KEY, outcomeKey, QUALITY_KEY, resultHeadingKey } from './text';
+import { badgeNameKey, CODE_KEY, outcomeKey, QUALITY_KEY, resultActions, resultHeadingKey } from './text';
 
 export interface ScreenProps {
   readonly state: GameState;
@@ -379,7 +379,7 @@ export function ResultScreen({ state, dispatch, mission, debrief }: ScreenProps 
   const di = DISTRICTS.findIndex((d) => d.missionId === mission.id);
   const result = resultType(debrief);
   const next = () => dispatch(state.tutorialActive ? { type: 'OPEN_MISSIONS' } : { type: 'NEXT_MISSION' });
-  const nextLabel = state.tutorialActive ? t('result.city') : isLast ? t('result.summary') : t('result.next');
+  const { nextLabel, primary } = resultActions(t, debrief, isLast, state.tutorialActive);
   return (
     <main className="screen screen-result">
       <TopBar title={copy.districtName} subtitle={t('result.subtitle')} onMissions={() => dispatch({ type: 'OPEN_MISSIONS' })} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })} />
@@ -425,10 +425,10 @@ export function ResultScreen({ state, dispatch, mission, debrief }: ScreenProps 
           <button type="button" className="btn btn-large" onClick={() => dispatch({ type: 'OPEN_WHY' })} data-testid="result-why">
             {t('dispatch.why')}
           </button>
-          <button type="button" className="btn btn-large" onClick={() => dispatch({ type: 'TRY_AGAIN' })} data-testid="try-again">
+          <button type="button" className={primary === 'retry' ? 'btn btn-primary btn-large' : 'btn btn-large'} onClick={() => dispatch({ type: 'TRY_AGAIN' })} data-testid="try-again">
             {t('result.tryAgain')}
           </button>
-          <button type="button" className="btn btn-primary btn-large" onClick={next} data-testid="next-mission">
+          <button type="button" className={primary === 'next' ? 'btn btn-primary btn-large' : 'btn btn-ghost btn-large'} onClick={next} data-testid="next-mission">
             {nextLabel}
           </button>
         </div>
