@@ -2,7 +2,7 @@
 
 Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external). Nothing below the "APPROVAL REQUIRED" line is executed without the user's explicit, written approval naming the target and time.
 
-> All pre-publication gates below are ☑ for the final "Q11 Emergency" build (commit c1760e1, web sources verified at aed04f3, 2026-10-10 22:15 UTC). Nothing below the approval line has been done.
+> All pre-publication gates below are ☑ for the final "Q11 Emergency" build (commit c1760e1, web sources verified at aed04f3, 2026-10-10 22:56 UTC). Nothing below the approval line has been done.
 
 ## Pre-publication gates (all must be ☑ before asking for approval)
 - ☑ `verify:release` exits 0 on the final Q11 Emergency build (sources aed04f3, 2026-10-10 18:42 UTC; `Q11_E2E_WORKERS=2 Q11_E2E_TIMEOUT=360000` under external load): lint 0 · typecheck 0 · unit 459/459 (25 files) · build 0 · verify:quantum 4746/0 · e2e 101 passed / 13 skipped-by-design / 0 failed on 4 browser projects · demo 163 s · secret-like lines 0 — `reports/release-verification.json`
@@ -17,7 +17,7 @@ Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external).
 - ☑ Secret-pattern scan 0 hits in tracked files (verify:release); `.env*`, `.vercel/` ignored
 - ☑ `submission/KNOWN_LIMITATIONS.md` updated for the redesign
 - ☑ Project Card on the Qollab draft re-pasted from the renamed `submission/PROJECT_PAGE.md` (2026-10-11 02:55 JST); title "Q11 Emergency — Quantum Emergency Response"; About (222 chars); thumbnail = the new truck og-image; tags kept
-- ☑ Final commit pushed (c1760e1; web sources verified at aed04f3); working tree clean; protected deployment dpl_6NnSKV4Ntma1XpfLPfGeBqzqjbiJ (q11-nc9q9fvvn-doraking.vercel.app, domain q11-emergency.vercel.app + 2 auto aliases) checked 2026-10-10 22:15 UTC: 16/16 anonymous blocked, authenticated fetch returns the app, bypass secret revoked (0)
+- ☑ Final commit pushed (c1760e1; web sources verified at aed04f3); working tree clean; protected deployment dpl_CoAbUoPCjWViaXeP7bQ8FJAoJaLc (q11-m72i37iyr-doraking.vercel.app, domain q11-emergency.vercel.app + 2 auto aliases) checked 2026-10-10 22:56 UTC: 16/16 anonymous blocked, authenticated fetch returns the app, bypass secret revoked (0)
 
 ## ────────── APPROVAL REQUIRED BELOW THIS LINE ──────────
 The user must explicitly approve *which* of the following to perform and *when*. Each step is independent.
