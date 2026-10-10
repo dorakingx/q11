@@ -17,11 +17,10 @@ export function BrandMarkContent() {
       {/* the two kinds of error, side by side above the truck: a red X flame and a blue Z flame */}
       <Flame letter="X" x={150} y={240} scale={1.4} />
       <Flame letter="Z" x={262} y={240} scale={1.4} />
-      <FireTruck x={256} y={440} scale={3} />
+      <FireTruck x={256} y={440} scale={3} plain />
       <Part x={256} y={440} scale={3}>
-        {/* a plain red panel over the locker row, then "Q11" in white straight on the body */}
-        <rect x={-68} y={-50} width={92} height={21} rx={2} fill={ART.truck} />
-        <text x={-22} y={-32} textAnchor="middle" fontSize={23} fontWeight={900} fill={ART.paper} fontFamily={FONT} letterSpacing={1.5} style={{ userSelect: 'none' }}>
+        {/* "Q11" painted in white on the clean red body, above the white trim stripe */}
+        <text x={-22} y={-35} textAnchor="middle" fontSize={20} fontWeight={900} fill={ART.paper} fontFamily={FONT} letterSpacing={1.5} style={{ userSelect: 'none' }}>
           Q11
         </text>
       </Part>
