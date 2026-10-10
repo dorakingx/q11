@@ -19,6 +19,15 @@ Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external).
 - ☑ Project Card on the Qollab draft re-pasted from the renamed `submission/PROJECT_PAGE.md` (2026-10-11 02:55 JST); title "Q11 Emergency — Quantum Emergency Response"; About (222 chars); thumbnail = the new truck og-image; tags kept
 - ☑ Final commit pushed (c1760e1; web sources verified at aed04f3); working tree clean; protected deployment dpl_CoAbUoPCjWViaXeP7bQ8FJAoJaLc (q11-m72i37iyr-doraking.vercel.app, domain q11-emergency.vercel.app + 2 auto aliases) checked 2026-10-10 22:56 UTC: 16/16 anonymous blocked, authenticated fetch returns the app, bypass secret revoked (0)
 
+## Organizer guidance read from Slack #hackathon-all (2026-10-11 08:00 JST)
+- Judges open the project page and press **Run** on a free **local** simulator (Select QPU → "Locally Run Simulators"); IonQ results neither add nor subtract points. Before submitting: Run end to end on a local simulator without errors ✔ (runs 10–18 exact) and say on the project page which simulator to pick ✔ (project page + `qollab/README.md`).
+- **Publish** must create a **public default version** (Publish → Visibility → public and default). Later edits stay in the draft; publish a new default version before the deadline so judges see the latest. Verify in a private window.
+- MIT: a `LICENSE` file in the public GitHub repo **and** in the Qollab project, "MIT License" in the README ✔ (both added, run 18). Apache-2.0 dependencies (Qiskit) are fine.
+- A Vercel / GitHub Pages front end counts only as an **extra**: if linked from the Project Card it must be **public**, MIT, with no API keys. Our Vercel deployment is protected → either unprotect it (approval step 4) before linking it, or leave the Project Website field empty.
+- The organizers' "easiest path" is one **public** GitHub repo; the project page says "source repository: link on this page once public" → make the repo public (approval step 3) and fill the link, or remove that line before publishing.
+- README / project page and video in English ✔; video 2–3 min, YouTube unlisted (viewable without sign-in) — pending approval step 2.
+- Dharwad node channel: no node-specific instructions.
+
 ## ────────── APPROVAL REQUIRED BELOW THIS LINE ──────────
 The user must explicitly approve *which* of the following to perform and *when*. Each step is independent.
 
