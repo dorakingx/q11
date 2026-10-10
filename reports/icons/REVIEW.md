@@ -90,7 +90,7 @@ Each round rendered the SVG at 16 / 32 / 64 / 128 px with sharp (librsvg) and I 
 | Command | Exit | Result |
 |---|---|---|
 | `node scripts/build-icons.mjs` | 0 | 11 files written; sanity check and ICO read-back passed |
-| `ls -la public` | 0 | 14 files: 3 SVG, 8 PNG, 1 ICO, 1 manifest |
+| `ls -la public` | 0 | 13 files: 3 SVG, 8 PNG, 1 ICO, 1 manifest |
 | `node -e "<ICO header check>"` | 0 | `ICONDIR reserved=0 type=1 count=3`; entries 16×16 (551 B), 32×32 (1083 B), 48×48 (1598 B), all PNG payloads with matching IHDR; total 3286 B |
 | `xmllint --noout public/*.svg` | 0 | all three SVGs well-formed |
 | manifest JSON parse | 0 | name / short_name / standalone / `#0b1a33` / 192, 512, 512-maskable |

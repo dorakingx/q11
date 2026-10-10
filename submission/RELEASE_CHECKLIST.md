@@ -3,24 +3,24 @@
 Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external). Nothing below the "APPROVAL REQUIRED" line is executed without the user's explicit, written approval naming the target and time.
 
 ## Pre-publication gates (all must be ☑ before asking for approval)
-- ☐ `npm run verify:release` exits 0 (lint, typecheck, unit, build, verify:quantum, e2e) — `reports/release-verification.json`
-- ☐ Quantum verification: ≥1000 seeded cases + exhaustive gate tables + 28 rsc3 patterns + six-eigenstate StabilizerState check + Aer mission circuits, 0 mismatches — `reports/quantum-verification.json`
-- ☐ Real-browser screenshots reviewed: title, dispatch, propagation replay, silent failure, mobile — `reports/screenshots/`
-- ☐ GitHub `dorakingx/q11` is **private** (`gh repo view --json isPrivate` = true); `main` pushed; HEAD SHA recorded in `submission/EVIDENCE_INDEX.md`
-- ☐ Vercel project `q11` has Vercel Authentication = **All Deployments**; `node scripts/check-protection.mjs <urls>` passes (401/redirect, no app body for anonymous) — `reports/protection-check.json`
-- ☐ Protected deployment's git SHA == GitHub HEAD SHA (recorded)
-- ☐ Qollab draft project exists in the user's account; ran on built-in simulator and on an IonQ remote simulator (backend name, shots, timestamp, job id if shown) — `reports/qollab-runs.md`
-- ☐ Icons: `public/icon.svg`, favicon.ico, PNG 16/32/64/180/192/512 reviewed at small sizes — `reports/icons/REVIEW.md`
-- ☐ `submission/DEMO.mp4` recorded from the real app, 120–180 s, sha256 recorded; NOT uploaded anywhere
-- ☐ `LICENSE` MIT; `submission/ATTRIBUTION.md` complete (libraries, versions, AI tools, references); attribution line "This effort is supported by Qollab & IonQ" present in README and project page
-- ☐ No secrets in repo/history (`git grep` patterns clean; `.env*`, `.vercel/` ignored)
-- ☐ `submission/KNOWN_LIMITATIONS.md` honest and current
-- ☐ Final commit pushed; working tree clean
+- ☑ `npm run verify:release` exits 0 — passed:true at SHA 0e950e8, 2026-10-10 02:24 UTC (`reports/release-verification.json`); re-run after the review fixes (STATUS.md)
+- ☑ Quantum verification: 4,746 comparisons, 0 mismatches (`reports/QUANTUM_VERIFICATION.md`)
+- ☑ Real-browser screenshots reviewed 2026-10-10 10:50 JST + manual pane checks 11:30 JST (EVIDENCE_INDEX)
+- ☑ GitHub `dorakingx/q11` private (`isPrivate: true`), `main` pushed at every milestone; final SHA in STATUS.md A5
+- ☑ Vercel `q11`: Vercel Authentication = All Deployments since creation; `check-protection` 16/16 blocked (`reports/protection-check.json`); authenticated fetch verified, bypass secret revoked
+- ☑ Deployments are Git-triggered, so each carries `meta.githubCommitSha`; final pair recorded in STATUS.md A6
+- ☑ Qollab draft exists (private); 8 runs incl. 4 IonQ Aria 1 jobs with ids — `reports/qollab-runs.md`
+- ☑ Icons reviewed at 16/32/64/128 on dark and light — `reports/icons/REVIEW.md`
+- ☑ `submission/DEMO.mp4` recorded from the real app, 146 s, sha256 75a4dd7a… (`reports/demo-recording.json`); NOT uploaded
+- ☑ MIT `LICENSE`; `ATTRIBUTION.md` complete; attribution line present in README, project page and the game's title screen
+- ☑ Secret-pattern scan 0 hits in tracked files (verify:release); `.env*`, `.vercel/` ignored
+- ☑ `submission/KNOWN_LIMITATIONS.md` current (updated after the review wave)
+- ☐ Final commit pushed; working tree clean (done at the end of the build — see STATUS.md)
 
 ## ────────── APPROVAL REQUIRED BELOW THIS LINE ──────────
 The user must explicitly approve *which* of the following to perform and *when*. Each step is independent.
 
-1. **Qollab publish** (user, in browser): open the Q11 draft → Project Card: paste `submission/PROJECT_PAGE.md`, set license MIT, thumbnail = `public/og-image.png` or icon → Code tab: press Run on the built-in simulator once more → **Publish**. Record the public URL `qollab.xyz/u/<username>/<project>`.
+1. **Qollab publish** (user, in browser): open the Q11 draft → Project Card (write-up, thumbnail and tags are already filled from `submission/PROJECT_PAGE.md`) → **substitute the real links**: in the write-up replace the line "source repository: link on this page once public" with the GitHub URL (after step 3) and fill the "Demo video" section with the public video URL (after step 2); optionally fill *Project Website* (protected Vercel URL only after step 4) and *Repository* → Code tab: press Run on the built-in simulator once more → **Publish** (choose the MIT licence if asked). Record the public URL `qollab.xyz/u/doraking/q11-quantum-emergency-response`.
 2. **Demo video public link** (user): upload `submission/DEMO.mp4` to a host viewable without sign-in (e.g. YouTube unlisted). Record the URL. Test in a logged-out/private window.
 3. **GitHub public** (optional for the hackathon; only if the user wants source public): `gh repo edit dorakingx/q11 --visibility public --accept-visibility-change-consequences`. Before that: re-run the secret scan and confirm the history is clean.
 4. **Vercel protection removal** (optional; only if the user wants a public web demo): Vercel dashboard → q11 → Settings → Deployment Protection → Vercel Authentication: *Only Preview Deployments* or Off. Alternatively keep the Vercel site private and rely on Qollab as the public runnable.

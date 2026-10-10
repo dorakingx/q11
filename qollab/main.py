@@ -81,8 +81,9 @@ def main(shots: int = 200, mission: str = "blind-dispatch", correction: str = "I
     print("  dominant-outcome agreement (noise-tolerant):", json.dumps(analysis.get("dominantMatches")),
           "| share of shots with the predicted alarms: %s | share with the predicted logical bit: %s" % (
               analysis.get("predictedSyndromeShare"), analysis.get("predictedLogicalShare")))
+    kind = "simulator result, not hardware" if "sim" in str(name).lower() or "basic" in str(name).lower() or "aer" in str(name).lower() or "fake" in str(name).lower() else "result from backend %s" % name
     print("Model: Clifford+Pauli educational simulation, perfect syndrome extraction. Counts are statistics;",
-          "the GF(2) verdict above is the proof. Simulator result, not hardware.")
+          "the GF(2) verdict above is the proof. This is a %s." % kind)
     record = {
         "schema": 1, "mission": mission, "correction": correction, "prep": prep, "readoutBasis": readout_basis,
         "backend": str(name), "shots": shots, "jobId": str(job_id) if job_id else None, "seconds": round(elapsed, 2),

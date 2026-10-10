@@ -1,6 +1,6 @@
 # Q11 quantum verification report
 
-Generated 2026-10-10T02:01:23Z by `quantum/verify.py` (**PASS**).
+Generated 2026-10-10T02:41:07Z by `quantum/verify.py` (**PASS**).
 
 Independent Python/Qiskit reference (`qollab/q11`, written from first principles) replayed the fixtures
 emitted by the TypeScript engine, then cross-checked itself against `qiskit.quantum_info` and Aer.
@@ -14,7 +14,7 @@ emitted by the TypeScript engine, then cross-checked itself against `qiskit.quan
 | numpy | 2.5.3 |
 | q11_python_engine | 1.0.0 |
 | model | Clifford+Pauli educational model, perfect syndrome extraction, no measurement noise |
-| total comparisons | 4749 |
+| total comparisons | 4746 |
 | mismatches | 0 |
 
 ## Per section
@@ -38,7 +38,7 @@ emitted by the TypeScript engine, then cross-checked itself against `qiskit.quan
 | verdicts-1000.json sample (every 5th, 200 cases) (qiskit StabilizerState, 6 eigenstates each) | 200 | 0 |
 | logical eigenstate preparation (Aer statevector, all generators +1) | 24 | 0 |
 | propagation missions (Aer statevector + Operator) | 42 | 0 |
-| mission circuits on AerSimulator (shots=2000, deterministic syndrome + logical readout) | 45 | 0 |
+| mission circuits on AerSimulator (shots=2000, deterministic syndrome + logical readout) | 42 | 0 |
 | mission circuits serialize with qiskit-ionq (qis gateset, offline, no job) | 42 | 0 |
 | mission circuits on qiskit BasicSimulator (Qollab built-in class, 200 shots) | 6 | 0 |
 
@@ -91,7 +91,7 @@ emitted by the TypeScript engine, then cross-checked itself against `qiskit.quan
 | red-forward-blue-backward | (none) | `YY` | `YY` | yes | yes | success |
 | color-switch | (none) | `XZ` | `XZ` | yes | yes | success |
 | blind-dispatch | 11000000 | `IIIIXIIII` | `IIIIXIIII` | yes | yes | success |
-| two-kinds-of-trouble | 10100100 | `IXIIIIZII` | `IYIIZIIII` | no | no | success |
+| two-kinds-of-trouble | 10100100 | `IXIIIIZII` | `IXIIIIZII` | yes | yes | success |
 | silent-failure | 10000000 | `XIIIIIIII` | `XIIIIIIII` | yes | yes | logical-error |
 
 Where the two decoders disagree the fixture correction was still verified to have minimum weight and the
@@ -129,18 +129,15 @@ no QPU, no IonQ job was run by this script.
 | blind-dispatch | `IIIIIIIII` (identity (no dispatch)) | 0/Z | 17 | AerSimulator | {"11000000": 2000} | ["0"] | detectable | yes |
 | blind-dispatch | `IIIIIIIII` (identity (no dispatch)) | +/X | 17 | AerSimulator | {"11000000": 2000} | ["0"] | detectable | yes |
 | blind-dispatch | `IIIIIIIII` (identity (no dispatch)) | +i/Y | 17 | AerSimulator | {"11000000": 2000} | ["0"] | detectable | yes |
-| two-kinds-of-trouble | `IYIIZIIII` (reference (min-weight / predicted frame)) | 0/Z | 17 | AerSimulator | {"10100100": 2000} | ["0"] | logical-error | yes |
-| two-kinds-of-trouble | `IYIIZIIII` (reference (min-weight / predicted frame)) | +/X | 17 | AerSimulator | {"10100100": 2000} | ["1"] | logical-error | yes |
-| two-kinds-of-trouble | `IYIIZIIII` (reference (min-weight / predicted frame)) | +i/Y | 17 | AerSimulator | {"10100100": 2000} | ["1"] | logical-error | yes |
+| two-kinds-of-trouble | `IXIIIIZII` (reference (min-weight / predicted frame)) | 0/Z | 17 | AerSimulator | {"10100100": 2000} | ["0"] | success | yes |
+| two-kinds-of-trouble | `IXIIIIZII` (reference (min-weight / predicted frame)) | +/X | 17 | AerSimulator | {"10100100": 2000} | ["0"] | success | yes |
+| two-kinds-of-trouble | `IXIIIIZII` (reference (min-weight / predicted frame)) | +i/Y | 17 | AerSimulator | {"10100100": 2000} | ["0"] | success | yes |
 | two-kinds-of-trouble | `IIIIIIIII` (identity (no dispatch)) | 0/Z | 17 | AerSimulator | {"10100100": 2000} | ["0"] | detectable | yes |
 | two-kinds-of-trouble | `IIIIIIIII` (identity (no dispatch)) | +/X | 17 | AerSimulator | {"10100100": 2000} | ["0"] | detectable | yes |
 | two-kinds-of-trouble | `IIIIIIIII` (identity (no dispatch)) | +i/Y | 17 | AerSimulator | {"10100100": 2000} | ["0"] | detectable | yes |
 | two-kinds-of-trouble | `IXIIIIIZI` (counterfactual: exact propagated error) | 0/Z | 17 | AerSimulator | {"10100100": 2000} | ["0"] | success | yes |
 | two-kinds-of-trouble | `IXIIIIIZI` (counterfactual: exact propagated error) | +/X | 17 | AerSimulator | {"10100100": 2000} | ["0"] | success | yes |
 | two-kinds-of-trouble | `IXIIIIIZI` (counterfactual: exact propagated error) | +i/Y | 17 | AerSimulator | {"10100100": 2000} | ["0"] | success | yes |
-| two-kinds-of-trouble | `IXIIIIZII` (fixture min-weight correction (TS tie-break)) | 0/Z | 17 | AerSimulator | {"10100100": 2000} | ["0"] | success | yes |
-| two-kinds-of-trouble | `IXIIIIZII` (fixture min-weight correction (TS tie-break)) | +/X | 17 | AerSimulator | {"10100100": 2000} | ["0"] | success | yes |
-| two-kinds-of-trouble | `IXIIIIZII` (fixture min-weight correction (TS tie-break)) | +i/Y | 17 | AerSimulator | {"10100100": 2000} | ["0"] | success | yes |
 | silent-failure | `XIIIIIIII` (reference (min-weight / predicted frame)) | 0/Z | 17 | AerSimulator | {"10000000": 2000} | ["1"] | logical-error | yes |
 | silent-failure | `XIIIIIIII` (reference (min-weight / predicted frame)) | +/X | 17 | AerSimulator | {"10000000": 2000} | ["0"] | logical-error | yes |
 | silent-failure | `XIIIIIIII` (reference (min-weight / predicted frame)) | +i/Y | 17 | AerSimulator | {"10000000": 2000} | ["1"] | logical-error | yes |
@@ -154,7 +151,7 @@ no QPU, no IonQ job was run by this script.
 | red-forward-blue-backward | `YY` (reference (min-weight / predicted frame)) | 0/Z | 2 | qiskit BasicSimulator | {"": 200} | ["0", "0"] | success | yes |
 | color-switch | `XZ` (reference (min-weight / predicted frame)) | 0/Z | 2 | qiskit BasicSimulator | {"": 200} | ["0", "0"] | success | yes |
 | blind-dispatch | `IIIIXIIII` (reference (min-weight / predicted frame)) | 0/Z | 17 | qiskit BasicSimulator | {"11000000": 200} | ["0"] | success | yes |
-| two-kinds-of-trouble | `IYIIZIIII` (reference (min-weight / predicted frame)) | 0/Z | 17 | qiskit BasicSimulator | {"10100100": 200} | ["0"] | logical-error | yes |
+| two-kinds-of-trouble | `IXIIIIZII` (reference (min-weight / predicted frame)) | 0/Z | 17 | qiskit BasicSimulator | {"10100100": 200} | ["0"] | success | yes |
 | silent-failure | `XIIIIIIII` (reference (min-weight / predicted frame)) | 0/Z | 17 | qiskit BasicSimulator | {"10000000": 200} | ["1"] | logical-error | yes |
 
 ## What is NOT verified here

@@ -1,0 +1,11 @@
+{
+  "recordedAt": "2026-10-10T02:15:29.811Z",
+  "base": "http://localhost:4173",
+  "shots": 98,
+  "scriptedSeconds": 185,
+  "durationSeconds": 146,
+  "within120to180": true,
+  "bytes": 4063995,
+  "sha256": "75a4dd7af15b8f98279e9450390907723003f4d9f46fb95d803ba1c5c4d90765",
+  "output": "submission/DEMO.mp4"
+}

@@ -1,7 +1,8 @@
 """Minimum-weight lookup decoder: for every syndrome, the lowest-weight Pauli producing it.
 
-Ties are broken by enumeration order (ascending qubit tuples, then letters X, Y, Z). Two min-weight
-corrections for the same syndrome may differ by a stabilizer (degenerate pairs such as X0 ~ X3 in rsc3);
+Ties are broken exactly like the TypeScript engine: qubit weight, then symplectic weight |x|+|z|
+(Y counts 2), then the numeric encoding (x+2z per qubit, base 4, qubit 0 least significant). Two min-weight
+corrections for the same syndrome may still differ by a stabilizer (degenerate pairs such as X0 ~ X3 in rsc3);
 the comparison code treats those as equivalent.
 """
 
@@ -25,16 +26,24 @@ def build_lookup(code: StabilizerCode) -> dict:
     for w in range(1, code.n + 1):
         if len(table) == total:
             break
+        # Same tie-break as the TypeScript engine (src/quantum/decoder.ts): among Paulis of equal qubit
+        # weight prefer the smaller symplectic weight |x|+|z| (Y counts 2, i.e. independent X/Z decoding),
+        # then the smaller numeric encoding (digit x+2z in base 4, qubit 0 least significant).
+        candidates = []
         for qubits in combinations(range(code.n), w):
             for letters in product("XYZ", repeat=w):
-                p = Pauli.identity(code.n)
                 xs, zs = [0] * code.n, [0] * code.n
                 for q, l in zip(qubits, letters):
                     xs[q], zs[q] = {"X": (1, 0), "Y": (1, 1), "Z": (0, 1)}[l]
-                p = Pauli(xs, zs)
-                key = syndrome_string(syndrome(code, p))
-                if key not in table:
-                    table[key] = p
+                sym = sum(xs) + sum(zs)
+                numeric = sum((xs[q] + 2 * zs[q]) * (4 ** q) for q in range(code.n))
+                candidates.append((sym, numeric, xs, zs))
+        candidates.sort(key=lambda c: (c[0], c[1]))
+        for _sym, _num, xs, zs in candidates:
+            p = Pauli(xs, zs)
+            key = syndrome_string(syndrome(code, p))
+            if key not in table:
+                table[key] = p
     return table
 
 

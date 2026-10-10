@@ -32,7 +32,7 @@ runs with circuit hashes) and `reports/QUANTUM_VERIFICATION.md` (summary). Exit 
 | Propagation missions | missions 2, 3 (challenge + training) | Aer statevector: `U·E|ψ⟩ ≡ E'·U|ψ⟩` up to phase for all six eigenstates; plus the operator identity. |
 | Full mission circuits | all 6 missions | `build_mission_circuit` on `AerSimulator`, 2000 shots (plus the reference correction on qiskit's `BasicSimulator`, the class behind Qollab's built-in backend, and an offline `qiskit_ionq` qis-gateset serialization of every circuit: no job, no network), for the reference correction, the identity, the exact-error counterfactual and (mission 5) the TS tie-break candidate; prep/readout (0,Z), (+,X), (+i,Y). The ancilla syndrome histogram must be a single key equal to the prediction and the logical readout deterministic and equal to the predicted bit. |
 
-Totals are printed to stdout and written to the JSON report (4749 comparisons, 51 local simulator runs at the time of writing; ~100 s, of which most is qiskit's pure-Python BasicSimulator on 17 qubits).
+Totals are printed to stdout and written to the JSON report (4749 comparisons, 51 local simulator runs at the time of writing; ~20–30 s, of which most is qiskit's pure-Python BasicSimulator on 17 qubits).
 
 ## Conventions
 

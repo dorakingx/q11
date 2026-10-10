@@ -16,7 +16,7 @@ A fire-dispatch command game about quantum error correction, built for the **Qol
 2. **Red Forward / Blue Backward** — X copies forward through a CNOT, Z copies backward.
 3. **Color Switch** — a Hadamard swaps red and blue; chain it with a CNOT.
 4. **Blind Dispatch** — distance-3 rotated surface code, one hidden fire, alarms only.
-5. **Two Kinds of Trouble** — red and blue alarms at once; X, Z and Y crews.
+5. **Two Kinds of Trouble** — red and blue alarms at once; one X crew and one Z crew (Y is taught in mission 2).
 6. **Silent Failure** — two fires, one alarm: the optimal dispatch silences everything and flips the logical qubit.
 
 ## Science in one paragraph

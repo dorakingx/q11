@@ -29,7 +29,7 @@ sending a crew to a safe block *starts* a fire (XOR). The fiction is a metaphor 
 - **Decision quality**: compare the player's C with the min-weight decoder output D for the same syndrome:
   `optimal` (C ≡ D up to stabilizer), `valid` (success but weight(C) > weight(D)), `unlucky` (C ≡ D but outcome is
   logical-error — the information could not distinguish; mission 6), `off` (otherwise).
-- Stars: 3 = success & optimal; 2 = success & valid; 1 = unlucky (optimal call, bad luck) or detectable with ≤1 wrong block; 0 otherwise.
+- Stars: 3 = success & optimal; 2 = success & valid; 1 = unlucky (optimal call, bad luck) or detectable with ≤1 wrong block **and at least one crew placed** (standing down with fires present = 0); 0 otherwise. A mission may declare `maxStars` (mission 6: 1); on such a mission a success that is not equivalent to the decoder's dispatch is scored `lucky` (1 star, "Lucky guess"), so the summary total is out of 16.
   Mission 6's intended path yields **1 star + "Optimal call"** and the mission counts as complete; the debrief explains distance 3.
 - Cost shown as crews used vs minimum.
 
@@ -38,7 +38,7 @@ sending a crew to a safe block *starts* a fire (XOR). The fiction is a metaphor 
 2. **Red Forward / Blue Backward** — trivial2, CNOT(0→1). Training steps: `XI`→`XX` (red copies to target), `IZ`→`ZZ` (blue copies to control). Challenge: `XZ` through CNOT → `YY`. Palette X, Z, Y. Budget 2.
 3. **Color Switch** — trivial2. Training: `XI` through H(0) → `ZI`; `ZI` through H(0),CNOT(0,1) → `XX`. Challenge: `ZI` through H(0), CNOT(0,1), H(1) → `XZ`. Palette X, Z, Y. Budget 2.
 4. **Blind Dispatch** — rsc3. Training: visible X on block 0 → alarm Z0 (and the degenerate twin, block 3, is explained). Challenge: hidden `X` on block 4 → alarms Z0 & Z1. Palette X, Z. Budget 1.
-5. **Two Kinds of Trouble** — rsc3. Challenge: hidden `IXIIIIIZI` (X on 1, Z on 7) → red alarms Z0, Z2; blue alarm X1. Palette X, Z, Y. Budget 2.
+5. **Two Kinds of Trouble** — rsc3. Challenge: hidden `IXIIIIIZI` (X on 1, Z on 7) → red alarms Z0, Z2; blue alarm X1. Palette X, Z (Y deliberately excluded: Y1·Z4 is an equally likely, inequivalent explanation of the same alarms — see KNOWN_LIMITATIONS). Budget 2.
 6. **Silent Failure** — rsc3. Challenge: hidden `IXXIIIIII` → only alarm Z0. Min-weight crew (block 0 or 3) silences every alarm but R = X̄ → logical flip. Palette X, Z. Budget 2. Debrief explains: distance 3 ⇒ any 1 fire is fixed, 2 fires can fool any dispatcher; shows the counterfactual (crews at 1 and 2) and why no alarm pattern justified it.
 
 Missions are listed in order; all are selectable (judges may jump). Completion stars are stored.
@@ -62,7 +62,7 @@ Missions are listed in order; all are selectable (judges may jump). Completion s
 
 ## Accessibility & input
 - All controls are real `<button>`s with `aria-label`s; the board blocks are buttons inside a `role="group"` with `aria-describedby` live alarm summary (`aria-live="polite"`).
-- Keyboard: Tab order palette → blocks → actions; arrows move focus between blocks; `1/2/3` select X/Z/Y; `Enter/Space` toggles; `Backspace` clears; `C` confirms.
+- Keyboard: Tab order palette → blocks → actions; arrows move focus between blocks; `1/2/3` select X/Z/Y; `Enter/Space` toggles; `Backspace` recalls the focused block's crew (or clears when no block is focused); `C` confirms. Shortcuts are active only while focus is inside the dispatch screen.
 - Touch: tap = click; no hover-only information. Sound: off by default; toggle enables simple Web Audio tones after a user gesture; always mutable. Motion: respects `prefers-reduced-motion` and a manual toggle.
 - Persistence: `localStorage["q11.save.v1"]` `{ version: 1, progress: {missionId: {stars, attempts, completed}}, settings: {sound, reducedMotion} }`. Corrupt/unknown data ⇒ reset with a visible notice. If storage is unavailable (Qollab sandbox) ⇒ in-memory only, silently.
 

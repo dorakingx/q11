@@ -57,7 +57,7 @@ export interface StabilizerCode {
   readonly n: number;
   /** Number of logical qubits (n - rank). */
   readonly k: number;
-  /** Code distance (machine-verified in tests for rep3/rsc3). */
+  /** Distance under the code's declared noise model (see noiseNote): rsc3 = 3 for all Paulis; rep3 = 3 for X noise only (its full-Pauli distance is 1). Machine-verified in tests. */
   readonly distance: number;
   /** Independent generators, in a fixed order (Z checks first, then X checks for CSS codes). */
   readonly checks: readonly Check[];

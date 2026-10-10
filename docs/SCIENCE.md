@@ -61,7 +61,8 @@ one error; two errors can defeat *any* decoder — the game scores the call as o
 For a mission with error E and chosen correction C: prepare a logical eigenstate (|0̄⟩ via a Clifford that maps Z_i to the
 stabilizer generators + Z̄, or |+̄⟩ for Z-type lessons), apply E as X/Y/Z gates, extract every check with one ancilla
 (Z check: data→ancilla CNOTs; X check: H–CNOT–H), apply C, then measure ancillas and data. The ancilla bits reproduce the
-syndrome of E; the data bits give the residual's Z-check parities and the logical readout, matching the GF(2) verdict.
+syndrome of E; the data bits give, for the checks whose qubits were all measured in that check's basis (all four Z checks
+under Z-basis readout), the residual's check parities, plus the logical readout — matching the GF(2) verdict.
 Counts under IonQ's noise-model simulators deviate statistically; the algebra, not the histogram, is the proof.
 
 ## 7. Scope

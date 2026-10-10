@@ -13,8 +13,10 @@ Recording: real app in Chromium at 1280×800 (desktop) with one mobile insert; c
 | 58–85 | Mission 4 Blind Dispatch | Surface code board; fires hidden; two amber alarms; place one red crew on block 4; confirm; debrief reveals the fire exactly there; what-if: decoder agrees | "Distance-3 surface code. You never see the fire — only the alarms." |
 | 85–100 | Mission 5 Two Kinds of Trouble | Red and blue alarms at once; red crew on block 1, blue crew on block 7 (decoder's equivalent: block 6) | "Red alarms for X, blue alarms for Z. Equivalent corrections differ by a stabilizer." |
 | 100–130 | Mission 6 Silent Failure | One alarm; red crew on block 0; confirm; **alarms all go quiet — verdict: Silent failure, logical qubit flipped**; replay shows two real fires on 1 and 2; what-if panel | "Every alarm is silent. The logical qubit flipped. Two fires can fool any dispatcher — that is what distance 3 means." |
-| 130–145 | Verification | Terminal: `npm run verify:quantum` summary (counts, 0 mismatches); Qollab tab: project running on built-in simulator; if an IonQ simulator run exists, show the recorded result labelled with the backend name | "The same missions run as Qiskit circuits on Qollab — built-in and IonQ simulators. Algebra is the proof; counts agree." |
-| 145–150 | Mobile insert + outro | Phone-size board of mission 4; title card with MIT + "This effort is supported by Qollab & IonQ" | "Open source, MIT. Built for the Qollab × IonQ Hackathon 2026." |
+| 130–140 | Verification caption (on the mission 6 debrief) | Caption quoting the recorded Qollab runs: built-in simulator exact; IonQ Aria 1 simulator logical bit 1 in 97% of shots | "The same mission ran as a Qiskit circuit on Qollab…" |
+| 140–146 | Mobile insert + outro | Phone-size (390×844) mission 4 dispatch board; captions with MIT + "This effort is supported by Qollab & IonQ" | "Touch-friendly on a phone. Open source, MIT…" |
+
+Note: `scriptedSeconds` in `reports/demo-recording.json` is wall-clock including navigation waits; the encoded video is 146 s.
 
 ## Production notes
 - Capture with the Playwright-driven recorder (`scripts/record-demo.mjs`) or a screen recorder; 30 fps; ffmpeg to H.264 MP4, AAC silent track optional.

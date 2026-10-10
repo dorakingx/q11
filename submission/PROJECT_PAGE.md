@@ -18,7 +18,7 @@ Each of the six missions has up to four phases:
 3. **Dispatch** — fires are hidden. You read the alarms, choose crews within a budget, and **confirm**. Nothing on screen reads the hidden error before you commit.
 4. **Debrief** — the truth is replayed step by step: the real fires, your crews, the residual, every check's result, and the verdict. A "what if" panel shows what a minimum-weight decoder would have done and whether it is equivalent to your call.
 
-Missions: **First Alarm** (3-qubit repetition code) · **Red Forward / Blue Backward** (CNOT) · **Color Switch** (Hadamard) · **Blind Dispatch** (distance-3 rotated surface code) · **Two Kinds of Trouble** (X, Z and Y alarms together) · **Silent Failure** (two fires, one alarm — the optimal call silences every alarm and flips the logical qubit).
+Missions: **First Alarm** (3-qubit repetition code) · **Red Forward / Blue Backward** (CNOT) · **Color Switch** (Hadamard) · **Blind Dispatch** (distance-3 rotated surface code) · **Two Kinds of Trouble** (X and Z alarms together) · **Silent Failure** (two fires, one alarm — the optimal call silences every alarm and flips the logical qubit).
 
 Keyboard, mouse and touch are all supported; shapes and letters carry every meaning so colour is never required; sound is off by default; reduced motion is respected.
 
@@ -32,7 +32,7 @@ Not "QEC as a game" — that exists. Q11's contribution is the *combination* ins
 ## The quantum mechanics inside
 - Paulis are binary symplectic pairs (x, z); composition is XOR; commutation is the symplectic product.
 - Gates: H swaps x/z; S: z ^= x; CNOT(c,t): x_t ^= x_c, z_c ^= z_t.
-- Codes: the 3-qubit repetition code (X noise only — a lone Z is undetectable and the game says so) and the distance-3 rotated surface code with 9 data qubits and 8 checks (Z: {0,1,3,4}, {4,5,7,8}, {1,2}, {6,7}; X: {1,2,4,5}, {3,4,6,7}, {0,3}, {5,8}; X̄ = X0X1X2, Z̄ = Z0Z3Z6). Commutation, rank, distance and the 28 single-error patterns are machine-verified.
+- Codes: the 3-qubit repetition code (X noise only — a lone Z is undetectable and the game says so) and the distance-3 rotated surface code with 9 data qubits and 8 checks (Z: {0,1,3,4}, {4,5,7,8}, {1,2}, {6,7}; X: {1,2,4,5}, {3,4,6,7}, {0,3}, {5,8}; X̄ = X0X1X2, Z̄ = Z0Z3Z6). Commutation, rank, distance and all 27 single-qubit errors (plus the no-error case: 28 patterns) are machine-verified.
 - Verdict on R = C·E: R ∈ stabilizer group ⇒ success; commutes but ∉ group ⇒ logical error (which logical is read from anticommutation with X̄/Z̄); anticommutes with a check ⇒ detectable.
 - Perfect syndrome model; Clifford + Pauli educational simulation. No claim about non-Clifford noise, measurement errors or hardware fidelity.
 
@@ -43,7 +43,7 @@ Recorded runs (free IonQ Aria 1 noise-model simulator, 100 shots each, from this
 
 ## Reproduce and extend
 ```
-git clone <repo>            # MIT
+# source repository: link on this page once public (MIT)
 npm ci && npm run dev       # play locally
 npm run test:unit           # engine + game tests
 npm run verify:quantum      # independent Python/Qiskit comparison: exhaustive gate tables, 28 single-error patterns,
@@ -51,6 +51,9 @@ npm run verify:quantum      # independent Python/Qiskit comparison: exhaustive g
                             # Aer runs of every mission circuit
 ```
 Ideas to extend: measurement noise and detection events across rounds; a union-find or MWPM decoder as a second "what if"; larger-distance codes; hook errors from the ancilla schedule.
+
+## Demo video
+2–3 minute recording of the real app (link added at publication; viewable without sign-in).
 
 ## Limitations
 See `KNOWN_LIMITATIONS.md` in the repository: Clifford + Pauli only, perfect syndromes, distance 3, cached/absent cloud results in the web build, no QPU runs.

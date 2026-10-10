@@ -1,19 +1,19 @@
-# Evidence index (filled with real values as gates pass — no placeholders are to be treated as results)
+# Evidence index (real values only; "final SHA" rows are updated by the last commit of the build)
 
 | Area | Evidence | Location / value |
 |---|---|---|
 | Spec | Build specification kept verbatim | `spec/Q11_BUILD_SPEC.md` (sha256 `e1236c4ccb1a942eedf5d63626c8aae597f6eea198aaf96dcaf6867769529aa6`) |
-| Unit tests | vitest run output | `npm run test:unit` — count: _pending_ |
-| Quantum verification | TS vs Python/Qiskit comparison report | `reports/quantum-verification.json`, `reports/QUANTUM_VERIFICATION.md` — cases: _pending_, mismatches: _pending_ |
-| E2E | Playwright run (desktop-chromium, mobile-chromium) | `npm run test:e2e` — count: _pending_; `playwright-report/` (local) |
-| Build | `npm run build` | exit: _pending_ |
-| Release aggregate | `npm run verify:release` | `reports/release-verification.json` — passed: _pending_ |
-| Real-browser screenshots | title, dispatch, propagation replay, silent failure, mobile | `reports/screenshots/*.png` (local, git-ignored) — reviewed on: _pending_ |
-| Icons | SVG + PNG set, small-size review | `public/`, `reports/icons/REVIEW.md` |
-| GitHub | private repo, HEAD | `https://github.com/dorakingx/q11` — `isPrivate: true` (checked 2026-10-10 00:28 UTC); final SHA: _pending_ |
-| Vercel project | protection set before first deploy | `prj_JIAQjMOr0rAnEHwhbY46UaeTNonL`, `ssoProtection.deploymentType = "all"` (2026-10-10 00:47 UTC, `latestDeployments: []` at that time) |
-| Vercel deployment | protected deployment URL, id, git SHA, anonymous check | `reports/protection-check.json` — _pending_ |
-| Qollab | draft project, built-in simulator runs, IonQ simulator runs | `reports/qollab-runs.md`: draft `qollab.xyz/u/doraking/q11-quantum-emergency-response` (private); built-in simulator: rep3 early check + blind-dispatch (exact match); IonQ Aria 1: rep3 early check, blind-dispatch (job 01a12375…, 01a12378…), silent-failure (job 01a1237b…); raw counts `reports/qollab-runs/*.json` |
-| Demo video | 120–180 s recording of the real app | `submission/DEMO.mp4` (local only, git-ignored), recorded 2026-10-10 02:15 UTC by `scripts/record-demo.mjs` from the built app at localhost:4173 — duration 146 s, 4,063,995 bytes, sha256 `75a4dd7af15b8f98279e9450390907723003f4d9f46fb95d803ba1c5c4d90765` (`reports/demo-recording.json`); NOT uploaded anywhere |
-| Submission docs | project page, descriptions, script, attribution, import, checklist, limitations | `submission/*.md` |
-| Publication | NOT performed | Qollab unpublished draft; repo private; Vercel protected; video not uploaded |
+| Unit tests | vitest run | `npm run test:unit` — 16 files, 137 tests passed (2026-10-10 02:24 UTC run inside verify:release; re-run after the review fixes, see docs/STATUS.md) |
+| Quantum verification | TS vs Python/Qiskit comparison | `reports/quantum-verification.json`, `reports/QUANTUM_VERIFICATION.md` — 4,746 comparisons, 0 mismatches, 48 Aer mission runs (after aligning the Python decoder tie-break; previously 4,749/0) |
+| E2E | Playwright (desktop-chromium 1280×800, mobile-chromium Pixel 7 390×844) | `npm run test:e2e` — 26 passed / 0 failed (5 spec files), log `reports/e2e-full.log` |
+| Build | `npm run build` | exit 0 (dist/assets/index-*.js ≈ 238 kB) |
+| Release aggregate | `node scripts/verify-release.mjs` | `reports/release-verification.json` — passed: true at git SHA 0e950e8, generatedAt 2026-10-10T02:24:10Z; log `reports/release-verification.log` |
+| Real-browser screenshots | title, mission 1/4 challenge, mission 6 debrief, mobile title/mission 4 | `reports/screenshots/*.png` (local, git-ignored), reviewed 2026-10-10 10:50 JST; additional manual checks in the Claude browser pane (How it works, Settings, mission 2 training, mission 6 debrief at 375×812) 11:30 JST |
+| Icons | SVG + PNG set, small-size review | `public/` (13 files), `reports/icons/REVIEW.md`, previews `reports/icons/preview-{dark,light}.png` |
+| GitHub | private repo | `https://github.com/dorakingx/q11` — `isPrivate: true` (checked 2026-10-10 00:28 UTC and at every push); branch `main`; final SHA: see docs/STATUS.md A5 |
+| Vercel project | protection set before first deploy | project `q11` (`prj_JIAQjMOr0rAnEHwhbY46UaeTNonL`, team `team_SbNwzYVsNb0NXjlFkKvPjcQT`), `ssoProtection.deploymentType = "all"` set at creation (2026-10-10 00:47 UTC, `latestDeployments: []` then); Git-connected to the private repo, production branch `main` |
+| Vercel deployments | anonymous checks | `reports/protection-check.json` — 16/16 anonymous requests → 302 to vercel.com/sso-api, no app body, no bypass secret; checked on deployment hosts q11-gwwim0mw3 (SHA 809c365) and q11-i57ew4q0l (SHA 43e9c6b) plus aliases q11-git-main-doraking / q11-doraking / q11-pied .vercel.app; authenticated fetch via `npx vercel@latest curl` returned the app HTML (bypass secret revoked immediately after) |
+| Qollab | draft project, simulator runs | `reports/qollab-runs.md`: draft `qollab.xyz/u/doraking/q11-quantum-emergency-response` (private); built-in simulator: rep3 early check, blind-dispatch via `main.py` (exact), JS page self-test (jobs 7d179532…, 28298148…, exact); IonQ Aria 1 (free noise-model simulator): rep3 early check, blind-dispatch via `main.py` (jobs 01a12375…, 01a12378…), silent-failure via `main.py` (job 01a1237b…), blind-dispatch via the JS page bridge (job 01a12396…); raw counts `reports/qollab-runs/*.json` |
+| Demo video | 120–180 s recording of the real app | `submission/DEMO.mp4` (local only, git-ignored), recorded 2026-10-10 02:15 UTC by `scripts/record-demo.mjs` — 146 s, 4,063,995 bytes, sha256 `75a4dd7af15b8f98279e9450390907723003f4d9f46fb95d803ba1c5c4d90765` (`reports/demo-recording.json`, committed); NOT uploaded anywhere |
+| Submission docs | project page, descriptions, script, attribution, import, checklist, limitations | `submission/*.md`; the project page text is already pasted into the draft's Project Card (unpublished) |
+| Publication | NOT performed | Qollab draft unpublished; repo private; Vercel protected; video not uploaded; nothing submitted on the team page |
