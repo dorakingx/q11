@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-10T18:44:23.800Z",
+  "checkedAt": "2026-10-10T21:41:32.603Z",
   "projectId": "prj_JIAQjMOr0rAnEHwhbY46UaeTNonL",
   "ssoProtectionDeploymentType": "all",
   "passwordProtection": null,
@@ -8,7 +8,7 @@
   "protectionOk": true,
   "unauthenticated": [
     {
-      "url": "https://q11-cajyyk4k1-doraking.vercel.app/",
+      "url": "https://q11-fk03po8r3-doraking.vercel.app/",
       "status": "302",
       "redirect": "https://vercel.com/sso-api",
       "contentType": "text/plain",
@@ -16,7 +16,7 @@
       "blocked": true
     },
     {
-      "url": "https://q11-cajyyk4k1-doraking.vercel.app/index.html",
+      "url": "https://q11-fk03po8r3-doraking.vercel.app/index.html",
       "status": "302",
       "redirect": "https://vercel.com/sso-api",
       "contentType": "text/plain",
@@ -24,7 +24,7 @@
       "blocked": true
     },
     {
-      "url": "https://q11-cajyyk4k1-doraking.vercel.app/manifest.webmanifest",
+      "url": "https://q11-fk03po8r3-doraking.vercel.app/manifest.webmanifest",
       "status": "302",
       "redirect": "https://vercel.com/sso-api",
       "contentType": "text/plain",
@@ -32,7 +32,7 @@
       "blocked": true
     },
     {
-      "url": "https://q11-cajyyk4k1-doraking.vercel.app/assets/",
+      "url": "https://q11-fk03po8r3-doraking.vercel.app/assets/",
       "status": "302",
       "redirect": "https://vercel.com/sso-api",
       "contentType": "text/plain",
