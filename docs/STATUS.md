@@ -1,6 +1,6 @@
 # Q11 Status
 
-_Last updated: 2026-10-10 19:30 JST_
+_Last updated: 2026-10-10 20:50 JST_
 
 Overall: **UX REDESIGN IN PROGRESS** (started 2026-10-10 18:15 JST on top of the 2cfae98 READY build; acceptance criteria R1–R15 in `docs/UX_REDESIGN.md`). The earlier READY_FOR_RELEASE_APPROVAL report applies to 2cfae98 only; the redesign must pass all gates again before any release. Nothing has been published or submitted.
 
@@ -24,8 +24,8 @@ Overall: **UX REDESIGN IN PROGRESS** (started 2026-10-10 18:15 JST on top of the
 
 ## Redesign waves (docs/UX_REDESIGN.md)
 - [x] Wave A (18:25–19:00 JST, commit 5751ebb): game core — 'dispatch' screen, save v2 + migration, city unlock rules, deterministic effect timeline, undo/redo, tutorial flag (98 tests); i18n EN/JA (447 keys, mission copy, 57 tests); SVG art library + gallery (105 tests, `reports/art/gallery.png`).
-- [ ] Wave B (started 19:25 JST): city map screen (src/ui/city) ∥ scene + spray player + four results + Why comparison (src/ui/scene).
-- [ ] Wave C: integration (App/screens/play rewired, warm theme, i18n migration, tutorial, mobile bottom bar, settings), e2e rewrite, screenshots at 375/390/768/1440.
+- [x] Wave B (19:25–20:05 JST, commit 1cd8dc6): city map screen (18 tests) ∥ scene + spray player + four results + Why comparison (36 tests); previews reviewed at 4 sizes.
+- [x] Wave C (20:05–21:10 JST, commit 36c00d5): integration — warm theme, city as mission screen, scene everywhere, spray answer-check, result overlay, Why?, tutorial first run, EN/JA, settings (language, free roam), mobile bottom bar; Board retired. Orchestrator re-run: lint 0 · typecheck 0 · unit 404/404 (24 files) · build 0 · Python 4746/0 · e2e 86 passed / 1 WebKit timing flake (test made robust, re-run 10/10) / 9 skipped-by-design · input latency ≤3.9 ms (reports/perf.json). Qollab draft re-uploaded (redesigned page renders, self-test exact, job cdeaf054…).
 - [ ] Review/fix wave, Qollab bundle + run, demo re-record, verify:release, protected deploy check, final report.
 
 ## P0 items
