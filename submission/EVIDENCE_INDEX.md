@@ -13,7 +13,7 @@
 | GitHub | private repo, HEAD | `https://github.com/dorakingx/q11` — `isPrivate: true` (checked 2026-10-10 00:28 UTC); final SHA: _pending_ |
 | Vercel project | protection set before first deploy | `prj_JIAQjMOr0rAnEHwhbY46UaeTNonL`, `ssoProtection.deploymentType = "all"` (2026-10-10 00:47 UTC, `latestDeployments: []` at that time) |
 | Vercel deployment | protected deployment URL, id, git SHA, anonymous check | `reports/protection-check.json` — _pending_ |
-| Qollab | draft project, built-in simulator run, IonQ simulator run | `reports/qollab-runs.md` — _BLOCKED: user sign-in required in the Claude browser pane_ |
+| Qollab | draft project, built-in simulator runs, IonQ simulator runs | `reports/qollab-runs.md`: draft `qollab.xyz/u/doraking/q11-quantum-emergency-response` (private); built-in simulator: rep3 early check + blind-dispatch (exact match); IonQ Aria 1: rep3 early check, blind-dispatch (job 01a12375…, 01a12378…), silent-failure (job 01a1237b…); raw counts `reports/qollab-runs/*.json` |
 | Demo video | 120–180 s recording of the real app | `submission/DEMO.mp4` (local only, git-ignored) — sha256: _pending_, duration: _pending_ |
 | Submission docs | project page, descriptions, script, attribution, import, checklist, limitations | `submission/*.md` |
 | Publication | NOT performed | Qollab unpublished draft; repo private; Vercel protected; video not uploaded |

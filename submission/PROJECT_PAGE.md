@@ -39,6 +39,8 @@ Not "QEC as a game" — that exists. Q11's contribution is the *combination* ins
 ## Qiskit, Qollab and IonQ
 This is a **JS/Qiskit** Qollab project: the page is the game; `q11/*.py` is a pure-Python Qiskit package. Press **Run**, choose a backend in *Select QPU*, and use **Verify on this backend** in a surface-code debrief. On the built-in simulator the measured syndrome distribution is deterministic and matches the prediction exactly. On IonQ's free noise-model simulators (Aria 1/2, Forte 1/Enterprise) counts deviate statistically; the page labels them as such. One job per run on IonQ, by Qollab's rules. **No hardware (QPU) runs were made, and none are claimed.**
 
+Recorded runs (free IonQ Aria 1 noise-model simulator, 100 shots each, from this project's `main.py`): *Blind Dispatch* — job `01a12378-c4f2-71ea-b5df-920acd440520`, dominant alarm pattern Z0·Z1 in 69% of shots, logical readout 0 in 93%; *Silent Failure* with the minimum-weight crew — job `01a1237b-5f60-7349-89d0-a343dca0201c`, dominant alarm pattern Z0 in 73%, logical readout **1 in 97%**: the alarms are explained and silenced, and the logical qubit is flipped, exactly as the GF(2) verdict predicts. On the built-in ideal simulator the same circuits reproduce the prediction in 100% of shots.
+
 ## Reproduce and extend
 ```
 git clone <repo>            # MIT

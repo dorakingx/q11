@@ -43,6 +43,10 @@ submission/   project page, demo script, checklist, evidence      reports/   tes
 docs/         plan, status, decisions, science, Qollab runtime    spec/      build specification
 ```
 
+## Evidence of real runs
+- Qollab built-in simulator and **IonQ Aria 1 remote simulator** executed the project's surface-code mission circuits (17 qubits): see `reports/qollab-runs.md` (job ids, histograms) and `reports/qollab-runs/*.json` (raw counts, re-analysed locally).
+- Independent Python/Qiskit comparison: `reports/QUANTUM_VERIFICATION.md`.
+
 ## Limitations
 Clifford + Pauli educational model, perfect syndromes, distance 3, no QPU runs, no claims of quantum advantage. Full list: `submission/KNOWN_LIMITATIONS.md`.
 
