@@ -48,6 +48,8 @@ submission/*.mov
 submission/*.webm
 submission/raw/
 reports/screenshots/*.png
+!reports/screenshots/before/
+!reports/screenshots/after/
 !reports/screenshots/.gitkeep
 .vercel
 

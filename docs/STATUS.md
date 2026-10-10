@@ -1,8 +1,8 @@
 # Q11 Status
 
-_Last updated: 2026-10-10 12:35 JST_
+_Last updated: 2026-10-10 18:20 JST_
 
-Overall: **READY_FOR_RELEASE_APPROVAL** — every pre-publication gate passes; the only remaining steps are the user-approved publication actions in `submission/RELEASE_CHECKLIST.md` (Qollab publish, demo-video link, optional repo/Vercel visibility, captain submission). Nothing has been published or submitted.
+Overall: **UX REDESIGN IN PROGRESS** (started 2026-10-10 18:15 JST on top of the 2cfae98 READY build; acceptance criteria R1–R15 in `docs/UX_REDESIGN.md`). The earlier READY_FOR_RELEASE_APPROVAL report applies to 2cfae98 only; the redesign must pass all gates again before any release. Nothing has been published or submitted.
 
 ## A1–A9
 | # | Criterion | State | Evidence |
