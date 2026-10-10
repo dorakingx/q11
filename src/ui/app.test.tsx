@@ -230,13 +230,17 @@ describe('App · returning player', () => {
     const u = user();
     render(<App storage="memory" />);
     await u.click(screen.getByTestId('lang-toggle'));
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Q11 Emergency');
-    expect(screen.getByTestId('title-kicker')).toHaveTextContent('クアンタム・エマージェンシー・レスポンス');
+    // In Japan the emergency number is 119, so the Japanese brand is "11Q" (the English "Q11" comes from 911).
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('11Q Emergency');
+    expect(screen.getByTestId('title-kicker')).toHaveTextContent('量子エラー訂正の消防ゲーム');
+    const lettering = Array.from(screen.getByRole('img', { name: /11Q Emergency のマーク/ }).querySelectorAll('text'), (n) => n.textContent);
+    expect(lettering).toContain('11Q');
+    expect(lettering).not.toContain('Q11');
     expect(document.documentElement.lang).toBe('ja');
     await act(async () => {
       await new Promise((r) => setTimeout(r, 80));
     });
-    expect(document.title).toBe('Q11 Emergency — クアンタム・エマージェンシー・レスポンス');
+    expect(document.title).toBe('11Q Emergency — 量子エラー訂正の消防ゲーム');
     expect(screen.getByTestId('play')).not.toHaveTextContent('Play');
     await u.click(screen.getByTestId('settings'));
     expect(screen.getByTestId('lang-ja')).toHaveAttribute('aria-pressed', 'true');

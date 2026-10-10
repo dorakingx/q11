@@ -89,13 +89,13 @@ describe('dictionaries', () => {
     // Z stations (diamonds) see red X fires, X stations (squares) see blue Z fires, on an ODD count.
     expect(en['how.alarms.desc']).toMatch(/diamond Z station .* odd number .* red \(X or Y\)/);
     expect(en['how.alarms.desc']).toMatch(/square X station .* odd number of blue \(Z or Y\)/);
-    expect(ja['how.alarms.desc']).toMatch(/ひし形の Z 警報所.*赤い火 \(X か Y\) が奇数/);
-    expect(ja['how.alarms.desc']).toMatch(/四角の X 警報所.*青い火 \(Z か Y\) が奇数/);
+    expect(ja['how.alarms.desc']).toMatch(/ひし形の Z ステーション.*赤い火 \(X か Y\) が奇数/);
+    expect(ja['how.alarms.desc']).toMatch(/四角の X ステーション.*青い火 \(Z か Y\) が奇数/);
     // XOR, not "more is better"; success = stabilizer membership, not quiet alarms.
     expect(en['how.crews.desc']).toContain('XOR');
     expect(ja['how.crews.desc']).toContain('XOR');
     expect(en['how.verdict.desc']).toMatch(/stabilizer/);
-    expect(ja['how.verdict.desc']).toMatch(/安定化子 \(stabilizer\)/);
+    expect(ja['how.verdict.desc']).toMatch(/スタビライザー \(stabilizer\)/);
     expect(en['details.notSyndromeZero']).toMatch(/not by “syndrome = 0”/);
     expect(ja['details.notSyndromeZero']).toMatch(/「シンドローム = 0」では決まりません/);
     // The one-line quantum-rules note and the one-shot correction note exist in both languages.
@@ -153,6 +153,37 @@ describe('dictionaries', () => {
     expect(en['dispatch.answerCheck']).toBe('Training replay: answer check');
     expect(ja['dispatch.answerCheck']).toBe('訓練リプレイ：答え合わせ');
   });
+
+  it('brands the Japanese version "11Q" (119) and the English one "Q11" (911), truck lettering included', () => {
+    expect(en['app.name']).toBe('Q11 Emergency');
+    expect(en['app.lettering']).toBe('Q11');
+    expect(ja['app.name']).toBe('11Q Emergency');
+    expect(ja['app.lettering']).toBe('11Q');
+    expect(translate('ja', 'doc.title', { app: ja['app.name'] })).toBe('11Q Emergency — 量子エラー訂正の消防ゲーム');
+    expect(translate('ja', 'doc.city', { app: ja['app.name'] })).toBe('11Q Emergency — 街の地図');
+    expect(translate('ja', 'doc.mission', { app: ja['app.name'], n: 4, title: 'Blind Dispatch' })).toBe('11Q Emergency — ミッション 4 · Blind Dispatch');
+    // The title kicker is a plain Japanese line that says what the game is, not a katakana transliteration.
+    expect(ja['title.heading']).toBe('量子エラー訂正の消防ゲーム');
+    expect(ja['title.heading']).not.toMatch(/[ァ-ヶ]・/);
+    expect(ja['app.tagline']).toBe(ja['title.heading']);
+  });
+
+  it('no Japanese string says "Q11": every human-facing brand mention in JA is "11Q"', () => {
+    const offenders: string[] = [];
+    for (const k of KEYS) if (ja[k].includes('Q11')) offenders.push(`ja.${k}`);
+    for (const id of MISSION_IDS) {
+      for (const [name, value] of fields(missionCopy(id, 'ja'))) if (value.includes('Q11')) offenders.push(`missions.ja ${id}.${name}`);
+      const f = fixtureCopyJa(id);
+      for (const [name, value] of [['briefing', f.briefing], ...f.training.map((c, i) => [`training[${String(i)}]`, c] as const), ...(['success', 'logical-error', 'detectable'] as const).map((v) => [`debrief.${v}`, f.debrief[v]] as const)]) {
+        if (value.includes('Q11')) offenders.push(`fixtures.ja ${id}.${name}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+    // …and the brand does appear, as 11Q, where the English says Q11.
+    const brandKeys = KEYS.filter((k) => en[k].includes('Q11'));
+    expect(brandKeys.length).toBeGreaterThanOrEqual(5);
+    for (const k of brandKeys) expect(ja[k], k).toContain('11Q');
+  });
 });
 
 /* ------------------------------------------------------------------ core */
@@ -175,7 +206,7 @@ describe('interpolate / translate', () => {
     expect(translate('en', 'doc.mission', { app: 'Q11 Emergency', n: 4, title: 'Blind Dispatch' })).toBe('Q11 Emergency — Mission 4 · Blind Dispatch');
     const t = translator('ja');
     expect(t('city.dispatch')).toBe('出動！');
-    expect(t('city.truck.travel', { district: '中央地区' })).toBe('消防車が 中央地区 へ向かっています…');
+    expect(t('city.truck.travel', { district: '中央地区' })).toBe('消防車が中央地区へ向かっています…');
   });
 
   it('picks .one / .other plural variants and fills {n}', () => {
@@ -314,7 +345,7 @@ describe('missionCopy', () => {
     }
   });
 
-  it.each(MISSION_IDS)('%s: Japanese keeps station ids, Pauli strings and numbers from the English copy; district name carries the EN name', (id) => {
+  it.each(MISSION_IDS)('%s: Japanese keeps station ids, Pauli strings and numbers from the English copy; district name is a Japanese place name', (id) => {
     const enC = missionCopy(id, 'en');
     const jaC = missionCopy(id, 'ja');
     const enF = fields(enC);
@@ -324,8 +355,10 @@ describe('missionCopy', () => {
       if (name === 'districtName' || name === 'kidTitle') return; // kid titles may be free translations
       for (const tok of physicsTokens(enText)) expect(jaText, `${id} ${name}: token ${tok}`).toContain(tok);
     });
-    expect(jaC.districtName).toMatch(/\([A-Za-z ]+\)/);
-    expect(jaC.detailsTitle).toMatch(/^くわしく/);
+    // A toy-city Japanese place name, no English in parentheses, short enough for the map label.
+    expect(jaC.districtName).not.toMatch(/[A-Za-z()（）]/);
+    expect(jaC.districtName.length).toBeLessThanOrEqual(6);
+    expect(jaC.detailsTitle).toMatch(/^詳細/);
     expect(enC.detailsTitle).toMatch(/^Details/);
   });
 
@@ -389,9 +422,9 @@ describe('fixtureCopyJa', () => {
     expect(m1.debrief.success).toContain('(X·X = I)');
     expect(m1.debrief['logical-error']).toContain('(XXX)');
     const m4 = fixtureCopyJa('blind-dispatch');
-    expect(m4.briefing).toMatch(/赤い警報所 \(Z チェック、ひし形\) は赤い火/);
-    expect(m4.briefing).toMatch(/青い警報所 \(X チェック、四角\) は青い火/);
-    expect(m4.training[0]).toContain('安定化子 (stabilizer)');
+    expect(m4.briefing).toMatch(/赤いステーション \(Z 検査、ひし形\) は赤い火/);
+    expect(m4.briefing).toMatch(/青いステーション \(X 検査、四角\) は青い火/);
+    expect(m4.training[0]).toContain('スタビライザー (stabilizer)');
     const m6 = fixtureCopyJa('silent-failure');
     expect(m6.debrief['logical-error']).toContain('距離 (distance) は 3');
     expect(m6.debrief['logical-error']).toContain('論理 X');

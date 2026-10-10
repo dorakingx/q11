@@ -212,9 +212,10 @@ main.screen-city * { box-sizing: border-box; }
 .city-panel-sub { margin: 0; color: var(--muted); font-weight: 700; font-size: 0.9rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
 .city-panel-facts { margin: 0; display: flex; flex-direction: column; gap: 10px; }
 .city-fact { display: flex; flex-direction: column; gap: 2px; }
-.city-fact dt { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+.city-fact dt { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); word-break: keep-all; overflow-wrap: anywhere; }
 .city-fact dd { margin: 0; font-size: 1rem; line-height: 1.4; }
 .city-fact-row { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+.city-fact-row dt { flex: 0 0 auto; }
 .city-fact-row dd { display: inline-flex; align-items: center; gap: 8px; }
 .city-status {
   display: inline-flex;
@@ -230,7 +231,7 @@ main.screen-city * { box-sizing: border-box; }
 .city-status.is-solved { background: var(--ok); color: var(--ink); }
 .city-status.is-locked { background: var(--line); color: var(--ink-soft); }
 .city-stars { display: inline-flex; gap: 2px; }
-.city-stars-text { font-size: 0.85rem; color: var(--ink-soft); }
+.city-stars-text { font-size: 0.85rem; color: var(--ink-soft); word-break: keep-all; overflow-wrap: anywhere; }
 .city-panel-actions {
   display: flex;
   gap: 10px;

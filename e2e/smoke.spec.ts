@@ -180,14 +180,21 @@ test('language toggle EN → JA changes the headings, document.title and <html l
   await expect(page.getByTestId('lang-toggle')).toHaveAccessibleName('Language: EN / JA, switch to 日本語');
   await expect(page.getByTestId('lang-toggle')).toContainText('EN');
   await page.getByTestId('lang-toggle').click();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Q11 Emergency');
-  await expect(page.getByTestId('title-kicker')).toHaveText('クアンタム・エマージェンシー・レスポンス');
-  await expect(page).toHaveTitle('Q11 Emergency — クアンタム・エマージェンシー・レスポンス');
+  // Japan's emergency number is 119, so the Japanese brand is "11Q" (title, document title, truck lettering).
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('11Q Emergency');
+  await expect(page.getByTestId('title-kicker')).toHaveText('量子エラー訂正の消防ゲーム');
+  await expect(page).toHaveTitle('11Q Emergency — 量子エラー訂正の消防ゲーム');
+  await expect(page.locator('.title-card svg[role="img"] text').filter({ hasText: '11Q' })).toHaveCount(1);
+  await expect(page.locator('.title-card svg[role="img"] text').filter({ hasText: 'Q11' })).toHaveCount(0);
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
+  await expect(page.getByTestId('announcer')).toHaveText('11Q Emergency のタイトル画面。');
   await expect(page.getByTestId('play')).toHaveText('あそぶ');
   await page.getByTestId('play').click();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('量子の街');
-  await expect(page).toHaveTitle('Q11 Emergency — 街の地図');
+  await expect(page).toHaveTitle('11Q Emergency — 街の地図');
+  await expect(page.getByTestId('announcer')).toHaveText('街の地図。');
+  await expect(page.getByTestId('city-title')).toHaveAccessibleName('11Q Emergency 量子の街 — タイトルにもどる');
+  await expect(page.getByTestId('city-title').locator('svg text').filter({ hasText: '11Q' })).toHaveCount(1);
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
   await page.getByTestId('settings').click();

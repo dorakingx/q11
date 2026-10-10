@@ -16,7 +16,7 @@ export interface Reactions {
 }
 
 export interface MissionCopy {
-  /** District on the city map (EN: "Central District"; JA adds the EN name in parentheses). */
+  /** District on the city map (EN: "Central District"; JA: a toy-city Japanese place name such as 「中央地区」). */
   readonly districtName: string;
   /** Short title a child reads on the map. */
   readonly kidTitle: string;

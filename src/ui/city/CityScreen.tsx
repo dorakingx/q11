@@ -290,7 +290,7 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
       <header className="city-hud">
         <div className="city-brand-group">
           <button type="button" className="city-brand" onClick={onTitle} aria-label={t('a11y.cityBackToTitle')} data-testid="city-title">
-            <Q11Mark size={40} />
+            <Q11Mark size={40} lettering={t('app.lettering')} />
             <span className="city-brand-name">
               <BrandName />
             </span>

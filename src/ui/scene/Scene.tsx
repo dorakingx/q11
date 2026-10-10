@@ -404,7 +404,9 @@ function HouseButton({ q, state, fog, crew, interactive, selected, budgetReached
     else if (crew === selected) parts.push(t('a11y.pressToRecall'));
     else parts.push(selected === undefined ? t('a11y.pressToSwitchAny') : t('a11y.pressToSwitch', { crew: crewName(t, selected) }));
   }
-  const label = parts.join(', ');
+  // The list separator follows the language: ", " in English, "、" in Japanese (the spray.list.comma template with
+  // empty items is exactly that separator), so the accessible name reads "家 4、かくれている、…" and not "家 4, …".
+  const label = parts.join(t('spray.list.comma', { a: '', b: '' }));
   const classes = ['block', `block-${state.kind}`, crew !== null ? 'has-crew' : '', budgetReached && crew === null ? 'is-budget-reached' : ''].filter(Boolean).join(' ');
   if (!interactive) {
     return <div className={classes} role="img" aria-label={label} data-q={q} data-testid={`block-${String(q)}`} />;

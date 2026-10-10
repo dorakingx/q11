@@ -309,7 +309,7 @@ export function ChallengeScreen({ mission, placements, selected, standDownDialog
   const caption = (
     <>
       <p className="board-caption" id={descId}>
-        {isWires ? t('challenge.startingFire', { fires: startLetters.map((x) => t('challenge.startToken', { letter: x.l, q: x.q })).join(', ') }) : `${t('challenge.fog')} ${alarmSummary(t, mission.code, synd)}`} <span className="muted">{t('challenge.tapHint')}</span>
+        {isWires ? t('challenge.startingFire', { fires: startLetters.map((x) => t('challenge.startToken', { letter: x.l, q: x.q })).join(t('spray.list.comma', { a: '', b: '' })) }) : `${t('challenge.fog')} ${alarmSummary(t, mission.code, synd)}`} <span className="muted">{t('challenge.tapHint')}</span>
       </p>
       {!isWires && highlightedCheck !== null ? (
         <p className="muted small" data-testid="detector-watch">

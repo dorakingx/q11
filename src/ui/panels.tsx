@@ -160,7 +160,8 @@ export function Palette({ allowed, selected, onSelect, callout }: PaletteProps) 
             <span className="palette-text">
               <span className="palette-name">
                 {t('palette.crew', { letter: l })}
-                <span className="sr-only">, {t(CREW_KEY[l])},</span>
+                {/* list separator per language (", " / "、"), see Scene.tsx HouseButton */}
+                <span className="sr-only">{`${t('spray.list.comma', { a: '', b: '' })}${t(CREW_KEY[l])}${t('spray.list.comma', { a: '', b: '' })}`}</span>
               </span>
               <span className="palette-hint">{t(PUTS_OUT_KEY[l])}</span>
             </span>
@@ -233,14 +234,14 @@ export function TopBar({ title, subtitle, onMissions, onSettings, settingsLabel,
         {onTitle === undefined ? (
           <span className="brand">
             <span className="brand-mark" aria-hidden="true">
-              <Q11Mark size={28} />
+              <Q11Mark size={28} lettering={t('app.lettering')} />
             </span>
             <BrandName />
           </span>
         ) : (
           <button type="button" className="btn btn-ghost brand-btn" onClick={onTitle} aria-label={t('a11y.backToTitle')}>
             <span className="brand-mark" aria-hidden="true">
-              <Q11Mark size={28} />
+              <Q11Mark size={28} lettering={t('app.lettering')} />
             </span>
             <BrandName />
           </button>

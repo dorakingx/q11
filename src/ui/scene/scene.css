@@ -297,6 +297,9 @@ button.block:focus-visible > .crew-preview {
   font-size: 1.5rem;
   line-height: 1.15;
   font-weight: 900;
+  /* keep-all: a Japanese title wraps at its punctuation (火は消え、| 家はもどった), never mid-word; English is unaffected */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 .result-restored .result-title {
   color: #1f7a43;

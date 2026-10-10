@@ -95,13 +95,20 @@ export function alarmSummary(t: Translate, codeId: CodeId, syndrome: readonly nu
   return t('alarms.summary.ringing', { ringing: ringing.length, total: code.checks.length, list: ringing.join(', ') });
 }
 
-/** "X fire on house 0" / "X fire on house 0 and Z fire on house 1" — lesson step labels. */
+/**
+ * "X fire on house 0" / "X fire on house 0, Z fire on house 1 and Y fire on house 2" — lesson step labels. The list is
+ * joined through the spray.list.* templates so each language gets its own separators (EN ", " / " and ", JA "、" / " と ").
+ */
 export function fireLabel(t: Translate, fire: string): string {
   const p = fromString(fire);
   const parts = support(p).map((q) => t('fire.onHouse', { letter: letterAt(p, q), q }));
   if (parts.length === 0) return t('fire.none');
-  if (parts.length === 1) return parts[0] ?? '';
-  return `${parts.slice(0, -1).join(', ')} ${t('common.and')} ${parts[parts.length - 1] ?? ''}`;
+  let acc = parts[0] ?? '';
+  for (let i = 1; i < parts.length; i++) {
+    const b = parts[i] ?? '';
+    acc = i === parts.length - 1 ? t('spray.list.and', { a: acc, b }) : t('spray.list.comma', { a: acc, b });
+  }
+  return acc;
 }
 
 /** Ids of the stations that watch house q, in checks order: "Z0, Z1, X0, X1". */

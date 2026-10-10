@@ -193,7 +193,12 @@ describe('CityScreen — HUD', () => {
   it('speaks Japanese when the provider says so', () => {
     renderCity({ lang: 'ja' });
     expect(screen.getByRole('heading', { level: 1, name: '量子の街' })).toBeInTheDocument();
-    expect(screen.getByTestId('mission-1')).toHaveAccessibleName(/^1 長屋通り \(Rowhouse Lane\) — 火事発生、/);
+    expect(screen.getByTestId('mission-1')).toHaveAccessibleName(/^1 ながや通り — 火事発生、/);
+    // The brand chip and the truck lettering follow the language: "11Q" (119) in Japanese.
+    expect(screen.getByTestId('city-title')).toHaveAccessibleName('11Q Emergency 量子の街 — タイトルにもどる');
+    const lettering = Array.from(screen.getByTestId('city-title').querySelectorAll('svg text'), (n) => n.textContent);
+    expect(lettering).toContain('11Q');
+    expect(lettering).not.toContain('Q11');
   });
 });
 

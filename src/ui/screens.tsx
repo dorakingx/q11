@@ -21,7 +21,7 @@ const BADGE_COLOURS = ['#2f6fdd', '#2bb673', '#8a4fd6', '#e8432a', '#f2b200', '#
 
 /* ------------------------------------------------------------------ title */
 
-/** The kicker line; a Japanese katakana compound may wrap only after its middle dots ("クアンタム・" | "エマージェンシー・" | "レスポンス"). */
+/** The kicker line; a katakana compound joined by middle dots may wrap only after a dot (plain text renders as is). */
 function KickerText({ text }: { readonly text: string }) {
   const parts = text.split('・');
   if (parts.length === 1) return <>{text}</>;
@@ -47,7 +47,7 @@ export function TitleScreen({ state, dispatch }: ScreenProps) {
   return (
     <main className="screen screen-title">
       <div className="title-card">
-        <Q11Mark size={112} label={t('a11y.q11mark')} />
+        <Q11Mark size={112} label={t('a11y.q11mark')} lettering={t('app.lettering')} />
         <h1 className="title-h" tabIndex={-1} data-focus-target>
           {t('app.name')}
         </h1>

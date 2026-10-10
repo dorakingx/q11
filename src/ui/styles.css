@@ -93,7 +93,8 @@ kbd { font: 700 0.8em ui-monospace, SFMono-Regular, Menlo, monospace; background
 .title-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; max-width: 680px; background: var(--panel); border: 2px solid var(--outline); border-radius: 28px; padding: 32px 28px; box-shadow: 0 6px 0 var(--shadow); }
 .title-h { font-size: clamp(1.9rem, 5vw, 2.6rem); font-weight: 900; letter-spacing: -0.01em; line-height: 1.15; }
 .title-kicker { margin-top: -6px; font-size: clamp(1rem, 2.6vw, 1.25rem); font-weight: 800; letter-spacing: 0.02em; color: var(--ink); max-width: 30ch; word-break: keep-all; overflow-wrap: anywhere; }
-.title-lead { font-size: 1.2rem; color: var(--ink-soft); font-weight: 700; max-width: 34ch; }
+/* keep-all: the Japanese kid line wraps at its punctuation (見えない火事、聞こえる警報。| 正しい隊を送ろう！), never mid-word; English is unaffected */
+.title-lead { font-size: 1.2rem; color: var(--ink-soft); font-weight: 700; max-width: 34ch; word-break: keep-all; overflow-wrap: anywhere; }
 .title-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 6px; }
 .title-tools { display: flex; align-items: center; justify-content: center; gap: 10px; }
 .title-foot { font-size: 0.85rem; margin-top: 10px; }
@@ -293,8 +294,8 @@ kbd { font: 700 0.8em ui-monospace, SFMono-Regular, Menlo, monospace; background
   :root { --gap: 12px; }
   .screen { padding: 8px 16px 24px; }
   .topbar { padding: 6px 8px; gap: 6px; }
-  .topbar-h { font-size: 1rem; white-space: normal; }
-  .topbar-sub { white-space: normal; overflow: visible; text-overflow: clip; }
+  .topbar-h { font-size: 1rem; white-space: normal; word-break: keep-all; overflow-wrap: anywhere; }
+  .topbar-sub { white-space: normal; overflow: visible; text-overflow: clip; word-break: keep-all; overflow-wrap: anywhere; }
   .topbar .btn-ghost:not(.btn-icon):not(.brand-btn) { padding: 10px 10px; font-size: 0.9rem; }
   .topbar .brand { display: none; }
   .topbar .brand-btn { padding: 8px 6px; }
@@ -312,7 +313,7 @@ kbd { font: 700 0.8em ui-monospace, SFMono-Regular, Menlo, monospace; background
 @media (max-width: 480px) {
   /* brand chips show "Q11" only; the word stays in the accessible name (visually hidden, not display:none) */
   .brand-word { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-  .topbar-sub { white-space: normal; overflow: visible; text-overflow: clip; }
+  .topbar-sub { white-space: normal; overflow: visible; text-overflow: clip; word-break: keep-all; overflow-wrap: anywhere; }
   .screen-challenge { padding-bottom: 104px; }
   .screen-challenge .action-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: var(--panel); border-top: 2px solid var(--outline); margin: 0; box-shadow: 0 -4px 12px var(--shadow); }
   .screen-challenge .action-bar .btn { flex: 1 1 auto; min-height: 52px; }

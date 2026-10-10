@@ -17,6 +17,8 @@
 export const en = {
   /* ------------------------------------------------------------------ app / document titles */
   'app.name': 'Q11 Emergency',
+  /** What is painted on the brand-mark truck: "Q11" (from 911) in English, "11Q" (from 119) in Japanese. */
+  'app.lettering': 'Q11',
   'app.tagline': 'Quantum Emergency Response',
   'doc.title': '{app} — Quantum Emergency Response',
   'doc.how': '{app} — How it works',
