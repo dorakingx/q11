@@ -1,44 +1,68 @@
 
-Running 38 tests using 2 workers
+Running 62 tests using 2 workers
 
-[1/38] [desktop-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
-[2/38] [desktop-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
-[3/38] [desktop-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
-[4/38] [desktop-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
-[5/38] [desktop-chromium] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
-[6/38] [desktop-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 375×812: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
-[7/38] [desktop-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 390×844: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
-[8/38] [desktop-chromium] › e2e/viewports.spec.ts:17:3 › viewport 1440×900: every screen fits, screenshots written
-[9/38] [desktop-chromium] › e2e/viewports.spec.ts:17:3 › viewport 768×1024: every screen fits, screenshots written
-[10/38] [desktop-chromium] › e2e/viewports.spec.ts:17:3 › viewport 390×844: every screen fits, screenshots written
-[11/38] [desktop-chromium] › e2e/viewports.spec.ts:17:3 › viewport 375×812: every screen fits, screenshots written
-[12/38] [mobile-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
-[13/38] [mobile-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
-[14/38] [mobile-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
-[15/38] [mobile-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
-[16/38] [mobile-chromium] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
-[17/38] [mobile-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 375×812: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
-[18/38] [mobile-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 390×844: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
-[19/38] [mobile-chromium] › e2e/viewports.spec.ts:17:3 › viewport 1440×900: every screen fits, screenshots written
-[20/38] [mobile-chromium] › e2e/viewports.spec.ts:17:3 › viewport 768×1024: every screen fits, screenshots written
-[21/38] [mobile-chromium] › e2e/viewports.spec.ts:17:3 › viewport 390×844: every screen fits, screenshots written
-[22/38] [mobile-chromium] › e2e/viewports.spec.ts:17:3 › viewport 375×812: every screen fits, screenshots written
-[23/38] [tablet-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
-[24/38] [tablet-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
-[25/38] [tablet-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
-[26/38] [tablet-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
-[27/38] [tablet-chromium] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
-[28/38] [tablet-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 375×812: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
-[29/38] [tablet-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 390×844: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
-[30/38] [tablet-chromium] › e2e/viewports.spec.ts:17:3 › viewport 1440×900: every screen fits, screenshots written
-[31/38] [tablet-chromium] › e2e/viewports.spec.ts:17:3 › viewport 768×1024: every screen fits, screenshots written
-[32/38] [tablet-chromium] › e2e/viewports.spec.ts:17:3 › viewport 390×844: every screen fits, screenshots written
-[33/38] [tablet-chromium] › e2e/viewports.spec.ts:17:3 › viewport 375×812: every screen fits, screenshots written
-[34/38] [desktop-webkit] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
-[35/38] [desktop-webkit] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
-[36/38] [desktop-webkit] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
-[37/38] [desktop-webkit] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
-[38/38] [desktop-webkit] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
-  12 skipped
-  26 passed (1.1m)
+[1/62] [desktop-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[2/62] [desktop-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[3/62] [desktop-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[4/62] [desktop-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[5/62] [desktop-chromium] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
+[6/62] [desktop-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 375×812: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[7/62] [desktop-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 390×844: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[8/62] [desktop-chromium] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge
+[9/62] [desktop-chromium] › e2e/smoke.spec.ts:89:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial
+[10/62] [desktop-chromium] › e2e/smoke.spec.ts:101:1 › mission 1 can be played with the keyboard only
+[11/62] [desktop-chromium] › e2e/smoke.spec.ts:175:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists
+[12/62] [desktop-chromium] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
+[13/62] [desktop-chromium] › e2e/smoke.spec.ts:226:1 › back to briefing: training and the planning stage both return to the briefing, and Skip starts a fresh plan
+[14/62] [desktop-chromium] › e2e/viewports.spec.ts:17:3 › viewport 1440×900: every screen fits, screenshots written
+[15/62] [desktop-chromium] › e2e/viewports.spec.ts:17:3 › viewport 768×1024: every screen fits, screenshots written
+[16/62] [desktop-chromium] › e2e/viewports.spec.ts:17:3 › viewport 390×844: every screen fits, screenshots written
+[17/62] [desktop-chromium] › e2e/viewports.spec.ts:17:3 › viewport 375×812: every screen fits, screenshots written
+[18/62] [mobile-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[19/62] [mobile-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[20/62] [mobile-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[21/62] [mobile-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[22/62] [mobile-chromium] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
+[23/62] [mobile-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 375×812: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[24/62] [mobile-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 390×844: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[25/62] [mobile-chromium] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge
+[26/62] [mobile-chromium] › e2e/smoke.spec.ts:89:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial
+[27/62] [mobile-chromium] › e2e/smoke.spec.ts:101:1 › mission 1 can be played with the keyboard only
+[28/62] [mobile-chromium] › e2e/smoke.spec.ts:175:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists
+[29/62] [mobile-chromium] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
+[30/62] [mobile-chromium] › e2e/smoke.spec.ts:226:1 › back to briefing: training and the planning stage both return to the briefing, and Skip starts a fresh plan
+[31/62] [mobile-chromium] › e2e/viewports.spec.ts:17:3 › viewport 1440×900: every screen fits, screenshots written
+[32/62] [mobile-chromium] › e2e/viewports.spec.ts:17:3 › viewport 768×1024: every screen fits, screenshots written
+[33/62] [mobile-chromium] › e2e/viewports.spec.ts:17:3 › viewport 390×844: every screen fits, screenshots written
+[34/62] [mobile-chromium] › e2e/viewports.spec.ts:17:3 › viewport 375×812: every screen fits, screenshots written
+[35/62] [tablet-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[36/62] [tablet-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[37/62] [tablet-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[38/62] [tablet-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[39/62] [tablet-chromium] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
+[40/62] [tablet-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 375×812: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[41/62] [tablet-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 390×844: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[42/62] [tablet-chromium] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge
+[43/62] [tablet-chromium] › e2e/smoke.spec.ts:89:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial
+[44/62] [tablet-chromium] › e2e/smoke.spec.ts:101:1 › mission 1 can be played with the keyboard only
+[45/62] [tablet-chromium] › e2e/smoke.spec.ts:175:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists
+[46/62] [tablet-chromium] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
+[47/62] [tablet-chromium] › e2e/smoke.spec.ts:226:1 › back to briefing: training and the planning stage both return to the briefing, and Skip starts a fresh plan
+[48/62] [tablet-chromium] › e2e/viewports.spec.ts:17:3 › viewport 1440×900: every screen fits, screenshots written
+[49/62] [tablet-chromium] › e2e/viewports.spec.ts:17:3 › viewport 768×1024: every screen fits, screenshots written
+[50/62] [tablet-chromium] › e2e/viewports.spec.ts:17:3 › viewport 390×844: every screen fits, screenshots written
+[51/62] [tablet-chromium] › e2e/viewports.spec.ts:17:3 › viewport 375×812: every screen fits, screenshots written
+[52/62] [desktop-webkit] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[53/62] [desktop-webkit] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[54/62] [desktop-webkit] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[55/62] [desktop-webkit] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[56/62] [desktop-webkit] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
+[57/62] [desktop-webkit] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge
+[58/62] [desktop-webkit] › e2e/smoke.spec.ts:89:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial
+[59/62] [desktop-webkit] › e2e/smoke.spec.ts:101:1 › mission 1 can be played with the keyboard only
+[60/62] [desktop-webkit] › e2e/smoke.spec.ts:175:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists
+[61/62] [desktop-webkit] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
+[62/62] [desktop-webkit] › e2e/smoke.spec.ts:226:1 › back to briefing: training and the planning stage both return to the briefing, and Skip starts a fresh plan
+  13 skipped
+  49 passed (50.0s)
 exit=0

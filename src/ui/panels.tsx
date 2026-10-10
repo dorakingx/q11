@@ -218,15 +218,20 @@ export function BrandName() {
 /**
  * The brand lockup: the mark (fluid, cropped to the drawn truck + flames) above the app name, the name set in the
  * title-screen face. The mark is exactly as wide as the name because the lockup shrink-wraps the name.
- * `nameAs` lets the title screen render the name as its h1.
+ * `nameAs` lets the title screen render the name as its h1; `layout="row"` puts the name to the right of a chip-high mark
+ * (the city HUD).
  */
-export function BrandLockup({ size = 'small', nameAs = 'span', nameProps }: { readonly size?: 'small' | 'title'; readonly nameAs?: 'span' | 'h1'; readonly nameProps?: Record<string, unknown> }) {
+export function BrandLockup({ size = 'small', nameAs = 'span', nameProps, layout = 'stack' }: { readonly size?: 'small' | 'title'; readonly nameAs?: 'span' | 'h1'; readonly nameProps?: Record<string, unknown>; readonly layout?: 'stack' | 'row' }) {
   const t = useT();
   const Name = nameAs;
   return (
-    <span className={`brand-lockup brand-lockup-${size}`}>
-      <span className="brand-mark brand-mark-fluid" aria-hidden={nameAs === 'span' ? 'true' : undefined}>
-        <Q11Mark fluid lettering={t('app.lettering')} label={nameAs === 'span' ? undefined : t('a11y.q11mark')} />
+    <span className={`brand-lockup brand-lockup-${size} brand-lockup-${layout}`}>
+      <span className={layout === 'row' ? 'brand-mark' : 'brand-mark brand-mark-fluid'} aria-hidden={nameAs === 'span' ? 'true' : undefined}>
+        {layout === 'row' ? (
+          <Q11Mark crop size={40} lettering={t('app.lettering')} />
+        ) : (
+          <Q11Mark fluid lettering={t('app.lettering')} label={nameAs === 'span' ? undefined : t('a11y.q11mark')} />
+        )}
       </span>
       <Name className={`brand-lockup-name${nameAs === 'h1' ? ' title-h' : ''}`} {...(nameProps ?? {})}>
         <BrandName />

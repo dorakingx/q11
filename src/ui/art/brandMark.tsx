@@ -19,20 +19,24 @@ export function BrandMarkContent({ lettering = 'Q11' }: { readonly lettering?: s
   );
 }
 
-export function BrandMark({ size = 72, label, lettering, fluid = false }: { readonly size?: number; readonly label?: string | undefined; readonly lettering?: string | undefined; readonly fluid?: boolean }) {
-  // fluid: fill the parent's width (height follows the aspect) and crop the frame to the drawn truck + flames so the
-  // picture is exactly as wide as the lockup's name underneath it.
+export function BrandMark({ size = 72, label, lettering, fluid = false, crop = false }: { readonly size?: number; readonly label?: string | undefined; readonly lettering?: string | undefined; readonly fluid?: boolean; readonly crop?: boolean }) {
+  // fluid: fill the parent's width (height follows the aspect); crop: frame = the drawn truck + flames (no empty margin)
+  // so a chip-high mark (size = height) is as big as it can be. Both crop the 512 frame to BRAND_MARK_BBOX.
   const b = BRAND_MARK_BBOX;
-  const viewBox = fluid ? `${String(b.x0)} ${String(b.y0)} ${String(b.x1 - b.x0)} ${String(b.y1 - b.y0)}` : '0 0 512 512';
+  const cropped = fluid || crop;
+  const bw = b.x1 - b.x0;
+  const bh = b.y1 - b.y0;
+  const viewBox = cropped ? `${String(b.x0)} ${String(b.y0)} ${String(bw)} ${String(bh)}` : '0 0 512 512';
+  const width = fluid ? '100%' : crop ? Math.round((size * bw) / bh) : size;
   return (
     <svg
-      width={fluid ? '100%' : size}
+      width={width}
       height={fluid ? undefined : size}
       viewBox={viewBox}
       role="img"
       aria-label={label ?? BRAND_MARK_LABEL}
       focusable="false"
-      style={fluid ? { display: 'block', height: 'auto' } : undefined}
+      style={fluid ? { display: 'block', height: 'auto' } : { display: 'block' }}
     >
       <BrandMarkContent lettering={lettering} />
     </svg>

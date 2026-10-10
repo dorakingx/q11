@@ -290,7 +290,7 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
       <header className="city-hud">
         <div className="city-brand-group">
           <button type="button" className="city-brand" onClick={onTitle} aria-label={t('a11y.cityBackToTitle')} data-testid="city-title">
-            <BrandLockup />
+            <BrandLockup layout="row" />
           </button>
           {/* the screen's heading stays for screen readers and focus; the map itself is the visible title */}
           <h1 className="city-brand-title sr-only" tabIndex={-1} data-focus-target>

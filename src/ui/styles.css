@@ -83,6 +83,9 @@ kbd { font: 700 0.8em ui-monospace, SFMono-Regular, Menlo, monospace; background
 .brand-lockup-name { display: block; text-align: center; font-weight: 900; letter-spacing: -0.01em; line-height: 1.15; color: var(--ink); white-space: nowrap; }
 .brand-lockup-small .brand-lockup-name { font-size: 0.95rem; margin-top: 2px; }
 .brand-lockup-title { gap: 8px; --lockup-mark: 84%; }
+/* row layout (city HUD): a chip-high mark with the name to its right, sized like the HUD's other text */
+.brand-lockup-row { flex-direction: row; align-items: center; gap: 8px; width: auto; }
+.brand-lockup-row .brand-lockup-name { margin-top: 0; font-size: 1rem; text-align: left; }
 .brand-lockup-title .brand-lockup-name { font-size: clamp(1.9rem, 5vw, 2.6rem); }
 .topbar-text { min-width: 0; }
 .topbar-h { font-size: 1.15rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
