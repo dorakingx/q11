@@ -1,0 +1,65 @@
+
+Running 59 tests using 2 workers
+
+[1/59] [desktop-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[2/59] [desktop-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[3/59] [desktop-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[4/59] [desktop-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[5/59] [desktop-chromium] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
+[6/59] [desktop-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 375×812: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[7/59] [desktop-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 390×844: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[8/59] [desktop-chromium] › e2e/missions.spec.ts:5:1 › all six districts are playable end to end in order, with tap-to-predict in the propagation lessons
+[9/59] [desktop-chromium] › e2e/missions.spec.ts:130:1 › mission 6 lucky guess (houses 1 and 2): success scored lucky, 1 star, no cloud card for that dispatch
+[10/59] [desktop-chromium] › e2e/missions.spec.ts:149:1 › How it works: kid copy with the art legend and the jargon under Details; Japanese switch
+[11/59] [desktop-chromium] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge
+[12/59] [desktop-chromium] › e2e/smoke.spec.ts:89:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial
+[13/59] [desktop-chromium] › e2e/smoke.spec.ts:101:1 › mission 1 can be played with the keyboard only
+[14/59] [desktop-chromium] › e2e/smoke.spec.ts:175:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists
+[15/59] [desktop-chromium] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
+[16/59] [desktop-chromium] › e2e/smoke.spec.ts:226:1 › back to briefing: training and the planning stage both return to the briefing, and Skip starts a fresh plan
+[17/59] [mobile-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[18/59] [mobile-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[19/59] [mobile-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[20/59] [mobile-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[21/59] [mobile-chromium] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
+[22/59] [mobile-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 375×812: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[23/59] [mobile-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 390×844: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[24/59] [mobile-chromium] › e2e/missions.spec.ts:5:1 › all six districts are playable end to end in order, with tap-to-predict in the propagation lessons
+[25/59] [mobile-chromium] › e2e/missions.spec.ts:130:1 › mission 6 lucky guess (houses 1 and 2): success scored lucky, 1 star, no cloud card for that dispatch
+[26/59] [mobile-chromium] › e2e/missions.spec.ts:149:1 › How it works: kid copy with the art legend and the jargon under Details; Japanese switch
+[27/59] [mobile-chromium] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge
+[28/59] [mobile-chromium] › e2e/smoke.spec.ts:89:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial
+[29/59] [mobile-chromium] › e2e/smoke.spec.ts:101:1 › mission 1 can be played with the keyboard only
+[30/59] [mobile-chromium] › e2e/smoke.spec.ts:175:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists
+[31/59] [mobile-chromium] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
+[32/59] [mobile-chromium] › e2e/smoke.spec.ts:226:1 › back to briefing: training and the planning stage both return to the briefing, and Skip starts a fresh plan
+[33/59] [tablet-chromium] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[34/59] [tablet-chromium] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[35/59] [tablet-chromium] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[36/59] [tablet-chromium] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[37/59] [tablet-chromium] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
+[38/59] [tablet-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 375×812: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[39/59] [tablet-chromium] › e2e/japanese.spec.ts:33:3 › 日本語 390×844: title, city, briefing, challenge, result and Why? fit; the brand reads 11Q
+[40/59] [tablet-chromium] › e2e/missions.spec.ts:5:1 › all six districts are playable end to end in order, with tap-to-predict in the propagation lessons
+[41/59] [tablet-chromium] › e2e/missions.spec.ts:130:1 › mission 6 lucky guess (houses 1 and 2): success scored lucky, 1 star, no cloud card for that dispatch
+[42/59] [tablet-chromium] › e2e/missions.spec.ts:149:1 › How it works: kid copy with the art legend and the jargon under Details; Japanese switch
+[43/59] [tablet-chromium] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge
+[44/59] [tablet-chromium] › e2e/smoke.spec.ts:89:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial
+[45/59] [tablet-chromium] › e2e/smoke.spec.ts:101:1 › mission 1 can be played with the keyboard only
+[46/59] [tablet-chromium] › e2e/smoke.spec.ts:175:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists
+[47/59] [tablet-chromium] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
+[48/59] [tablet-chromium] › e2e/smoke.spec.ts:226:1 › back to briefing: training and the planning stage both return to the briefing, and Skip starts a fresh plan
+[49/59] [desktop-webkit] › e2e/city.spec.ts:4:1 › city: locked districts toast, Dispatch! drives the truck (skippable), free roam opens every district
+[50/59] [desktop-webkit] › e2e/city.spec.ts:64:1 › the truck drive finishes on its own (≈1.5 s) and dispatches exactly once
+[51/59] [desktop-webkit] › e2e/city.spec.ts:76:1 › persistence: a v1 save migrates to v2 with progress and settings kept and no reset notice; corrupt data resets with a notice
+[52/59] [desktop-webkit] › e2e/city.spec.ts:107:1 › settings: toggles persist across reload; reset clears progress after confirmation
+[53/59] [desktop-webkit] › e2e/city.spec.ts:132:1 › summary after the old town: badges, stars and the free-roam hint
+[54/59] [desktop-webkit] › e2e/smoke.spec.ts:4:1 › first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge
+[55/59] [desktop-webkit] › e2e/smoke.spec.ts:89:1 › skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial
+[56/59] [desktop-webkit] › e2e/smoke.spec.ts:101:1 › mission 1 can be played with the keyboard only
+[57/59] [desktop-webkit] › e2e/smoke.spec.ts:175:1 › language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists
+[58/59] [desktop-webkit] › e2e/smoke.spec.ts:206:1 › document.title follows the screen and the live region announces each screen
+[59/59] [desktop-webkit] › e2e/smoke.spec.ts:226:1 › back to briefing: training and the planning stage both return to the briefing, and Skip starts a fresh plan
+  5 skipped
+  54 passed (2.4m)
+exit=0

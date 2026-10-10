@@ -325,6 +325,12 @@ function step(state: GameState, action: Action): GameState {
       }
       return state;
     }
+    case 'BACK_TO_BRIEFING': {
+      // Only before the crews are committed: training and the planning stage. The plan is discarded (the briefing's
+      // buttons start fresh, exactly as if the district had just been opened).
+      if (state.missionId === null || (state.screen !== 'training' && state.screen !== 'challenge')) return state;
+      return { ...enterBriefing(state, state.missionId), tutorialActive: false };
+    }
     case 'START_CHALLENGE': {
       const m = currentMission(state);
       if (m === null || (state.screen !== 'training' && state.screen !== 'briefing')) return state;

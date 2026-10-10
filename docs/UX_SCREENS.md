@@ -32,3 +32,6 @@ Sound, Reduce motion, Language, Free roam, Reset progress, storage note.
 
 ## Accessibility & input
 Real buttons for houses/detectors/districts; arrow-key navigation on the scene; focus moves to the screen heading; live region announces alarms/outcome; all meanings by shape + letter; ≥48px targets; no hover-only content; no horizontal scroll at 375/390/768/1440 widths.
+
+## Back to briefing (2026-10-11)
+Training and the planning stage show a ghost button **Back to briefing** (JA 作戦説明にもどる, `data-testid="back-to-briefing"`) in the top bar, next to **Quantum City**. It returns to the district's briefing (`BACK_TO_BRIEFING`): the plan and training position are discarded, so **Start training** / **Skip to dispatch** start fresh. It is not shown during the guided first run and not after Spray! (the answer check, result and Why? keep their own buttons).

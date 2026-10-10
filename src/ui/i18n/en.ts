@@ -134,6 +134,7 @@ export const en = {
   'briefing.start': 'Start',
   'briefing.skipToDispatch': 'Skip to dispatch',
   'briefing.go': 'Go!',
+  'briefing.back': 'Back to briefing',
 
   /* ------------------------------------------------------------------ training */
   'training.subtitle': 'Training · lesson {n} of {total} · fires visible',

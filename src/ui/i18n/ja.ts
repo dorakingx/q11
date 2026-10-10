@@ -140,6 +140,7 @@ export const ja: Readonly<Record<Key, string>> = {
   'briefing.start': 'はじめる',
   'briefing.skipToDispatch': '訓練をとばして出動',
   'briefing.go': 'いくぞ！',
+  'briefing.back': '作戦説明にもどる',
 
   /* ------------------------------------------------------------------ training */
   'training.subtitle': '訓練 · レッスン {n} / {total} · 火が見える',

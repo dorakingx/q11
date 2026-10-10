@@ -242,6 +242,8 @@ export type Action =
   | { type: 'LESSON_CURSOR'; cursor: number }
   | { type: 'LESSON_SELECT'; lesson: number }
   | { type: 'START_CHALLENGE' }
+  /** Training or planning (before Spray!) → back to the district's briefing; the plan is discarded. */
+  | { type: 'BACK_TO_BRIEFING' }
   | { type: 'SELECT_LETTER'; letter: CrewLetter }
   | { type: 'TOGGLE_BLOCK'; qubit: number }
   /** Recall the crew on one block (Backspace on a focused block). No-op when the block is empty. */

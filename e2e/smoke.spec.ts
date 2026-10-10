@@ -222,3 +222,26 @@ test('document.title follows the screen and the live region announces each scree
   await expect(page.locator('[data-check="Z0"] .alarm-blocks')).toHaveText('houses 0, 1, 3, 4');
   await expect(page.getByTestId('block-4')).toHaveAccessibleName(/^House 4, hidden, press to send red \(X\) crew$/);
 });
+
+test('back to briefing: training and the planning stage both return to the briefing, and Skip starts a fresh plan', async ({ page }) => {
+  await seedSave(page, { progress: { 'first-alarm': { stars: 3, attempts: 1, completed: true } } });
+  await page.goto('/');
+  await page.getByTestId('play').click();
+  await page.getByTestId('mission-2').click();
+  await page.getByTestId('dispatch-go').click();
+  await expect(page.getByTestId('briefing')).toBeVisible({ timeout: 10_000 });
+  await page.getByTestId('start-mission').click();
+  await expect(page.getByTestId('training-next')).toBeVisible();
+  await page.getByTestId('back-to-briefing').click();
+  await expect(page.getByTestId('briefing')).toBeVisible();
+  await page.getByTestId('briefing-skip').click();
+  await page.getByTestId('palette-Y').click();
+  await page.getByTestId('block-0').click();
+  await expect(page.getByTestId('confirm')).toBeVisible();
+  await page.getByTestId('back-to-briefing').click();
+  await expect(page.getByTestId('briefing')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Harbor Bridge');
+  await page.getByTestId('briefing-skip').click();
+  await expect(page.locator('.crew-marker')).toHaveCount(0);
+});
+

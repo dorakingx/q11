@@ -49,6 +49,7 @@ Overall: **READY_FOR_RELEASE_APPROVAL (Q11 Emergency)** — all A1–A9 and R1�
 
 ## Verification log
 (appended as commands run — command, exit code, counts)
+- 2026-10-11 07:10 Back to briefing (training / planning → briefing, BACK_TO_BRIEFING): lint 0 · typecheck 0 · unit 461/461 · `Q11_E2E_WORKERS=2` smoke+missions+japanese+city on 4 projects → 54 passed / 5 skipped / 0 failed (`reports/e2e-back-to-briefing.log`); Qollab run 15 exact (job 9a5e76c6…)
 - 2026-10-11 06:41 `node scripts/check-protection.mjs` on q11-fk03po8r3 (SHA 1e2d138) + q11-emergency.vercel.app + 2 aliases → 16/16 blocked, bypass 0; authenticated curl → app HTML (assets index-AwxabjYY.js = local build); bypass secret revoked → 0
 - 2026-10-11 06:30 lettered trucks (map + scene show Q11 / 11Q like the icon): lint 0 · typecheck 0 · unit art/scene/city 187/187 · `Q11_E2E_WORKERS=2` city+spray+smoke+japanese on 4 projects → 85 passed / 5 skipped / 0 failed (`reports/e2e-truck-lettering.log`); Qollab run 14 exact (job add02c92…)
 - 2026-10-11 04:05 `gh repo edit dorakingx/q11 --homepage https://q11-emergency.vercel.app --description "Q11 Emergency — …"` → GitHub About now points at the new domain and name (repo still private)

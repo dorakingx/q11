@@ -781,3 +781,27 @@ describe('settings', () => {
     expect(reducer(s, { type: 'DISMISS_NOTICE' }).notice).toBeNull();
   });
 });
+
+describe('BACK_TO_BRIEFING', () => {
+  it('returns from training and from the planning stage to the briefing, discarding the plan', () => {
+    let s = run(fresh(), { type: 'PLAY' }, { type: 'START_MISSION' });
+    expect(s.screen).toBe('training');
+    s = reducer(s, { type: 'BACK_TO_BRIEFING' });
+    expect(s.screen).toBe('briefing');
+    expect(s.missionId).toBe('first-alarm');
+    s = run(s, { type: 'START_CHALLENGE' }, { type: 'SELECT_LETTER', letter: 'X' }, { type: 'TOGGLE_BLOCK', qubit: 0 });
+    expect(s.screen).toBe('challenge');
+    expect(Object.keys(s.placements)).toHaveLength(1);
+    s = reducer(s, { type: 'BACK_TO_BRIEFING' });
+    expect(s.screen).toBe('briefing');
+    expect(s.placements).toEqual({});
+    expect(s.undoStack).toEqual([]);
+  });
+  it('is ignored once the crews are committed and outside a mission', () => {
+    const start = fresh();
+    expect(reducer(start, { type: 'BACK_TO_BRIEFING' })).toBe(start);
+    const s = run(fresh(), { type: 'PLAY' }, { type: 'START_MISSION' }, { type: 'START_CHALLENGE' }, { type: 'SELECT_LETTER', letter: 'X' }, { type: 'TOGGLE_BLOCK', qubit: 1 }, { type: 'CONFIRM' });
+    expect(s.screen).toBe('dispatch');
+    expect(reducer(s, { type: 'BACK_TO_BRIEFING' })).toBe(s);
+  });
+});
