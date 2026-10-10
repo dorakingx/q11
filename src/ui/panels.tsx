@@ -209,43 +209,53 @@ export interface TopBarProps {
   readonly onTitle?: () => void;
 }
 
-/**
- * The app name as the brand chips show it: "Q11" plus the word "Emergency", which narrow viewports (< 480 px) hide
- * visually (CSS .brand-word) while it stays part of the accessible name.
- */
+/** The app name as the brand chips show it ("Q11 Emergency" / "11Q Emergency"). */
 export function BrandName() {
   const t = useT();
-  const name = t('app.name');
-  const cut = name.indexOf(' ');
-  if (cut < 0) return <>{name}</>;
+  return <>{t('app.name')}</>;
+}
+
+/**
+ * The brand lockup: the mark (fluid, cropped to the drawn truck + flames) above the app name, the name set in the
+ * title-screen face. The mark is exactly as wide as the name because the lockup shrink-wraps the name.
+ * `nameAs` lets the title screen render the name as its h1.
+ */
+export function BrandLockup({ size = 'small', nameAs = 'span', nameProps }: { readonly size?: 'small' | 'title'; readonly nameAs?: 'span' | 'h1'; readonly nameProps?: Record<string, unknown> }) {
+  const t = useT();
+  const Name = nameAs;
   return (
-    <>
-      {name.slice(0, cut)}
-      <span className="brand-word">{name.slice(cut)}</span>
-    </>
+    <span className={`brand-lockup brand-lockup-${size}`}>
+      <span className="brand-mark brand-mark-fluid" aria-hidden={nameAs === 'span' ? 'true' : undefined}>
+        <Q11Mark fluid lettering={t('app.lettering')} label={nameAs === 'span' ? undefined : t('a11y.q11mark')} />
+      </span>
+      <Name className={`brand-lockup-name${nameAs === 'h1' ? ' title-h' : ''}`} {...(nameProps ?? {})}>
+        <BrandName />
+      </Name>
+    </span>
   );
 }
 
 export function TopBar({ title, subtitle, onMissions, onSettings, settingsLabel, onTitle }: TopBarProps) {
   const t = useT();
+  // The brand lockup is the way back: to the city map on mission screens, to the title elsewhere.
+  const brand =
+    onMissions !== undefined ? (
+      <button type="button" className="btn btn-ghost brand-btn" onClick={onMissions} aria-label={t('a11y.backToCity')} data-testid="topbar-city">
+        <BrandLockup />
+      </button>
+    ) : onTitle !== undefined ? (
+      <button type="button" className="btn btn-ghost brand-btn" onClick={onTitle} aria-label={t('a11y.backToTitle')}>
+        <BrandLockup />
+      </button>
+    ) : (
+      <span className="brand">
+        <BrandLockup />
+      </span>
+    );
   return (
     <header className="topbar">
       <div className="topbar-title">
-        {onTitle === undefined ? (
-          <span className="brand">
-            <span className="brand-mark" aria-hidden="true">
-              <Q11Mark size={28} lettering={t('app.lettering')} />
-            </span>
-            <BrandName />
-          </span>
-        ) : (
-          <button type="button" className="btn btn-ghost brand-btn" onClick={onTitle} aria-label={t('a11y.backToTitle')}>
-            <span className="brand-mark" aria-hidden="true">
-              <Q11Mark size={28} lettering={t('app.lettering')} />
-            </span>
-            <BrandName />
-          </button>
-        )}
+        {brand}
         <div className="topbar-text">
           <h1 className="topbar-h" tabIndex={-1} data-focus-target>
             {title}
@@ -254,12 +264,8 @@ export function TopBar({ title, subtitle, onMissions, onSettings, settingsLabel,
         </div>
       </div>
       <nav className="topbar-actions" aria-label={t('a11y.gameNav')}>
-        {onMissions !== undefined ? (
-          <button type="button" className="btn btn-ghost" onClick={onMissions} data-testid="topbar-city">
-            {t('city.title')}
-          </button>
-        ) : null}
         <button type="button" className="btn btn-ghost btn-icon" onClick={onSettings} aria-label={settingsLabel ?? t('title.settings')} data-testid="topbar-settings">
+
           <GearIcon />
         </button>
       </nav>

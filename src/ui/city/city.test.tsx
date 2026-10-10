@@ -177,7 +177,7 @@ describe('CityScreen — HUD', () => {
     const h1 = screen.getByRole('heading', { level: 1, name: 'Quantum City' });
     expect(h1).toHaveAttribute('data-focus-target');
     expect(h1.closest('button')).toBeNull(); // the heading is a focus target of its own, not part of the brand button
-    expect(screen.getByTestId('city-title')).toHaveAccessibleName('Q11 Emergency Quantum City — back to title');
+    expect(screen.getByTestId('city-title')).toHaveAccessibleName('Q11 Emergency — back to title');
     const badges = screen.getByTestId('city-badges');
     expect(within(badges).getByText('Alarm Reader')).toBeInTheDocument();
     expect(within(badges).getByText('Gate Tracker')).toBeInTheDocument();
@@ -195,7 +195,7 @@ describe('CityScreen — HUD', () => {
     expect(screen.getByRole('heading', { level: 1, name: '量子の街' })).toBeInTheDocument();
     expect(screen.getByTestId('mission-1')).toHaveAccessibleName(/^1 ながや通り — 火事発生、/);
     // The brand chip and the truck lettering follow the language: "11Q" (119) in Japanese.
-    expect(screen.getByTestId('city-title')).toHaveAccessibleName('11Q Emergency 量子の街 — タイトルにもどる');
+    expect(screen.getByTestId('city-title')).toHaveAccessibleName('11Q Emergency — タイトルにもどる');
     const lettering = Array.from(screen.getByTestId('city-title').querySelectorAll('svg text'), (n) => n.textContent);
     expect(lettering).toContain('11Q');
     expect(lettering).not.toContain('Q11');

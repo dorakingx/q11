@@ -41,15 +41,20 @@ main.screen-city * { box-sizing: border-box; }
 .city-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
   background: transparent;
   border: 0;
   border-radius: var(--radius);
-  padding: 4px 8px 4px 4px;
+  padding: 4px 6px;
   min-height: var(--tap);
   text-align: left;
+  color: var(--ink);
 }
-.city-brand-name { font-weight: 900; font-size: 1rem; letter-spacing: 0.08em; color: var(--z); white-space: nowrap; }
+.city-brand:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; box-shadow: 0 0 0 6px var(--focus-halo); }
+/* The home screen's lockup is the biggest brand chip in the game: the name sets the width, the mark follows it. */
+.city-brand .brand-lockup-small .brand-lockup-name { font-size: 1rem; }
+@media (min-width: 768px) {
+  .city-brand .brand-lockup-small .brand-lockup-name { font-size: 1.12rem; }
+}
 .city-brand-title { margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--ink); line-height: 1.1; padding: 2px 6px; border-radius: 8px; }
 .city-brand-title:focus { outline: none; }
 .city-brand-title:focus-visible { outline: 3px solid var(--focus); outline-offset: 0; box-shadow: 0 0 0 6px var(--focus-halo); }

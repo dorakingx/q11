@@ -59,7 +59,7 @@ for (const [w, h] of SIZES) {
     await expect(page.getByTestId('city-map')).toBeVisible();
     await expect(page).toHaveTitle('11Q Emergency — 街の地図');
     await expect(page.locator('main h1')).toHaveText('量子の街');
-    await expect(page.getByTestId('city-title')).toHaveAccessibleName('11Q Emergency 量子の街 — タイトルにもどる');
+    await expect(page.getByTestId('city-title')).toHaveAccessibleName('11Q Emergency — タイトルにもどる');
     await expect(page.getByTestId('city-title').locator('svg text').filter({ hasText: '11Q' })).toHaveCount(1);
     await expectInsideViewport(page, page.getByTestId('city-title'), 'city brand chip');
     await expectInsideViewport(page, page.locator('main h1'), 'city heading');

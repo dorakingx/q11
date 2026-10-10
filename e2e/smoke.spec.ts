@@ -193,7 +193,7 @@ test('language toggle EN → JA changes the headings, document.title and <html l
   await expect(page.getByRole('heading', { level: 1 })).toContainText('量子の街');
   await expect(page).toHaveTitle('11Q Emergency — 街の地図');
   await expect(page.getByTestId('announcer')).toHaveText('街の地図。');
-  await expect(page.getByTestId('city-title')).toHaveAccessibleName('11Q Emergency 量子の街 — タイトルにもどる');
+  await expect(page.getByTestId('city-title')).toHaveAccessibleName('11Q Emergency — タイトルにもどる');
   await expect(page.getByTestId('city-title').locator('svg text').filter({ hasText: '11Q' })).toHaveCount(1);
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja');

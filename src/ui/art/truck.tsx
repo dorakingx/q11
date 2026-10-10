@@ -35,7 +35,8 @@ export function FireTruck({ facing = 1, lights = false, wheelFrame = 0, plain = 
         </g>
         {/* body */}
         <rect x={-72} y={-52} width={100} height={42} rx={4} fill={ART.truck} stroke={ART.ink} strokeWidth={OUTLINE} />
-        <rect x={-72} y={-32} width={100} height={6} fill={ART.truckTrim} />
+        {/* trim stripes sit inside the outlines (inset by the stroke) so the body and cab outlines stay unbroken */}
+        <rect x={-72 + OUTLINE / 2} y={-32} width={100 - OUTLINE} height={6} fill={ART.truckTrim} />
         {/* lockers (omitted on the plain body) */}
         {clean ? null : (
           <g fill={ART.truckDark} stroke={ART.ink} strokeWidth={OUTLINE_THIN}>
@@ -47,7 +48,7 @@ export function FireTruck({ facing = 1, lights = false, wheelFrame = 0, plain = 
         {/* cab */}
         <path d="M28 -10 L28 -58 Q28 -62 32 -62 L58 -62 Q66 -62 70 -54 L76 -36 L76 -10 Z" fill={ART.truck} stroke={ART.ink} strokeWidth={OUTLINE} strokeLinejoin="round" />
         <path d="M34 -56 L58 -56 Q63 -56 65 -51 L70 -38 L34 -38 Z" fill={ART.glass} stroke={ART.ink} strokeWidth={OUTLINE_THIN} strokeLinejoin="round" />
-        <rect x={28} y={-32} width={48} height={6} fill={ART.truckTrim} />
+        <rect x={28 + OUTLINE / 2} y={-32} width={48 - OUTLINE} height={6} fill={ART.truckTrim} />
         {/* bumper + hose reel */}
         <rect x={70} y={-18} width={10} height={8} rx={2} fill={ART.inkSoft} stroke={ART.ink} strokeWidth={OUTLINE_THIN} />
         {clean ? null : <circle cx={-56} cy={-24} r={6} fill={ART.hose} stroke={ART.ink} strokeWidth={OUTLINE_THIN} />}

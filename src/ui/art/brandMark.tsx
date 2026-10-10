@@ -5,7 +5,7 @@
  */
 import { Flame } from './fire';
 import { FireTruck } from './truck';
-import { BRAND_MARK_LABEL } from './brandMarkMeta';
+import { BRAND_MARK_BBOX, BRAND_MARK_LABEL } from './brandMarkMeta';
 
 /** The mark's content for a 512 × 512 viewBox (no <svg> element). `lettering` is what is painted on the truck: "Q11" (911) in English, "11Q" (119) in Japanese. */
 export function BrandMarkContent({ lettering = 'Q11' }: { readonly lettering?: string | undefined } = {}) {
@@ -19,9 +19,21 @@ export function BrandMarkContent({ lettering = 'Q11' }: { readonly lettering?: s
   );
 }
 
-export function BrandMark({ size = 72, label, lettering }: { readonly size?: number; readonly label?: string | undefined; readonly lettering?: string | undefined }) {
+export function BrandMark({ size = 72, label, lettering, fluid = false }: { readonly size?: number; readonly label?: string | undefined; readonly lettering?: string | undefined; readonly fluid?: boolean }) {
+  // fluid: fill the parent's width (height follows the aspect) and crop the frame to the drawn truck + flames so the
+  // picture is exactly as wide as the lockup's name underneath it.
+  const b = BRAND_MARK_BBOX;
+  const viewBox = fluid ? `${String(b.x0)} ${String(b.y0)} ${String(b.x1 - b.x0)} ${String(b.y1 - b.y0)}` : '0 0 512 512';
   return (
-    <svg width={size} height={size} viewBox="0 0 512 512" role="img" aria-label={label ?? BRAND_MARK_LABEL} focusable="false">
+    <svg
+      width={fluid ? '100%' : size}
+      height={fluid ? undefined : size}
+      viewBox={viewBox}
+      role="img"
+      aria-label={label ?? BRAND_MARK_LABEL}
+      focusable="false"
+      style={fluid ? { display: 'block', height: 'auto' } : undefined}
+    >
       <BrandMarkContent lettering={lettering} />
     </svg>
   );

@@ -7,7 +7,7 @@ test('city: locked districts toast, Dispatch! drives the truck (skippable), free
   // Focus lands on the city heading (outside the brand button, whose name starts with its visible text).
   await expect(page.locator('main h1')).toHaveText('Quantum City');
   await expect(page.locator('main h1')).toBeFocused();
-  await expect(page.getByTestId('city-title')).toHaveAccessibleName('Q11 Emergency Quantum City — back to title');
+  await expect(page.getByTestId('city-title')).toHaveAccessibleName('Q11 Emergency — back to title');
   await expect(page.getByTestId('mission-1')).toHaveAccessibleName('1 Rowhouse Lane — Safe, 3 of 3 stars');
   await expect(page.getByTestId('mission-1')).toHaveAttribute('data-status', 'solved');
   await expect(page.getByTestId('mission-2')).toHaveAttribute('data-status', 'available');

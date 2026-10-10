@@ -6,9 +6,9 @@ import { Fragment } from 'react';
 import { getCode } from '../quantum';
 import { DISTRICTS, districtForMission, listPublicMissions, maxTotalStars, resultType, totalStars, type Action, type Debrief, type DistrictKind, type GameState, type Language, type PublicMissionView } from '../game';
 import { BridgeSpan, ChapterBadge, ConversionLab, Detector, House, MemoryTower, Tree } from './art';
-import { GearIcon, Q11Mark } from './glyphs';
+import { GearIcon } from './glyphs';
 import { briefingText, missionCopy, plural, reactionFor, useLanguage, useT } from './i18n';
-import { Details, DetectorIcon, FlameIcon, HelmetIcon, LangToggle, Legend, Stars, TopBar, WaterIcon } from './panels';
+import { BrandLockup, Details, DetectorIcon, FlameIcon, HelmetIcon, LangToggle, Legend, Stars, TopBar, WaterIcon } from './panels';
 import { badgeNameKey, CODE_KEY, outcomeKey, QUALITY_KEY, resultActions, resultHeadingKey } from './text';
 
 export interface ScreenProps {
@@ -47,10 +47,7 @@ export function TitleScreen({ state, dispatch }: ScreenProps) {
   return (
     <main className="screen screen-title">
       <div className="title-card">
-        <Q11Mark size={112} label={t('a11y.q11mark')} lettering={t('app.lettering')} />
-        <h1 className="title-h" tabIndex={-1} data-focus-target>
-          {t('app.name')}
-        </h1>
+        <BrandLockup size="title" nameAs="h1" nameProps={{ tabIndex: -1, 'data-focus-target': true }} />
         <p className="title-kicker" data-testid="title-kicker">
           <KickerText text={t('title.heading')} />
         </p>

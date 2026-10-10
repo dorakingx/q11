@@ -11,9 +11,9 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type RefObject } from 'react';
 import { firstAvailable, getPublicMission, maxTotalStars, totalStars, type Action, type DistrictStatus, type GameState } from '../../game';
 import { ART, CITY_H, CITY_W, ChapterBadge, CityBackdrop, DISTRICTS, FireTruck, ROADS, ROAD_START, SmokePlume, districtById, type DistrictBox, type DistrictId, type DistrictVisualState } from '../art';
-import { GearIcon, Q11Mark } from '../glyphs';
+import { GearIcon } from '../glyphs';
 import { missionCopy, plural, useLanguage, useT } from '../i18n';
-import { BrandName } from '../panels';
+import { BrandLockup } from '../panels';
 import { RESTORE_MS, TOAST_MS, TRAVEL_MS, WHEEL_MS, badgeColour, badgeKey, detectReducedMotion, easeInOut, hitBoxStyle, isDistrictId, neighbourDistrict, pointOnRoad, statusesOf, type MeasurablePath, type TruckPose } from './geometry';
 import './city.css';
 
@@ -290,12 +290,10 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
       <header className="city-hud">
         <div className="city-brand-group">
           <button type="button" className="city-brand" onClick={onTitle} aria-label={t('a11y.cityBackToTitle')} data-testid="city-title">
-            <Q11Mark size={40} lettering={t('app.lettering')} />
-            <span className="city-brand-name">
-              <BrandName />
-            </span>
+            <BrandLockup />
           </button>
-          <h1 className="city-brand-title" tabIndex={-1} data-focus-target>
+          {/* the screen's heading stays for screen readers and focus; the map itself is the visible title */}
+          <h1 className="city-brand-title sr-only" tabIndex={-1} data-focus-target>
             {t('city.title')}
           </h1>
         </div>
