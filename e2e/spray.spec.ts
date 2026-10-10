@@ -1,5 +1,5 @@
 /// <reference lib="dom" />
-import { expect, expectFailedResultActions, expectNoHorizontalOverflow, expectPrimaryButton, openChallenge, openCity, readSave, seedSave, serialisedHouses, sprayAndSkip, stepSprayToEnd, test } from './helpers';
+import { expect, expectFailedResultActions, expectNoHorizontalOverflow, expectPrimaryButton, freezeClock, openChallenge, openCity, readSave, seedSave, serialisedHouses, sprayAndSkip, stepSprayToEnd, test } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   await seedSave(page, { freeRoam: true });
@@ -73,6 +73,153 @@ test('prediction miss — Harbor Bridge, red crew on house 0 only: no alarms, no
   await expect(page.getByTestId('city-map')).toBeVisible();
   await expect(page.getByTestId('toast-badge')).toHaveCount(0);
   await expect(page.getByTestId('city-panel')).toContainText('Conversion Lab'); // free roam: the next district is open, so it is pre-selected
+});
+
+test('propagation prelude — Harbor Bridge: the start fires travel through the coupler before the trucks; the houses light only when the fires arrive; the narration follows the picture; Skip during the prelude jumps to the final frame', async ({ page }) => {
+  // The prelude frames are transient (≈2.2 s), so this test drives Playwright's fake clock: it is frozen right before
+  // Spray! and advanced by hand (`runFor`), which pins every snapshot to a known timeline instant whatever the machine
+  // load. Timeline (src/game/effects.ts EFFECT_TIMING): fires-start 0–450 · gate 450–1200 (tokens switch at
+  // 450 + 0.55 × 750 ≈ 862) · fires-arrive 1200–1650 (houses light at 1650) · hold · trucks from 2150.
+  await page.clock.install();
+  await openCity(page);
+  await openChallenge(page, 2);
+  // Planning: no prelude, no travelling tokens, nothing reveals the propagated fires.
+  await expect(page.locator('[data-testid="lane-token"]')).toHaveCount(0);
+  await expect(page.locator('[data-house][data-house-state="fire"]')).toHaveCount(0);
+  await page.getByTestId('palette-Y').click();
+  await page.getByTestId('block-0').click();
+  await page.getByTestId('block-1').click();
+  await freezeClock(page);
+  await page.getByTestId('confirm').click();
+  await expect(page.getByTestId('spray-player')).toBeVisible();
+  const caption = page.getByTestId('spray-caption');
+  const announcer = page.getByTestId('spray-announcer');
+  const token = (q: number) => page.locator(`[data-testid="lane-token"][data-lane-q="${String(q)}"]`);
+  const house = (q: number) => page.locator(`[data-house="${String(q)}"]`);
+  // t = 0: the tokens XZ sit at the input (red on house 0, blue on house 1), houses plain, the time cursor drawn, no truck.
+  await expect(token(0)).toHaveAttribute('data-letter', 'X');
+  await expect(token(1)).toHaveAttribute('data-letter', 'Z');
+  const snapshot = await page.locator('[data-scene]').evaluate((root) => ({
+    tokens: Array.from(root.querySelectorAll('[data-testid="lane-token"]')).map((k) => `${k.getAttribute('data-lane-q') ?? ''}:${k.getAttribute('data-letter') ?? ''}`),
+    houses: Array.from(root.querySelectorAll('[data-house]')).map((h) => h.getAttribute('data-house-state')),
+    cursor: root.querySelectorAll('.time-cursor').length,
+    trucks: root.querySelectorAll('.truck').length,
+  }));
+  expect(snapshot.tokens).toEqual(['0:X', '1:Z']);
+  expect(snapshot.houses, 'the lane-end houses are not on fire while the tokens travel').toEqual(['normal', 'normal']);
+  expect(snapshot.cursor).toBe(1);
+  expect(snapshot.trucks).toBe(0);
+  await expect(caption).toHaveText('The fire starts here: red (X) fire on house 0 and blue (Z) fire on house 1.');
+  await expect(announcer).toBeEmpty();
+  // t ≈ 950: inside the coupler, past the pattern switch — YY on the active gate, houses still plain, the caption names both directions.
+  await page.clock.runFor(950);
+  await expect(token(0)).toHaveAttribute('data-letter', 'Y');
+  await expect(token(1)).toHaveAttribute('data-letter', 'Y');
+  await expect(page.locator('.gate.is-active')).toHaveCount(1);
+  await expect(house(0)).toHaveAttribute('data-house-state', 'normal');
+  await expect(house(1)).toHaveAttribute('data-house-state', 'normal');
+  await expect(caption).toHaveText('Through the coupler: the red (X) fire copies forward onto house 1 and the blue (Z) fire copies backward onto house 0.');
+  await expect(announcer).toBeEmpty();
+  // t ≈ 1400: travelling to the houses — the coupler is done, the houses are still plain, the caption still names the coupler rule.
+  await page.clock.runFor(450);
+  await expect(page.locator('.gate.is-done')).toHaveCount(1);
+  await expect(token(0)).toHaveAttribute('data-letter', 'Y');
+  await expect(house(0)).toHaveAttribute('data-house-state', 'normal');
+  await expect(house(1)).toHaveAttribute('data-house-state', 'normal');
+  await expect(caption).toContainText('Through the coupler');
+  await expect(announcer).toBeEmpty();
+  await expect(page.locator('.truck')).toHaveCount(0);
+  // t ≈ 1700: arrived — tokens and cursor gone, both houses carry the Y fire, caption and live region say so, no truck yet (the arrival holds).
+  await page.clock.runFor(300);
+  await expect(page.locator('[data-testid="lane-token"]')).toHaveCount(0);
+  await expect(page.locator('.time-cursor')).toHaveCount(0);
+  await expect(house(0)).toHaveAttribute('data-house-state', 'fire');
+  await expect(house(1)).toHaveAttribute('data-house-state', 'fire');
+  await expect(caption).toHaveText('The fires reach the houses: red-and-blue (Y) fire on house 0 and red-and-blue (Y) fire on house 1.');
+  await expect(announcer).toHaveText('The fires reach the houses: red-and-blue (Y) fire on house 0 and red-and-blue (Y) fire on house 1.');
+  await expect(page.locator('.truck')).toHaveCount(0);
+  // t ≈ 2300: the trucks (arrival + hold) — the existing sequence from here on, back on real time.
+  await page.clock.runFor(600);
+  await expect(page.locator('.truck')).toHaveCount(1);
+  await expect(caption).toHaveText('The trucks arrive at Harbor Bridge.');
+  await page.clock.resume();
+  await expect(page.getByTestId('result-overlay')).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'restored');
+  await expect(page.locator('[data-testid="lane-token"]')).toHaveCount(0);
+  await expect(page.locator('[data-house="0"][data-house-state="restored"]')).toHaveCount(1);
+  await expect(page.locator('[data-house="1"][data-house-state="restored"]')).toHaveCount(1);
+  await expect(page.locator('.lane-start[data-faded="true"]')).toHaveCount(2);
+  // Try again, then Skip during the prelude (the clock is frozen again, so the replay sits at t = 0 when Skip is pressed):
+  // straight to the final frame (no tokens, no cursor, houses in their end state).
+  await page.getByTestId('result-retry').click();
+  await page.getByTestId('palette-X').click();
+  await page.getByTestId('block-0').click();
+  await freezeClock(page);
+  await page.getByTestId('confirm').click();
+  await expect(page.getByTestId('spray-player')).toBeVisible();
+  await expect(page.locator('[data-testid="lane-token"]')).toHaveCount(2);
+  await expect(page.locator('[data-house="0"]')).toHaveAttribute('data-house-state', 'normal');
+  await page.getByTestId('spray-skip').click();
+  await expect(page.getByTestId('result-overlay')).toBeVisible();
+  await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'prediction-miss');
+  await expect(page.locator('[data-testid="lane-token"]')).toHaveCount(0);
+  await expect(page.locator('.time-cursor')).toHaveCount(0);
+  await expect(page.locator('[data-house="0"][data-house-state="fire"]')).toHaveCount(1); // Y ⊕ X = Z left on house 0
+  await expect(page.locator('[data-house="1"][data-house-state="fire"]')).toHaveCount(1); // Y never sprayed
+  await page.clock.resume();
+  await page.getByTestId('result-details').locator('summary').click();
+  await expect(page.getByTestId('residual')).toHaveText('ZY');
+});
+
+test('propagation prelude under reduced motion — Harbor Bridge: the stepper gains the start / gate / arrive frames before the trucks', async ({ page }) => {
+  // The save is seeded once by beforeEach (free roam); reduced motion is switched on through Settings like a player would.
+  await page.goto('/');
+  await page.getByTestId('settings').click();
+  await page.getByTestId('switch-motion').click();
+  await page.getByTestId('back').click();
+  await page.getByTestId('play').click();
+  await expect(page.getByTestId('city-map')).toBeVisible();
+  await openChallenge(page, 2);
+  await page.getByTestId('palette-Y').click();
+  await page.getByTestId('block-0').click();
+  await page.getByTestId('block-1').click();
+  await page.getByTestId('confirm').click();
+  await expect(page.getByTestId('spray-player')).toHaveAttribute('data-reduced-motion', 'true');
+  // 3 prelude frames + trucks + 2 × (run, spray, impact) + reveal, alarms, outcome, done = 14 (11 without the prelude).
+  await expect(page.getByTestId('spray-step')).toHaveText('Frame 1 of 14');
+  await expect(page.getByTestId('spray-caption')).toHaveText('The fire starts here: red (X) fire on house 0 and blue (Z) fire on house 1.');
+  await expect(page.locator('[data-testid="lane-token"]')).toHaveCount(2);
+  await expect(page.locator('[data-testid="lane-token"][data-lane-q="0"]')).toHaveAttribute('data-letter', 'X');
+  await expect(page.locator('[data-testid="lane-token"][data-lane-q="1"]')).toHaveAttribute('data-letter', 'Z');
+  await expect(page.locator('[data-house="0"]')).toHaveAttribute('data-house-state', 'normal');
+  await expect(page.locator('[data-house="1"]')).toHaveAttribute('data-house-state', 'normal');
+  await expect(page.locator('.truck')).toHaveCount(0);
+  await page.getByTestId('spray-next').click(); // the coupler: XZ → YY
+  await expect(page.getByTestId('spray-caption')).toHaveText('Through the coupler: the red (X) fire copies forward onto house 1 and the blue (Z) fire copies backward onto house 0.');
+  await expect(page.locator('.gate.is-active')).toHaveCount(1);
+  await expect(page.locator('[data-testid="lane-token"][data-lane-q="0"]')).toHaveAttribute('data-letter', 'Y');
+  await expect(page.locator('[data-testid="lane-token"][data-lane-q="1"]')).toHaveAttribute('data-letter', 'Y');
+  await expect(page.locator('[data-house="0"]')).toHaveAttribute('data-house-state', 'normal');
+  await page.getByTestId('spray-next').click(); // the fires reach the houses
+  await expect(page.getByTestId('spray-caption')).toHaveText('The fires reach the houses: red-and-blue (Y) fire on house 0 and red-and-blue (Y) fire on house 1.');
+  await expect(page.locator('[data-testid="lane-token"]')).toHaveCount(0);
+  await expect(page.locator('[data-house="0"]')).toHaveAttribute('data-house-state', 'fire');
+  await expect(page.locator('[data-house="1"]')).toHaveAttribute('data-house-state', 'fire');
+  await expect(page.locator('.truck')).toHaveCount(0);
+  await page.getByTestId('spray-next').click(); // the trucks arrive (the existing sequence from here on)
+  await expect(page.getByTestId('spray-caption')).toHaveText('The trucks arrive at Harbor Bridge.');
+  await expect(page.locator('.truck')).toHaveCount(1);
+  await page.getByTestId('spray-prev').click();
+  await expect(page.locator('.truck')).toHaveCount(0);
+  await expect(page.locator('[data-house="0"]')).toHaveAttribute('data-house-state', 'fire');
+  await stepSprayToEnd(page);
+  await expect(page.getByTestId('result-overlay')).toHaveAttribute('data-result', 'restored');
+  await expect(page.locator('[data-house="0"][data-house-state="restored"]')).toHaveCount(1);
+  // Why? compares the sprays only: no prelude frames there (11 frames for both boards).
+  await page.getByTestId('result-why').click();
+  await expect(page.getByTestId('why-compare')).toBeVisible();
+  await expect(page.locator('.why-compare .spray-step-label')).toContainText('Frame 1 of 11');
+  await expect(page.locator('.why-compare [data-testid="lane-token"]')).toHaveCount(0);
 });
 
 test('result 2 — two kinds X1 + Z6: safe pattern (ghost houses, "Logical qubit safe" badge, raw residual in Details)', async ({ page }) => {

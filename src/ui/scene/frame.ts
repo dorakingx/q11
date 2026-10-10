@@ -9,12 +9,18 @@
  * stay fogged until 'reveal-remaining'. The detectors show the true fire's alarms from the first frame and switch
  * to the residual's alarms at the 'alarms' event.
  *
+ * Propagation prelude (lane boards, timelines with 'fires-start' / 'gate' / 'fires-arrive' events): `lanes` carries
+ * the travelling tokens (column -1 = input, 0..steps-1 = gate columns, steps = output), the active gate cursor and
+ * whether the fires have arrived. The houses stay normal until 'fires-arrive' completes, then show the final fires;
+ * every later rule (spray-start, impact, reveal, outcome) is untouched. Timelines without a prelude: `lanes` = null.
+ *
  * Reduced motion uses the same function on the reduced timeline (one unit of time per event): the stepper shows
  * `computeFrame(reduced, step + 1, { strict: true })`, i.e. every event up to `step` completed and nothing after.
  */
 import type { CrewLetter, EffectEvent, EffectTimeline, ResultType } from '../../game';
+import { PRELUDE_EVENTS } from '../../game';
 import type { CrewPose, HouseState } from '../art';
-import type { PauliLetter } from '../../quantum';
+import { fromString, letterAt, type Pauli, type PauliLetter } from '../../quantum';
 
 export interface TruckFrame {
   /** 0 = off-screen start, 1 = parked. */
@@ -41,8 +47,28 @@ export interface SplashFrame {
   readonly spread: number;
 }
 
+/** One travelling fire token on a lane board. Columns: -1 = input, 0..steps-1 = gate columns, steps = output. */
+export interface LaneTokenFrame {
+  readonly q: number;
+  readonly letter: CrewLetter;
+  readonly from: number;
+  readonly to: number;
+  /** 0 = at `from`, 1 = at `to`. */
+  readonly progress: number;
+}
+
+export interface LaneFrame {
+  /** Active gate index: -1 before the first gate, `steps` once the tokens head for (or have reached) the output. */
+  readonly cursor: number;
+  readonly tokens: readonly LaneTokenFrame[];
+  /** The fires have reached the houses (tokens gone, houses lit). */
+  readonly arrived: boolean;
+}
+
 export interface SceneFrame {
   readonly houses: readonly HouseState[];
+  /** Propagation prelude state (lane boards with a non-empty circuit); null when the timeline has no prelude. */
+  readonly lanes: LaneFrame | null;
   /** Alarm bits shown on the detectors; null = no stations / nothing to show (all quiet drawing). */
   readonly syndrome: readonly number[] | null;
   readonly truck: TruckFrame | null;
@@ -85,12 +111,28 @@ function fireState(letter: PauliLetter): HouseState {
   return letter === 'I' ? { kind: 'normal' } : { kind: 'fire', letter };
 }
 
+/** Tokens for a pattern string with every token between the same two columns. */
+function tokensOf(pattern: Pauli, from: number, to: number, progress: number): LaneTokenFrame[] {
+  const out: LaneTokenFrame[] = [];
+  for (let q = 0; q < pattern.n; q++) {
+    const letter = letterAt(pattern, q);
+    if (letter !== 'I') out.push({ q, letter, from, to, progress });
+  }
+  return out;
+}
+
 /** Fraction of the impact event during which the splash lands on the still-true fire before the after-state appears. */
 export const IMPACT_FLASH = 0.4;
 
 export function computeFrame(timeline: EffectTimeline, time: number, opts: FrameOptions): SceneFrame {
   const strict = opts.strict ?? false;
   const houses: HouseState[] = Array.from({ length: opts.n }, (_, q) => opts.preState(q));
+  // Propagation prelude: the gate columns are the 'gate' events; `arrivedFires` is set once the tokens reach the houses.
+  const steps = timeline.events.filter((e) => e.type === 'gate').length;
+  const prelude = timeline.events.some((e) => PRELUDE_EVENTS.has(e.type));
+  let laneCursor = -1;
+  let laneTokens: LaneTokenFrame[] = [];
+  let arrivedFires: Pauli | null = null;
   const touched = new Set<number>();
   const residual = new Map<number, PauliLetter>();
   const crews = new Map<number, CrewFrame>();
@@ -111,6 +153,30 @@ export function computeFrame(timeline: EffectTimeline, time: number, opts: Frame
     if (p === undefined) return;
     currentEvent = index;
     switch (e.type) {
+      case 'fires-start':
+        laneCursor = -1;
+        laneTokens = tokensOf(fromString(e.fires), -1, -1, p);
+        break;
+      case 'gate':
+        laneCursor = e.index;
+        if (p < e.travel) {
+          // travelling from the previous column (input for the first gate) to this gate's column
+          laneTokens = tokensOf(fromString(e.before), e.index - 1, e.index, e.travel <= 0 ? 1 : p / e.travel);
+        } else {
+          // at the gate: the pattern has switched to the engine's next frame
+          laneTokens = tokensOf(fromString(e.after), e.index, e.index, 1);
+        }
+        break;
+      case 'fires-arrive':
+        laneCursor = steps;
+        if (p < 1) {
+          laneTokens = tokensOf(fromString(e.fires), steps - 1, steps, p);
+        } else {
+          laneTokens = [];
+          arrivedFires = fromString(e.fires);
+          for (let q = 0; q < opts.n; q++) houses[q] = fireState(q < arrivedFires.n ? letterAt(arrivedFires, q) : 'I');
+        }
+        break;
       case 'trucks-arrive':
         truck = { progress: p, lights: p < 1, wheelFrame: p < 1 ? wheelFrame : 0 };
         break;
@@ -150,7 +216,8 @@ export function computeFrame(timeline: EffectTimeline, time: number, opts: Frame
         revealed = true;
         for (let q = 0; q < opts.n; q++) {
           if (touched.has(q)) continue;
-          const pre = opts.preState(q);
+          // Lane boards with a prelude: the untouched houses keep the fires that arrived; otherwise the pre-spray state.
+          const pre: HouseState = arrivedFires !== null ? fireState(q < arrivedFires.n ? letterAt(arrivedFires, q) : 'I') : opts.preState(q);
           houses[q] = pre.kind === 'fog' ? { kind: 'normal' } : pre;
         }
         e.qs.forEach((q) => {
@@ -186,6 +253,7 @@ export function computeFrame(timeline: EffectTimeline, time: number, opts: Frame
 
   return {
     houses,
+    lanes: prelude ? { cursor: laneCursor, tokens: laneTokens, arrived: arrivedFires !== null } : null,
     syndrome,
     truck,
     crews: [...crews.values()].sort((a, b) => a.q - b.q),

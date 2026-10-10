@@ -53,8 +53,9 @@ export function WhyCompare(props: WhyCompareProps) {
   const t = useT();
   const { mine } = props;
   const alt = useMemo(() => alternativeDebrief(mine), [mine]);
-  const mineTimeline = useMemo(() => buildEffects(mine, props.reducedMotion), [mine, props.reducedMotion]);
-  const altTimeline = useMemo(() => buildEffects(alt, props.reducedMotion), [alt, props.reducedMotion]);
+  // No propagation prelude here: the comparison is about the sprays, so both panels start with the fires in the houses.
+  const mineTimeline = useMemo(() => buildEffects(mine, props.reducedMotion, { propagation: false }), [mine, props.reducedMotion]);
+  const altTimeline = useMemo(() => buildEffects(alt, props.reducedMotion, { propagation: false }), [alt, props.reducedMotion]);
   const shared = sharedTimeline(mineTimeline, altTimeline);
   const clock = useSprayClock(shared, props.reducedMotion);
   const hasChecks = getCode(props.codeId).checks.length > 0;

@@ -6,11 +6,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import { buildEffects, confirmDispatch, getPublicMission, resultType, type CrewLetter, type Debrief, type EffectTimeline } from '../../game';
-import { fromString, letterAt, support } from '../../quantum';
+import { buildEffects, confirmDispatch, EFFECT_TIMING, getPublicMission, hasPrelude, resultType, type CrewLetter, type Debrief, type EffectEvent, type EffectTimeline } from '../../game';
+import { fromString, letterAt, support, type Circuit } from '../../quantum';
 import { missionCopy, translator } from '../i18n';
-import { announcementAt, captionAt } from './captions';
-import { computeFrame, finalFrame } from './frame';
+import { announcementAt, captionAt, captionForEvent, gateText } from './captions';
+import { computeFrame, finalFrame, type LaneFrame } from './frame';
 import { ResultOverlay } from './ResultOverlay';
 import { Scene } from './Scene';
 import { SprayPlayer } from './SprayPlayer';
@@ -146,11 +146,13 @@ describe('computeFrame · house states follow the timeline', () => {
     expect(last.outcome).toBe('safe-pattern');
   });
 
-  it('propagation missions start from the propagated true fire, not fog', () => {
+  it('propagation missions without the prelude (Why? comparison) start from the propagated true fire, not fog', () => {
     const d = confirmDispatch('red-forward-blue-backward', { 0: 'Y', 1: 'Y' });
-    const tl = buildEffects(d, false);
+    const tl = buildEffects(d, false, { propagation: false });
+    expect(hasPrelude(tl)).toBe(false);
     const opts = frameOptionsFor(d, 2, 'propagation');
     const f = computeFrame(tl, 0, opts);
+    expect(f.lanes).toBeNull();
     expect(f.houses).toEqual([
       { kind: 'fire', letter: 'Y' },
       { kind: 'fire', letter: 'Y' },
@@ -158,6 +160,324 @@ describe('computeFrame · house states follow the timeline', () => {
     const end = finalFrame(tl, opts);
     expect(end.outcome).toBe('restored');
     expect(end.houses).toEqual([{ kind: 'restored' }, { kind: 'restored' }]);
+  });
+});
+
+describe('computeFrame · propagation prelude (lane boards)', () => {
+  const bridge = confirmDispatch('red-forward-blue-backward', { 0: 'Y', 1: 'Y' }); // XZ → CNOT → YY, both put out
+  const lab = confirmDispatch('color-switch', { 0: 'X', 1: 'X' }); // ZI → H, CNOT, H → XZ; X on 1 misses (Y left)
+  const lanesOf = (f: { readonly lanes: LaneFrame | null }): LaneFrame => {
+    if (f.lanes === null) throw new Error('no lanes');
+    return f.lanes;
+  };
+  const at = (tl: EffectTimeline, type: EffectEvent['type'], nth = 0): EffectEvent => {
+    const e = tl.events.filter((x) => x.type === type)[nth];
+    if (e === undefined) throw new Error(type);
+    return e;
+  };
+
+  it('houses stay normal while the tokens travel; the final fires light the houses exactly when fires-arrive completes', () => {
+    const tl = buildEffects(bridge, false);
+    const opts = frameOptionsFor(bridge, 2, 'propagation', hasPrelude(tl));
+    const arrive = at(tl, 'fires-arrive');
+    const normal = [{ kind: 'normal' }, { kind: 'normal' }];
+    expect(computeFrame(tl, 0, opts).houses).toEqual(normal);
+    expect(computeFrame(tl, at(tl, 'gate').t + 10, opts).houses).toEqual(normal);
+    expect(computeFrame(tl, arrive.t + arrive.dur - 1, opts).houses).toEqual(normal);
+    const arrived = computeFrame(tl, arrive.t + arrive.dur, opts);
+    expect(arrived.houses).toEqual([
+      { kind: 'fire', letter: 'Y' },
+      { kind: 'fire', letter: 'Y' },
+    ]);
+    expect(lanesOf(arrived)).toEqual({ cursor: 1, tokens: [], arrived: true });
+    // No truck, crews or streams before the trucks arrive.
+    const during = computeFrame(tl, arrive.t - 1, opts);
+    expect(during.truck).toBeNull();
+    expect(during.crews).toEqual([]);
+    expect(during.streams).toEqual([]);
+    expect(during.outcome).toBeNull();
+  });
+
+  it('tokens: start at the input, travel to the gate column and switch pattern at `travel`, then travel to the output; progress is monotonic', () => {
+    const tl = buildEffects(bridge, false);
+    const opts = frameOptionsFor(bridge, 2, 'propagation', true);
+    const start = at(tl, 'fires-start');
+    const gate = at(tl, 'gate');
+    const arrive = at(tl, 'fires-arrive');
+    if (gate.type !== 'gate') throw new Error('gate');
+    // fires-start: the start fires XZ appear at the input (column -1).
+    const f0 = lanesOf(computeFrame(tl, start.t + start.dur / 2, opts));
+    expect(f0.cursor).toBe(-1);
+    expect(f0.arrived).toBe(false);
+    expect(f0.tokens.map((k) => [k.q, k.letter, k.from, k.to])).toEqual([
+      [0, 'X', -1, -1],
+      [1, 'Z', -1, -1],
+    ]);
+    expect(f0.tokens[0]?.progress).toBeCloseTo(0.5, 5);
+    // gate, before travel: the tokens move from the input (-1) to the coupler (0) still as XZ.
+    const travelling = lanesOf(computeFrame(tl, gate.t + gate.dur * gate.travel * 0.5, opts));
+    expect(travelling.cursor).toBe(0);
+    expect(travelling.tokens.map((k) => [k.q, k.letter, k.from, k.to])).toEqual([
+      [0, 'X', -1, 0],
+      [1, 'Z', -1, 0],
+    ]);
+    expect(travelling.tokens[0]?.progress).toBeCloseTo(0.5, 5);
+    // gate, after travel: the pattern has switched to YY at the coupler.
+    const switched = lanesOf(computeFrame(tl, gate.t + gate.dur * gate.travel, opts));
+    expect(switched.tokens.map((k) => [k.q, k.letter, k.from, k.to, k.progress])).toEqual([
+      [0, 'Y', 0, 0, 1],
+      [1, 'Y', 0, 0, 1],
+    ]);
+    // fires-arrive: YY travels from the coupler (0) to the output (1 = steps).
+    const arriving = lanesOf(computeFrame(tl, arrive.t + arrive.dur * 0.25, opts));
+    expect(arriving.cursor).toBe(1);
+    expect(arriving.tokens.map((k) => [k.q, k.letter, k.from, k.to])).toEqual([
+      [0, 'Y', 0, 1],
+      [1, 'Y', 0, 1],
+    ]);
+    expect(arriving.tokens[0]?.progress).toBeCloseTo(0.25, 5);
+    // Monotonic: sampling every 10 ms through the prelude, (from, progress) never goes backwards.
+    let last = -Infinity;
+    for (let time = 0; time <= arrive.t + arrive.dur; time += 10) {
+      const l = lanesOf(computeFrame(tl, time, opts));
+      const tok = l.tokens[0];
+      const pos = tok === undefined ? (l.arrived ? Infinity : last) : tok.from + tok.progress * (tok.to - tok.from);
+      expect(pos).toBeGreaterThanOrEqual(last);
+      last = pos;
+      expect(l.tokens.every((k) => k.progress >= 0 && k.progress <= 1)).toBe(true);
+    }
+  });
+
+  it('cursor sequence on the lab board: -1 (start) → 0 → 1 → 2 (gates) → 3 (arriving / arrived); gate patterns ZI → XI → XX → XZ', () => {
+    const tl = buildEffects(lab, false);
+    const opts = frameOptionsFor(lab, 2, 'propagation', true);
+    const seq: number[] = [];
+    const letters: string[] = [];
+    for (let time = 0; time <= at(tl, 'trucks-arrive').t; time += 25) {
+      const l = lanesOf(computeFrame(tl, time, opts));
+      if (seq[seq.length - 1] !== l.cursor) seq.push(l.cursor);
+      const pat = ['I', 'I'];
+      l.tokens.forEach((k) => (pat[k.q] = k.letter));
+      const str = pat.join('');
+      if (letters[letters.length - 1] !== str) letters.push(str);
+    }
+    expect(seq).toEqual([-1, 0, 1, 2, 3]);
+    // The pattern string seen on the tokens over time (II = tokens gone after arrival).
+    expect(letters).toEqual(['ZI', 'XI', 'XX', 'XZ', 'II']);
+    const arrived = computeFrame(tl, at(tl, 'trucks-arrive').t, opts);
+    expect(arrived.houses).toEqual([
+      { kind: 'fire', letter: 'X' },
+      { kind: 'fire', letter: 'Z' },
+    ]);
+  });
+
+  it('the final frame (skip / time ≥ duration) equals the no-prelude final frame: same houses, outcome, crews and residual', () => {
+    for (const d of [bridge, lab, confirmDispatch('red-forward-blue-backward', {}), confirmDispatch('color-switch', { 0: 'Z', 1: 'Z' })]) {
+      const withPrelude = buildEffects(d, false);
+      const plain = buildEffects(d, false, { propagation: false });
+      const a = finalFrame(withPrelude, frameOptionsFor(d, 2, 'propagation', true));
+      const b = finalFrame(plain, frameOptionsFor(d, 2, 'propagation', false));
+      expect(a.lanes).toEqual({ cursor: getPublicMission(d.missionId).circuit.length, tokens: [], arrived: true });
+      expect(b.lanes).toBeNull();
+      const strip = ({ lanes: _lanes, currentEvent: _c, ...rest }: typeof a) => rest;
+      expect(strip(a)).toEqual(strip(b));
+      expect(a.done).toBe(true);
+      // Skip mid-prelude is the same final frame.
+      expect(strip(computeFrame(withPrelude, withPrelude.durationMs, frameOptionsFor(d, 2, 'propagation', true)))).toEqual(strip(b));
+    }
+  });
+
+  it('the stage preState is normal with a prelude and the propagated fire without one', () => {
+    expect(frameOptionsFor(bridge, 2, 'propagation', true).preState(0)).toEqual({ kind: 'normal' });
+    expect(frameOptionsFor(bridge, 2, 'propagation', false).preState(0)).toEqual({ kind: 'fire', letter: 'Y' });
+    expect(frameOptionsFor(bridge, 2, 'propagation').preState(1)).toEqual({ kind: 'fire', letter: 'Y' });
+    expect(frameOptionsFor(bridge, 2, 'dispatch', true).preState(0)).toEqual({ kind: 'fog' });
+  });
+
+  it('strict mode (reduced-motion stepper): step 0 = tokens at the input, step 1 = YY at the coupler, step 2 = fires in the houses, then trucks', () => {
+    const tl = buildEffects(bridge, true);
+    const opts = { ...frameOptionsFor(bridge, 2, 'propagation', true), strict: true };
+    expect(tl.events.slice(0, 4).map((e) => e.type)).toEqual(['fires-start', 'gate', 'fires-arrive', 'trucks-arrive']);
+    const s0 = computeFrame(tl, 1, opts);
+    expect(s0.houses).toEqual([{ kind: 'normal' }, { kind: 'normal' }]);
+    expect(lanesOf(s0)).toEqual({
+      cursor: -1,
+      arrived: false,
+      tokens: [
+        { q: 0, letter: 'X', from: -1, to: -1, progress: 1 },
+        { q: 1, letter: 'Z', from: -1, to: -1, progress: 1 },
+      ],
+    });
+    const s1 = computeFrame(tl, 2, opts);
+    expect(s1.houses).toEqual([{ kind: 'normal' }, { kind: 'normal' }]);
+    expect(lanesOf(s1)).toEqual({
+      cursor: 0,
+      arrived: false,
+      tokens: [
+        { q: 0, letter: 'Y', from: 0, to: 0, progress: 1 },
+        { q: 1, letter: 'Y', from: 0, to: 0, progress: 1 },
+      ],
+    });
+    const s2 = computeFrame(tl, 3, opts);
+    expect(s2.houses).toEqual([
+      { kind: 'fire', letter: 'Y' },
+      { kind: 'fire', letter: 'Y' },
+    ]);
+    expect(lanesOf(s2)).toEqual({ cursor: 1, tokens: [], arrived: true });
+    expect(s2.truck).toBeNull();
+    const s3 = computeFrame(tl, 4, opts);
+    expect(s3.truck).toEqual({ progress: 1, lights: false, wheelFrame: 0 });
+    const last = computeFrame(tl, tl.events.length, opts);
+    expect(last.done).toBe(true);
+    expect(last.outcome).toBe('restored');
+    expect(last.houses).toEqual([{ kind: 'restored' }, { kind: 'restored' }]);
+  });
+
+  it('is a pure function of the frame: no Math.random in the frame model', () => {
+    const spy = vi.spyOn(Math, 'random');
+    const tl = buildEffects(lab, false);
+    const opts = frameOptionsFor(lab, 2, 'propagation', true);
+    for (let time = 0; time <= tl.durationMs; time += 50) expect(computeFrame(tl, time, opts)).toEqual(computeFrame(tl, time, opts));
+    expect(spy).not.toHaveBeenCalled();
+  });
+});
+
+describe('captions · propagation prelude', () => {
+  const t = translator('en');
+  const ja = translator('ja');
+  const ctx = { district: 'Harbor Bridge', hasChecks: false };
+
+  /** The instant a gate's tokens switch to `after` (the same threshold computeFrame uses). */
+  const switchTime = (g: EffectEvent): number => (g.type === 'gate' ? g.t + g.dur * g.travel : -1);
+  const endOf = (e: EffectEvent | undefined): number => (e === undefined ? -1 : e.t + e.dur);
+
+  it('mission 2 (XZ through CNOT → YY): the start list names both fires with letters; the coupler caption names both directions once the tokens have switched', () => {
+    const d = confirmDispatch('red-forward-blue-backward', { 0: 'Y', 1: 'Y' });
+    const tl = buildEffects(d, false);
+    const gate = tl.events.find((e) => e.type === 'gate');
+    if (gate?.type !== 'gate') throw new Error('gate');
+    const startLine = 'The fire starts here: red (X) fire on house 0 and blue (Z) fire on house 1.';
+    const couplerLine = 'Through the coupler: the red (X) fire copies forward onto house 1 and the blue (Z) fire copies backward onto house 0.';
+    const arriveLine = 'The fires reach the houses: red-and-blue (Y) fire on house 0 and red-and-blue (Y) fire on house 1.';
+    expect(captionAt(t, tl, 0, ctx)).toBe(startLine);
+    // While the tokens travel to the coupler they still read XZ, so the start line stays; the coupler line comes with the switch.
+    expect(captionAt(t, tl, gate.t, ctx)).toBe(startLine);
+    expect(captionAt(t, tl, switchTime(gate) - 1, ctx)).toBe(startLine);
+    expect(captionAt(t, tl, switchTime(gate), ctx)).toBe(couplerLine);
+    const arrive = tl.events.find((e) => e.type === 'fires-arrive');
+    // Travelling to the houses (still plain): the coupler line holds; the arrival line comes when the houses light.
+    expect(captionAt(t, tl, arrive?.t ?? -1, ctx)).toBe(couplerLine);
+    expect(captionAt(t, tl, endOf(arrive) - 1, ctx)).toBe(couplerLine);
+    expect(captionAt(t, tl, endOf(arrive), ctx)).toBe(arriveLine);
+    // …and holds until the trucks (EFFECT_TIMING.arriveHold later).
+    const trucks = tl.events.find((e) => e.type === 'trucks-arrive');
+    expect(trucks?.t).toBe(endOf(arrive) + EFFECT_TIMING.arriveHold);
+    expect(captionAt(t, tl, (trucks?.t ?? 0) - 1, ctx)).toBe(arriveLine);
+    expect(captionAt(t, tl, trucks?.t ?? -1, ctx)).toBe('The trucks arrive at Harbor Bridge.');
+    // Japanese says the same through the same letters.
+    expect(captionAt(ja, tl, 0, ctx)).toBe('火はここから始まります：家 0 に 赤 (X) の火 と 家 1 に 青 (Z) の火。');
+    expect(captionAt(ja, tl, switchTime(gate), ctx)).toContain('前へ家 1');
+    expect(captionAt(ja, tl, switchTime(gate), ctx)).toContain('後ろへ家 0');
+    // The live region announces the arrival when it happens (not the start, not the gate, not the travel), then the trucks as before.
+    expect(announcementAt(t, tl, 0, ctx)).toBe('');
+    expect(announcementAt(t, tl, switchTime(gate), ctx)).toBe('');
+    expect(announcementAt(t, tl, arrive?.t ?? -1, ctx)).toBe('');
+    expect(announcementAt(t, tl, endOf(arrive) - 1, ctx)).toBe('');
+    expect(announcementAt(t, tl, endOf(arrive), ctx)).toBe(arriveLine);
+    expect(announcementAt(t, tl, (trucks?.t ?? 0) - 1, ctx)).toBe(arriveLine);
+    expect(announcementAt(t, tl, trucks?.t ?? -1, ctx)).toBe('The trucks arrive at Harbor Bridge.');
+  });
+
+  it('mission 3 (ZI through H, CNOT, H → XZ): the first mirror machine swaps, the coupler copies forward only, the last mirror machine swaps on house 1', () => {
+    const d = confirmDispatch('color-switch', { 0: 'X', 1: 'Z' });
+    const tl = buildEffects(d, false);
+    const gates = tl.events.filter((e) => e.type === 'gate');
+    const lines = [
+      'The mirror machine on house 0 swaps red (X) and blue (Z).',
+      'Through the coupler: the red (X) fire copies forward onto house 1.',
+      'The mirror machine on house 1 swaps red (X) and blue (Z).',
+    ];
+    expect(gates.map((g) => captionForEvent(t, g, 1, ctx))).toEqual(lines);
+    // Before the switch a gate adds no line (the previous one stays); from the switch on it speaks.
+    expect(gates.map((g) => captionForEvent(t, g, 0, ctx))).toEqual([null, null, null]);
+    expect(gates.map((g) => captionForEvent(t, g, (g.type === 'gate' ? g.travel : 1) - 0.01, ctx))).toEqual([null, null, null]);
+    expect(gates.map((g) => captionForEvent(t, g, g.type === 'gate' ? g.travel : 1, ctx))).toEqual(lines);
+    expect(gates.map((g) => captionAt(t, tl, switchTime(g), ctx))).toEqual(lines);
+    expect(gates.map((g) => captionAt(t, tl, g.t, ctx))).toEqual(['The fire starts here: blue (Z) fire on house 0.', lines[0], lines[1]]);
+    expect(captionAt(t, tl, 0, ctx)).toBe('The fire starts here: blue (Z) fire on house 0.');
+    const arrive = tl.events.find((e) => e.type === 'fires-arrive');
+    expect(captionAt(t, tl, arrive?.t ?? -1, ctx)).toBe(lines[2]);
+    expect(captionAt(t, tl, endOf(arrive), ctx)).toBe('The fires reach the houses: red (X) fire on house 0 and blue (Z) fire on house 1.');
+  });
+
+  it('the narration never leads the picture: on every lane board the caption and the live region describe exactly what computeFrame shows at the same time', () => {
+    // Sampled every 5 ms through the prelude (plus the exact thresholds): the gate line is shown iff the tokens carry
+    // that gate's `after`; the arrival line (and its announcement) iff the houses are lit; the trucks' line only from
+    // their own start. This is the regression test for "captions lead the picture by up to 412 / 450 ms".
+    for (const d of [confirmDispatch('red-forward-blue-backward', { 0: 'Y', 1: 'Y' }), confirmDispatch('color-switch', { 0: 'X', 1: 'Z' }), confirmDispatch('color-switch', {})]) {
+      const tl = buildEffects(d, false);
+      const opts = frameOptionsFor(d, 2, 'propagation', true);
+      const districtCtx = { district: d.missionId === 'color-switch' ? 'Conversion Lab' : 'Harbor Bridge', hasChecks: false };
+      const gates = tl.events.filter((e): e is Extract<EffectEvent, { type: 'gate' }> => e.type === 'gate');
+      const arrive = tl.events.find((e) => e.type === 'fires-arrive');
+      const trucks = tl.events.find((e) => e.type === 'trucks-arrive');
+      if (arrive?.type !== 'fires-arrive' || trucks === undefined) throw new Error('prelude');
+      const arriveLine = captionForEvent(t, arrive, 1, districtCtx);
+      const startLine = captionAt(t, tl, 0, districtCtx);
+      expect(startLine).toMatch(/^The fire starts here/);
+      const times = new Set<number>();
+      for (let time = 0; time <= trucks.t; time += 5) times.add(time);
+      gates.forEach((g) => times.add(switchTime(g)));
+      times.add(endOf(arrive));
+      times.add(trucks.t);
+      for (const time of [...times].sort((a, b) => a - b)) {
+        const frame = computeFrame(tl, time, opts);
+        const lanes = frame.lanes;
+        if (lanes === null) throw new Error('lanes');
+        const caption = captionAt(t, tl, time, districtCtx);
+        const announcement = announcementAt(t, tl, time, districtCtx);
+        const shown = ['I', 'I'];
+        lanes.tokens.forEach((k) => (shown[k.q] = k.letter));
+        if (time >= trucks.t) {
+          expect(caption, `t=${String(time)}`).toBe(`The trucks arrive at ${districtCtx.district}.`);
+          continue;
+        }
+        if (lanes.arrived) {
+          // Houses lit ⇔ the arrival line, in both channels.
+          expect(frame.houses.some((h) => h.kind === 'fire') || d.fires === 'II', `t=${String(time)}`).toBe(true);
+          expect(caption, `t=${String(time)}`).toBe(arriveLine);
+          expect(announcement, `t=${String(time)}`).toBe(arriveLine);
+          continue;
+        }
+        expect(frame.houses.every((h) => h.kind === 'normal'), `t=${String(time)}`).toBe(true);
+        expect(announcement, `t=${String(time)}`).toBe('');
+        // The tokens carry some gate's `after` (that gate's line) or still the start pattern (the start line).
+        const switched = gates.filter((g) => time >= switchTime(g));
+        const current = switched[switched.length - 1];
+        if (current === undefined) {
+          expect(shown.join(''), `t=${String(time)}`).toBe(d.startFires);
+          expect(caption, `t=${String(time)}`).toBe(startLine);
+        } else {
+          expect(shown.join(''), `t=${String(time)}`).toBe(current.after);
+          expect(caption, `t=${String(time)}`).toBe(gateText(t, current));
+        }
+      }
+    }
+  });
+
+  it('other rules: blue-only through a coupler copies backward; nothing to copy; S adds / drops the blue part; CZ and SWAP use the generic line', () => {
+    const base = confirmDispatch('red-forward-blue-backward', { 0: 'Y', 1: 'Y' });
+    const synthetic = (startFires: string, fires: string, circuit: Circuit) =>
+      buildEffects({ ...base, missionId: 'synthetic', startFires, fires, crews: 'II', residual: fires }, false, { circuit }).events.filter((e) => e.type === 'gate');
+    expect(synthetic('IZ', 'ZZ', [{ kind: 'CNOT', c: 0, t: 1 }]).map((g) => captionForEvent(t, g, 1, ctx))).toEqual(['Through the coupler: the blue (Z) fire copies backward onto house 0.']);
+    expect(synthetic('ZI', 'ZI', [{ kind: 'CNOT', c: 0, t: 1 }]).map((g) => captionForEvent(t, g, 1, ctx))).toEqual(['Through the coupler: nothing to copy, the fires pass unchanged.']);
+    expect(synthetic('XI', 'YI', [{ kind: 'S', q: 0 }]).map((g) => captionForEvent(t, g, 1, ctx))).toEqual(['The dial on house 0: the red (X) fire picks up a blue (Z) part.']);
+    expect(synthetic('YI', 'XI', [{ kind: 'S', q: 0 }]).map((g) => captionForEvent(t, g, 1, ctx))).toEqual(['The dial on house 0: the red-and-blue (Y) fire drops its blue (Z) part.']);
+    expect(synthetic('ZI', 'ZI', [{ kind: 'S', q: 0 }]).map((g) => captionForEvent(t, g, 1, ctx))).toEqual(['The dial on house 0: nothing changes here.']);
+    expect(synthetic('YI', 'YI', [{ kind: 'H', q: 0 }]).map((g) => captionForEvent(t, g, 1, ctx))).toEqual(['The mirror machine on house 0: nothing changes here.']);
+    expect(synthetic('XI', 'XZ', [{ kind: 'CZ', a: 0, b: 1 }]).map((g) => captionForEvent(t, g, 1, ctx))).toEqual(['CZ between houses 0 and 1: XI becomes XZ.']);
+    expect(synthetic('ZI', 'ZI', [{ kind: 'CZ', a: 0, b: 1 }]).map((g) => captionForEvent(t, g, 1, ctx))).toEqual(['CZ between houses 0 and 1: the fire pattern ZI is unchanged.']);
+    expect(synthetic('XI', 'IX', [{ kind: 'SWAP', a: 0, b: 1 }]).map((g) => captionForEvent(t, g, 1, ctx))).toEqual(['SWAP of houses 0 and 1: XI becomes IX.']);
   });
 });
 
@@ -293,6 +613,106 @@ describe('SprayPlayer · clock, captions, onDone', () => {
     expect(onDone2).toHaveBeenCalledTimes(1);
     second.unmount();
     expect(onDone2).toHaveBeenCalledTimes(1);
+  });
+
+  it('Harbor Bridge: the prelude plays before the trucks — tokens travel (lane-token), houses stay normal, then light up; Skip jumps to the final frame', () => {
+    const onDone = vi.fn();
+    const debrief = confirmDispatch('red-forward-blue-backward', { 0: 'Y', 1: 'Y' });
+    const timeline = buildEffects(debrief, false);
+    const m = getPublicMission(debrief.missionId);
+    const { container } = render(<SprayPlayer codeId={m.code} circuit={m.circuit} debrief={debrief} timeline={timeline} reducedMotion={false} onDone={onDone} missionCopy={missionCopy(m.id, 'en')} />);
+    const state = (q: number) => container.querySelector(`[data-house="${String(q)}"]`)?.getAttribute('data-house-state');
+    const tokens = () => Array.from(container.querySelectorAll('[data-testid="lane-token"]'));
+    expect(screen.getByRole('heading', { name: 'Training replay: answer check' })).toBeInTheDocument();
+    expect(screen.getByTestId('spray-caption')).toHaveTextContent('The fire starts here: red (X) fire on house 0 and blue (Z) fire on house 1.');
+    expect(tokens().map((k) => [k.getAttribute('data-lane-q'), k.getAttribute('data-letter')])).toEqual([
+      ['0', 'X'],
+      ['1', 'Z'],
+    ]);
+    expect(state(0)).toBe('normal');
+    expect(state(1)).toBe('normal');
+    expect(container.querySelector('.truck')).toBeNull();
+    expect(container.querySelector('.time-cursor')).not.toBeNull();
+    const gate = timeline.events.find((e) => e.type === 'gate');
+    if (gate?.type !== 'gate') throw new Error('gate');
+    tick(gate.t + gate.dur * gate.travel + 10);
+    expect(screen.getByTestId('spray-caption')).toHaveTextContent('Through the coupler: the red (X) fire copies forward onto house 1 and the blue (Z) fire copies backward onto house 0.');
+    expect(container.querySelector('.gate.is-active')).not.toBeNull();
+    expect(tokens().map((k) => k.getAttribute('data-letter'))).toEqual(['Y', 'Y']);
+    expect(state(0)).toBe('normal');
+    const arrive = timeline.events.find((e) => e.type === 'fires-arrive');
+    if (arrive?.type !== 'fires-arrive') throw new Error('arrive');
+    // Arriving: YY travels to the houses (still plain), every gate done. The caption keeps the coupler line and the
+    // live region stays silent: the arrival is only narrated once the houses light (the narration never leads the picture).
+    tick(arrive.t + 30 - (gate.t + gate.dur * gate.travel + 10));
+    expect(screen.getByTestId('spray-caption')).toHaveTextContent('Through the coupler: the red (X) fire copies forward onto house 1 and the blue (Z) fire copies backward onto house 0.');
+    expect(screen.getByTestId('spray-announcer').textContent).toBe('');
+    expect(tokens().map((k) => k.getAttribute('data-letter'))).toEqual(['Y', 'Y']);
+    expect(container.querySelectorAll('.gate.is-done')).toHaveLength(1);
+    expect(container.querySelector('.gate.is-active')).toBeNull();
+    expect(state(0)).toBe('normal');
+    // Arrived: the tokens are gone, the houses carry the final fires, both channels say so — and the trucks wait (arriveHold).
+    tick(arrive.dur - 30 + 20); // (+20: the rAF clock samples every 16 ms)
+    expect(tokens()).toHaveLength(0);
+    expect(container.querySelector('.time-cursor')).toBeNull();
+    expect(state(0)).toBe('fire');
+    expect(state(1)).toBe('fire');
+    expect(screen.getByTestId('spray-caption')).toHaveTextContent('The fires reach the houses: red-and-blue (Y) fire on house 0 and red-and-blue (Y) fire on house 1.');
+    expect(screen.getByTestId('spray-announcer')).toHaveTextContent('The fires reach the houses: red-and-blue (Y) fire on house 0 and red-and-blue (Y) fire on house 1.');
+    expect(container.querySelector('.truck')).toBeNull();
+    // Then the usual spray: trucks (after the hold), crews, splash, outcome.
+    const trucks = timeline.events.find((e) => e.type === 'trucks-arrive');
+    expect(trucks?.t).toBe(arrive.t + arrive.dur + EFFECT_TIMING.arriveHold);
+    tick(EFFECT_TIMING.arriveHold);
+    expect(screen.getByTestId('spray-caption')).toHaveTextContent('The trucks arrive at Harbor Bridge.');
+    expect(screen.getByTestId('spray-announcer')).toHaveTextContent('The trucks arrive at Harbor Bridge.');
+    expect(container.querySelector('.truck')).not.toBeNull();
+    tick(timeline.durationMs);
+    expect(state(0)).toBe('restored');
+    expect(state(1)).toBe('restored');
+    expect(onDone).toHaveBeenCalledTimes(1);
+    // Skip during the prelude: straight to the final frame.
+    const onDone2 = vi.fn();
+    const second = render(<SprayPlayer codeId={m.code} circuit={m.circuit} debrief={debrief} timeline={timeline} reducedMotion={false} onDone={onDone2} missionCopy={missionCopy(m.id, 'en')} />);
+    tick(100);
+    expect(second.container.querySelectorAll('[data-testid="lane-token"]')).toHaveLength(2);
+    fireEvent.click(within(second.container).getByTestId('spray-skip'));
+    expect(second.container.querySelectorAll('[data-testid="lane-token"]')).toHaveLength(0);
+    expect(second.container.querySelector('[data-house="0"]')?.getAttribute('data-house-state')).toBe('restored');
+    expect(onDone2).toHaveBeenCalledTimes(1);
+  });
+
+  it('Harbor Bridge under reduced motion: the stepper gains the prelude frames (start → gate → arrive → trucks …)', () => {
+    const onDone = vi.fn();
+    const debrief = confirmDispatch('red-forward-blue-backward', { 0: 'Y', 1: 'Y' });
+    const timeline = buildEffects(debrief, true);
+    const plain = buildEffects(debrief, true, { propagation: false });
+    expect(timeline.events).toHaveLength(plain.events.length + 3);
+    const m = getPublicMission(debrief.missionId);
+    const { container } = render(<SprayPlayer codeId={m.code} circuit={m.circuit} debrief={debrief} timeline={timeline} reducedMotion onDone={onDone} missionCopy={missionCopy(m.id, 'en')} />);
+    const state = (q: number) => container.querySelector(`[data-house="${String(q)}"]`)?.getAttribute('data-house-state');
+    const tokens = () => Array.from(container.querySelectorAll('[data-testid="lane-token"]')).map((k) => k.getAttribute('data-letter'));
+    expect(screen.getByTestId('spray-step')).toHaveTextContent(`Frame 1 of ${String(timeline.events.length)}`);
+    expect(tokens()).toEqual(['X', 'Z']);
+    expect(state(0)).toBe('normal');
+    fireEvent.click(screen.getByTestId('spray-next')); // gate complete: YY at the coupler
+    expect(tokens()).toEqual(['Y', 'Y']);
+    expect(container.querySelector('.gate.is-active')).not.toBeNull();
+    expect(state(0)).toBe('normal');
+    fireEvent.click(screen.getByTestId('spray-next')); // arrived
+    expect(tokens()).toEqual([]);
+    expect(state(0)).toBe('fire');
+    expect(state(1)).toBe('fire');
+    expect(container.querySelector('.truck')).toBeNull();
+    fireEvent.click(screen.getByTestId('spray-next')); // trucks
+    expect(container.querySelector('.truck')).not.toBeNull();
+    fireEvent.click(screen.getByTestId('spray-prev'));
+    fireEvent.click(screen.getByTestId('spray-prev'));
+    expect(tokens()).toEqual(['Y', 'Y']);
+    expect(state(0)).toBe('normal');
+    for (let i = 0; i < timeline.events.length; i++) fireEvent.click(screen.getByTestId('spray-next'));
+    expect(state(0)).toBe('restored');
+    expect(onDone).toHaveBeenCalledTimes(1);
   });
 
   it('reduced motion: no clock — Prev/Next step static frames; the last step calls onDone exactly once', () => {
@@ -513,6 +933,13 @@ describe('WhyCompare', () => {
     const m = getPublicMission(debrief.missionId);
     expect(resultType(debrief)).toBe('prediction-miss');
     const { container } = render(<WhyCompare codeId={m.code} circuit={m.circuit} mine={debrief} reducedMotion missionCopy={missionCopy(m.id, 'en')} />);
+    // The comparison is about the sprays: no propagation prelude, both panels start with the fires in the houses.
+    expect(container.querySelectorAll('[data-testid="lane-token"]')).toHaveLength(0);
+    expect(screen.getByTestId('why-mine').querySelector('[data-house="0"]')?.getAttribute('data-house-state')).toBe('fire');
+    expect(screen.getByTestId('why-alt').querySelector('[data-house="0"]')?.getAttribute('data-house-state')).toBe('fire');
+    expect(screen.getByTestId('why-mine').querySelector('.why-caption')).toHaveTextContent('The trucks arrive at Conversion Lab.');
+    expect(screen.getByTestId('why-mine').querySelector('.spray-step-label, .why-compare .spray-step-label')).toBeNull();
+    expect(screen.getByText(`Frame 1 of ${String(buildEffects(debrief, true, { propagation: false }).events.length)}`)).toBeInTheDocument();
     expect(within(screen.getByTestId('why-alt')).getByRole('heading', { name: 'The other way · Crews where the fires really ended' })).toBeInTheDocument();
     expect(within(screen.getByTestId('why-mine')).getByText('→ Prediction missed — fires left on the wires')).toBeInTheDocument();
     expect(within(screen.getByTestId('why-alt')).getByText('→ Logical qubit safe')).toBeInTheDocument();

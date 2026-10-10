@@ -4,7 +4,7 @@
  */
 import { useMemo } from 'react';
 import { fromString, type Circuit, type CodeId } from '../../quantum';
-import type { Debrief, EffectTimeline, MissionKind } from '../../game';
+import { hasPrelude, type Debrief, type EffectTimeline, type MissionKind } from '../../game';
 import { computeFrame } from './frame';
 import { Scene } from './Scene';
 import type { SceneKind } from './geometry';
@@ -29,10 +29,13 @@ export interface SprayStageProps {
 export function SprayStage(props: SprayStageProps) {
   const n = fromString(props.debrief.fires).n;
   const kind = missionKindOf(props.debrief.missionId, props.missionKind);
-  const opts = useMemo(() => frameOptionsFor(props.debrief, n, kind), [props.debrief, n, kind]);
+  const prelude = hasPrelude(props.timeline);
+  const opts = useMemo(() => frameOptionsFor(props.debrief, n, kind, prelude), [props.debrief, n, kind, prelude]);
   const frame = useMemo(() => computeFrame(props.timeline, props.time, { ...opts, strict: props.strict ?? false }), [props.timeline, props.time, opts, props.strict]);
   const outcome = outcomeFor(props.debrief, frame);
   const isLanes = props.codeId === 'trivial2' || props.codeId === 'trivial3';
+  // With a prelude the gate cursor follows the travelling tokens (frame.lanes); otherwise the fires already sit in the houses.
+  const gateCursor = frame.lanes !== null ? frame.lanes.cursor : props.circuit.length;
   return (
     <Scene
       codeId={props.codeId}
@@ -43,7 +46,7 @@ export function SprayStage(props: SprayStageProps) {
       residual={null}
       syndrome={frame.syndrome}
       interactive={false}
-      gateCursor={isLanes ? props.circuit.length : undefined}
+      gateCursor={isLanes ? gateCursor : undefined}
       inputFires={isLanes ? props.debrief.startFires : null}
       frame={frame}
       outcome={outcome}

@@ -5,7 +5,9 @@
  *   houses-row / grid   rep3 / rsc3 houses + detectors (watch lines/tint on tap); a reserved strip on the right holds
  *                       the memory beacon tower at result time
  *   bridge / lab        propagation lanes with gates, travelling fire tokens, a time cursor, a house per lane end;
- *                       once the outcome is reached the input tokens fade into "start" badges
+ *                       once the outcome is reached the input tokens fade into "start" badges. A spray frame with
+ *                       `lanes` (the propagation prelude) moves the tokens between the columns and highlights the
+ *                       active gate; a pure function of the frame, no randomness.
  *
  * Layout: `.scene` (the labelled group) = an optional header band (the "Logical qubit safe" badge) over the
  * `.scene-board`, which keeps the SVG's aspect ratio and carries the house / detector hit areas.
@@ -46,8 +48,8 @@ import {
 } from '../art';
 import { useT } from '../i18n';
 import type { Translate } from '../i18n';
-import { HOUSE_DIMS, crewSpot, defaultHouseVariant, deriveSceneKind, flamePoint, houseBox, laneTokenX, lerpPt, easeOut, sceneGeometry, type SceneGeometry, type SceneKind } from './geometry';
-import type { SceneFrame } from './frame';
+import { HOUSE_DIMS, crewSpot, defaultHouseVariant, deriveSceneKind, flamePoint, houseBox, laneTokenX, lerp, lerpPt, easeOut, sceneGeometry, type SceneGeometry, type SceneKind } from './geometry';
+import type { LaneFrame, SceneFrame } from './frame';
 import { anomalyLetter, asCrew, letterOf, staticHouseState } from './houseState';
 
 /** Result-time decoration (R9). `patternQubits` = support of the engine residual; `beacon` = draw the memory tower. */
@@ -226,7 +228,7 @@ export function Scene(props: SceneProps) {
           )}
           {/* lane gates, cursor and tokens */}
           {geo.lanes !== null ? (
-            <LaneContent geo={geo} circuit={props.circuit} cursor={cursor} fires={frame !== undefined ? null : props.fires} inputFires={props.inputFires ?? null} startFaded={reached !== null} startLabel={t('result.startBadge')} />
+            <LaneContent geo={geo} circuit={props.circuit} cursor={cursor} fires={frame !== undefined ? null : props.fires} lanes={frame?.lanes ?? null} inputFires={props.inputFires ?? null} startFaded={reached !== null} startLabel={t('result.startBadge')} />
           ) : null}
           {/* watch tint behind the watched houses */}
           {watched.map((q) => {
@@ -442,23 +444,30 @@ interface LaneContentProps {
   readonly circuit: Circuit;
   readonly cursor: number;
   readonly fires: string | null;
+  /** Spray frame with the propagation prelude: travelling tokens + active gate (overrides `cursor` / `fires`). */
+  readonly lanes: LaneFrame | null;
   readonly inputFires: string | null;
   /** Outcome reached: the input tokens fade into "start" badges so they are not mistaken for leftover fires. */
   readonly startFaded: boolean;
   readonly startLabel: string;
 }
 
-function LaneContent({ geo, circuit, cursor, fires, inputFires, startFaded, startLabel }: LaneContentProps) {
+function LaneContent({ geo, circuit, cursor: staticCursor, fires, lanes, inputFires, startFaded, startLabel }: LaneContentProps) {
   const g = geo.lanes;
   if (g === null) return null;
   const steps = circuit.length;
-  const atOutput = cursor >= steps;
-  const tokenX = laneTokenX(g, cursor, steps);
+  // Column x: -1 = input, 0..steps-1 = gate columns, steps = output.
+  const colX = (c: number): number => (c < 0 ? g.inX : c >= steps ? g.outX : g.stepX(c, steps));
+  const cursor = lanes !== null ? lanes.cursor : staticCursor;
+  const atOutput = lanes !== null ? lanes.arrived : cursor >= steps;
+  const firstToken = lanes?.tokens[0];
+  const travelX = firstToken === undefined ? null : lerp(colX(firstToken.from), colX(firstToken.to), easeOut(firstToken.progress));
+  const tokenX = lanes !== null ? (travelX ?? colX(Math.min(cursor, steps))) : laneTokenX(g, cursor, steps);
   const tokenAt = (s: string | null, q: number): CrewLetter | null => asCrew(letterOf(s, q));
   return (
     <g className="lanes">
       {circuit.map((gate, j) => (
-        <g key={j} className={j === cursor ? 'gate is-active' : j < cursor ? 'gate is-done' : 'gate'} opacity={j <= cursor ? 1 : 0.6}>
+        <g key={j} className={j === cursor ? 'gate is-active' : j < cursor ? 'gate is-done' : 'gate'} opacity={j <= cursor ? 1 : 0.6} data-gate-index={j} data-gate-state={j === cursor ? 'active' : j < cursor ? 'done' : 'pending'}>
           <GateArt gate={gate} x={g.stepX(j, steps)} laneY={g.laneY} active={j === cursor} />
         </g>
       ))}
@@ -477,16 +486,25 @@ function LaneContent({ geo, circuit, cursor, fires, inputFires, startFaded, star
           </g>
         );
       })}
-      {!atOutput
-        ? Array.from({ length: g.lanes }, (_, q) => {
-            const l = tokenAt(fires, q);
-            return l === null ? null : (
-              <g key={`tok-${String(q)}`} className="token">
-                <LaneToken letter={l} x={tokenX} y={g.laneY(q) - 6} />
+      {lanes !== null
+        ? lanes.tokens.map((tok) => {
+            const x = lerp(colX(tok.from), colX(tok.to), easeOut(tok.progress));
+            return (
+              <g key={`tok-${String(tok.q)}`} className="token lane-token" data-testid="lane-token" data-lane-q={tok.q} data-letter={tok.letter} data-progress={tok.progress.toFixed(2)}>
+                <LaneToken letter={tok.letter} x={x} y={g.laneY(tok.q) - 6} />
               </g>
             );
           })
-        : null}
+        : !atOutput
+          ? Array.from({ length: g.lanes }, (_, q) => {
+              const l = tokenAt(fires, q);
+              return l === null ? null : (
+                <g key={`tok-${String(q)}`} className="token">
+                  <LaneToken letter={l} x={tokenX} y={g.laneY(q) - 6} />
+                </g>
+              );
+            })
+          : null}
     </g>
   );
 }

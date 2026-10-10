@@ -6,10 +6,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { useState } from 'react';
-import { confirmDispatch, getPublicMission, resultType, type CrewLetter } from '../../game';
+import { buildEffects, confirmDispatch, getPublicMission, resultType, type CrewLetter } from '../../game';
 import { fromString, support } from '../../quantum';
 import { Scene } from './Scene';
-import { boxesIntersect, crewBox, crewSpot, detectorBox, deriveSceneKind, flameBox, sceneGeometry, houseBox, houseDrawnBox, defaultHouseVariant, TOWER_STRIP } from './geometry';
+import { computeFrame, type SceneFrame } from './frame';
+import { boxesIntersect, crewBox, crewSpot, detectorBox, deriveSceneKind, easeOut, flameBox, lerp, sceneGeometry, houseBox, houseDrawnBox, defaultHouseVariant, TOWER_STRIP } from './geometry';
+import { frameOptionsFor } from './stageModel';
 
 const RSC3 = getPublicMission('two-kinds-of-trouble');
 
@@ -213,6 +215,65 @@ describe('Scene · lane boards', () => {
     expect(container.querySelectorAll('.gate')).toHaveLength(3);
     expect(container.querySelectorAll('.gate.is-active')).toHaveLength(1);
     expect(container.textContent).toContain('H');
+  });
+
+  it('spray frame with the prelude: travelling tokens at the interpolated x (eased), the active / done gate classes, the cursor at the token x, test ids', () => {
+    const d = confirmDispatch('color-switch', { 0: 'X', 1: 'Z' });
+    const tl = buildEffects(d, false);
+    const opts = frameOptionsFor(d, 2, 'propagation', true);
+    const geo = sceneGeometry('lab', 'trivial2');
+    const g = geo.lanes;
+    if (g === null) throw new Error('lanes');
+    const steps = lab.circuit.length;
+    const colX = (c: number) => (c < 0 ? g.inX : c >= steps ? g.outX : g.stepX(c, steps));
+    const tokenXs = (root: HTMLElement) =>
+      Array.from(root.querySelectorAll('[data-testid="lane-token"]')).map((k) => {
+        const m = /translate\(([-\d.]+) /.exec(k.querySelector('g')?.getAttribute('transform') ?? '');
+        return Number(m?.[1]);
+      });
+    const second = tl.events.filter((e) => e.type === 'gate')[1];
+    if (second?.type !== 'gate') throw new Error('gate');
+    // Mid-travel into the coupler (gate 1): the X token moves from column 0 to column 1; gate 0 done, gate 1 active, gate 2 pending.
+    const midTravel = second.t + second.dur * second.travel * 0.5;
+    const frame: SceneFrame = computeFrame(tl, midTravel, opts);
+    const { container, rerender } = render(<Scene codeId={lab.code} circuit={lab.circuit} fires={d.fires} crews={null} residual={null} syndrome={null} interactive={false} gateCursor={steps} inputFires={d.startFires} frame={frame} />);
+    const toks = container.querySelectorAll('[data-testid="lane-token"]');
+    expect(toks).toHaveLength(1);
+    expect(toks[0]?.getAttribute('data-lane-q')).toBe('0');
+    expect(toks[0]?.getAttribute('data-letter')).toBe('X');
+    const expectedX = lerp(colX(0), colX(1), easeOut(frame.lanes?.tokens[0]?.progress ?? 0));
+    expect(tokenXs(container)[0]).toBeCloseTo(expectedX, 1);
+    expect(expectedX).toBeGreaterThan(colX(0));
+    expect(expectedX).toBeLessThan(colX(1));
+    const gateStates = Array.from(container.querySelectorAll('.gate')).map((e) => e.getAttribute('data-gate-state'));
+    expect(gateStates).toEqual(['done', 'active', 'pending']);
+    expect(container.querySelectorAll('.gate.is-done')).toHaveLength(1);
+    expect(container.querySelectorAll('.gate.is-active')).toHaveLength(1);
+    expect(Number(container.querySelector('.time-cursor')?.getAttribute('x1'))).toBeCloseTo(expectedX, 1);
+    // Houses are still plain while the fire travels; the start tokens are still full (no outcome yet).
+    expect(container.querySelector('[data-house="0"]')?.getAttribute('data-house-state')).toBe('normal');
+    expect(container.querySelector('[data-house="1"]')?.getAttribute('data-house-state')).toBe('normal');
+    expect(container.querySelector('.lane-start')?.getAttribute('data-faded')).toBe('false');
+    // After the pattern switch the tokens sit on the coupler column as XX.
+    const switched = computeFrame(tl, second.t + second.dur * second.travel, opts);
+    rerender(<Scene codeId={lab.code} circuit={lab.circuit} fires={d.fires} crews={null} residual={null} syndrome={null} interactive={false} gateCursor={steps} inputFires={d.startFires} frame={switched} />);
+    expect(Array.from(container.querySelectorAll('[data-testid="lane-token"]')).map((k) => k.getAttribute('data-letter'))).toEqual(['X', 'X']);
+    tokenXs(container).forEach((x) => expect(x).toBeCloseTo(colX(1), 1));
+    // Arrived: no tokens, no cursor, every gate done, fires in the houses.
+    const arrive = tl.events.find((e) => e.type === 'fires-arrive');
+    const arrived = computeFrame(tl, (arrive?.t ?? 0) + (arrive?.dur ?? 0), opts);
+    rerender(<Scene codeId={lab.code} circuit={lab.circuit} fires={d.fires} crews={null} residual={null} syndrome={null} interactive={false} gateCursor={steps} inputFires={d.startFires} frame={arrived} />);
+    expect(container.querySelectorAll('[data-testid="lane-token"]')).toHaveLength(0);
+    expect(container.querySelector('.time-cursor')).toBeNull();
+    expect(container.querySelectorAll('.gate.is-done')).toHaveLength(3);
+    expect(container.querySelector('[data-house="0"]')?.getAttribute('data-house-state')).toBe('fire');
+    expect(container.querySelector('[data-house="1"]')?.getAttribute('data-house-state')).toBe('fire');
+    // A frame without a prelude keeps the static drawing: no travelling tokens, cursor at the output.
+    const plain = computeFrame(buildEffects(d, false, { propagation: false }), 0, frameOptionsFor(d, 2, 'propagation'));
+    rerender(<Scene codeId={lab.code} circuit={lab.circuit} fires={d.fires} crews={null} residual={null} syndrome={null} interactive={false} gateCursor={steps} inputFires={d.startFires} frame={plain} />);
+    expect(container.querySelectorAll('[data-testid="lane-token"]')).toHaveLength(0);
+    expect(container.querySelector('.time-cursor')).toBeNull();
+    expect(container.querySelector('[data-house="0"]')?.getAttribute('data-house-state')).toBe('fire');
   });
 
   it('lane houses are interactive buttons too', () => {

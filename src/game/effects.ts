@@ -3,12 +3,18 @@
  * every per-house outcome is read from the residual the engine computed (and asserted to equal before ⊕ crew),
  * so the pictures can never disagree with the verdict. No randomness, no React, no timers.
  *
- * Timeline (ms, full motion): trucks arrive → for each crew in ascending house order: run, spray (the sprayed
- * house's fog lifts and the TRUE fire shows for the whole stream), impact → reveal fires nobody sprayed → alarms of
- * the residual → outcome → done. Impacts are spaced by `stagger` and the tail starts `hold` after the last impact
- * so every impact caption holds at least that long. Reduced motion: one frame per event.
+ * Timeline (ms, full motion): [propagation prelude] → trucks arrive → for each crew in ascending house order: run,
+ * spray (the sprayed house's fog lifts and the TRUE fire shows for the whole stream), impact → reveal fires nobody
+ * sprayed → alarms of the residual → outcome → done. Impacts are spaced by `stagger` and the tail starts `hold` after
+ * the last impact so every impact caption holds at least that long. Reduced motion: one frame per event.
+ *
+ * Propagation prelude (missions with a non-empty circuit, i.e. the lane boards): BEFORE the trucks the public start
+ * fires appear at the lane input ('fires-start'), travel through every gate in order ('gate' — the pattern switches
+ * from `before` to `after` exactly as the engine's propagate() frames say) and reach the output houses
+ * ('fires-arrive', whose fires equal Debrief.fires). The lit houses then hold for `arriveHold` (the arrival caption
+ * stays readable) before the trucks start. It plays only in the answer check, never during planning.
  */
-import { bitsToLetter, fromString, getCode, letterAt, letterToBits, support, weight, type PauliLetter } from '../quantum';
+import { bitsToLetter, fromString, getCode, letterAt, letterToBits, propagate, support, toString, weight, type Circuit, type Gate, type PauliLetter } from '../quantum';
 import { getPublicMission } from './missions';
 import type { CrewLetter, Debrief } from './types';
 
@@ -26,6 +32,26 @@ export type ResultType = 'restored' | 'safe-pattern' | 'still-burning' | 'logica
 export type ImpactEffect = 'extinguished' | 'changed' | 'ignited';
 
 export type EffectEvent =
+  /** Prelude: the public start fires (`fires` = Debrief.startFires) appear as tokens at the lane input. */
+  | { readonly type: 'fires-start'; readonly t: number; readonly dur: number; readonly fires: string }
+  /**
+   * Prelude: the tokens travel from the previous column (the input for index 0) to gate column `index` during the
+   * first `travel` fraction of `dur`; the gate highlights and at `travel` the pattern switches from `before` to
+   * `after` (both from the engine's propagate() frames: before = frames[index], after = frames[index + 1]).
+   */
+  | {
+      readonly type: 'gate';
+      readonly t: number;
+      readonly dur: number;
+      readonly index: number;
+      readonly gate: Gate;
+      readonly before: string;
+      readonly after: string;
+      readonly changed: boolean;
+      readonly travel: number;
+    }
+  /** Prelude: the tokens travel from the last gate column to the output; at completion the houses show `fires` (= Debrief.fires). */
+  | { readonly type: 'fires-arrive'; readonly t: number; readonly dur: number; readonly fires: string }
   | { readonly type: 'trucks-arrive'; readonly t: number; readonly dur: number }
   | { readonly type: 'crew-run'; readonly t: number; readonly dur: number; readonly q: number; readonly crew: CrewLetter }
   /** The hose stream starts: the sprayed house shows its TRUE fire (`before`) from here on. */
@@ -59,6 +85,17 @@ export interface EffectTimeline {
  * One crew plays in ≈2.6 s, two crews in ≈3.0 s.
  */
 export const EFFECT_TIMING = {
+  /** Prelude: the start tokens appear. */
+  firesStart: 450,
+  /** Prelude: one gate (travel to the column, then the pattern switch). */
+  gate: 750,
+  /** Prelude: the tokens reach the output houses. */
+  arrive: 450,
+  /**
+   * Prelude: the fires sit in the houses (with the "fires reach the houses" line) before the trucks start. Without
+   * it the trucks' caption would replace the arrival line the instant it appears. ≥ CAPTION_HOLD.
+   */
+  arriveHold: 500,
   trucks: 400,
   run: 400,
   stagger: 420,
@@ -73,6 +110,34 @@ export const EFFECT_TIMING = {
 
 /** Minimum time an impact caption is shown (ms). */
 export const CAPTION_HOLD = 400;
+
+/** Fraction of a 'gate' event spent travelling to the gate column before the pattern switches. */
+export const GATE_TRAVEL = 0.55;
+
+/** The prelude event types (lane boards only). */
+export const PRELUDE_EVENTS: ReadonlySet<EffectEvent['type']> = new Set<EffectEvent['type']>(['fires-start', 'gate', 'fires-arrive']);
+
+/** Whether a timeline starts with the propagation prelude (fires travelling through the gates before the trucks). */
+export function hasPrelude(timeline: EffectTimeline): boolean {
+  return timeline.events.some((e) => PRELUDE_EVENTS.has(e.type));
+}
+
+export interface EffectOptions {
+  /** Circuit to propagate the start fires through (default: the mission's public circuit; unknown mission id → none). */
+  readonly circuit?: Circuit;
+  /** `false` leaves the prelude out even when the circuit is non-empty (the Why? comparison is about the sprays). */
+  readonly propagation?: boolean;
+}
+
+/** The mission's public circuit, or [] when the debrief's id is not a mission (synthetic debriefs). */
+function circuitFor(debrief: Pick<Debrief, 'missionId'>, opts: EffectOptions): Circuit {
+  if (opts.circuit !== undefined) return opts.circuit;
+  try {
+    return getPublicMission(debrief.missionId).circuit;
+  } catch {
+    return [];
+  }
+}
 
 /** Pauli product of two single-qubit letters (XOR of symplectic bits; phase dropped). */
 export function xorLetters(a: PauliLetter, b: PauliLetter): PauliLetter {
@@ -160,22 +225,54 @@ export function remainingAlarms(debrief: Pick<Debrief, 'missionId' | 'syndromeOf
 }
 
 /**
- * Build the timeline. Deterministic: same debrief ⇒ same events. Throws if the engine residual ever disagrees
- * with before ⊕ crew at some house (it cannot, but the assertion keeps the pictures honest).
+ * The propagation prelude for a non-empty circuit: start tokens → one event per gate → arrival → hold. Every pattern
+ * comes from the engine's propagate() frames; the last frame must equal Debrief.fires (else the pictures would lie).
+ * `end` (where the trucks start) includes the hold after the arrival.
  */
-export function buildEffects(debrief: Debrief, reducedMotion: boolean): EffectTimeline {
+function preludeEvents(debrief: Pick<Debrief, 'fires' | 'startFires'>, circuit: Circuit): { readonly events: EffectEvent[]; readonly end: number } {
+  const T = EFFECT_TIMING;
+  const start = fromString(debrief.startFires);
+  const traj = propagate(start, circuit);
+  const last = traj.frames[traj.frames.length - 1];
+  if (last === undefined || toString(last) !== debrief.fires) {
+    throw new Error(`effects: propagating ${debrief.startFires} through the circuit gives ${last === undefined ? '?' : toString(last)}, but the debrief says ${debrief.fires}`);
+  }
+  const events: EffectEvent[] = [{ type: 'fires-start', t: 0, dur: T.firesStart, fires: debrief.startFires }];
+  let t: number = T.firesStart;
+  circuit.forEach((gate, index) => {
+    const before = traj.frames[index];
+    const after = traj.frames[index + 1];
+    if (before === undefined || after === undefined) throw new Error(`effects: propagate() returned no frame for gate ${String(index)}`);
+    const b = toString(before);
+    const a = toString(after);
+    events.push({ type: 'gate', t, dur: T.gate, index, gate, before: b, after: a, changed: a !== b, travel: GATE_TRAVEL });
+    t += T.gate;
+  });
+  events.push({ type: 'fires-arrive', t, dur: T.arrive, fires: debrief.fires });
+  return { events, end: t + T.arrive + T.arriveHold };
+}
+
+/**
+ * Build the timeline. Deterministic: same debrief ⇒ same events. Throws if the engine residual ever disagrees
+ * with before ⊕ crew at some house (it cannot, but the assertion keeps the pictures honest), or if the prelude's
+ * propagated fires differ from Debrief.fires.
+ */
+export function buildEffects(debrief: Debrief, reducedMotion: boolean, opts: EffectOptions = {}): EffectTimeline {
   const fires = fromString(debrief.fires);
   const crews = fromString(debrief.crews);
   const residual = fromString(debrief.residual);
   if (fires.n !== crews.n || fires.n !== residual.n) throw new Error('effects: fires, crews and residual must share the qubit count');
   const T = EFFECT_TIMING;
-  const events: EffectEvent[] = [{ type: 'trucks-arrive', t: 0, dur: T.trucks }];
-  let cursor: number = T.trucks;
+  const circuit = opts.propagation === false ? [] : circuitFor(debrief, opts);
+  const prelude = circuit.length > 0 ? preludeEvents(debrief, circuit) : { events: [], end: 0 };
+  const offset = prelude.end;
+  const events: EffectEvent[] = [...prelude.events, { type: 'trucks-arrive', t: offset, dur: T.trucks }];
+  let cursor: number = offset + T.trucks;
   const sprayed = support(crews);
   sprayed.forEach((q, i) => {
     const crew = letterAt(crews, q);
     if (crew === 'I') return; // unreachable: support() only lists non-identity sites
-    const run = T.trucks + i * T.stagger;
+    const run = offset + T.trucks + i * T.stagger;
     const spray = run + T.sprayAfterRun;
     const impact = spray + T.spray;
     const before = letterAt(fires, q);

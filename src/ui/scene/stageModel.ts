@@ -17,14 +17,16 @@ export function missionKindOf(missionId: string, override: MissionKind | undefin
 
 /**
  * Frame options for a debrief: fog before the spray on dispatch missions, the propagated true fire on propagation
- * missions; the alarms show the true fire's syndrome from the start (codes with stations) and switch to the
+ * missions — or, when the timeline carries the propagation prelude (`prelude`), plain houses until the fires arrive
+ * through the gates; the alarms show the true fire's syndrome from the start (codes with stations) and switch to the
  * residual's at the 'alarms' event.
  */
-export function frameOptionsFor(debrief: Debrief, n: number, kind: MissionKind): FrameOptions {
+export function frameOptionsFor(debrief: Debrief, n: number, kind: MissionKind, prelude = false): FrameOptions {
   const fires = fromString(debrief.fires);
   const residual = fromString(debrief.residual);
   const preState = (q: number): HouseState => {
     if (kind === 'dispatch') return { kind: 'fog' };
+    if (prelude) return { kind: 'normal' };
     const l = letterOf(debrief.fires, q);
     return l === 'I' ? { kind: 'normal' } : { kind: 'fire', letter: l };
   };

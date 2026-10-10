@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fromString, getCode, getMission, letterAt, support, syndrome, syndromeToArray, weight } from '../quantum';
-import { buildEffects, CAPTION_HOLD, EFFECT_TIMING, houseOutcome, logicalPatternSupport, remainingAlarms, resultType, xorLetters, type EffectEvent } from './effects';
+import { fromString, getCode, getMission, letterAt, propagate, support, syndrome, syndromeToArray, toString, weight, type Circuit } from '../quantum';
+import { buildEffects, CAPTION_HOLD, EFFECT_TIMING, GATE_TRAVEL, hasPrelude, houseOutcome, logicalPatternSupport, PRELUDE_EVENTS, remainingAlarms, resultType, xorLetters, type EffectEvent } from './effects';
 import { confirmDispatch } from './machine';
-import { listPublicMissions } from './missions';
+import { getPublicMission, listPublicMissions } from './missions';
 import type { CrewLetter, Debrief } from './types';
 
 function placementsOf(s: string): Record<number, CrewLetter> {
@@ -37,10 +37,37 @@ function checkTimeline(debrief: Debrief, reduced: boolean): void {
   const fires = fromString(debrief.fires);
   const crews = fromString(debrief.crews);
   const residual = fromString(debrief.residual);
-  // Shape: trucks first, done last, one run/spray/impact triple per crew in ascending house order.
-  expect(ev[0]?.type).toBe('trucks-arrive');
+  const circuit = getPublicMission(debrief.missionId).circuit;
+  // Shape: [prelude: fires-start, one gate per circuit gate, fires-arrive] → trucks → …, done last, one
+  // run/spray/impact triple per crew in ascending house order. The prelude exists iff the circuit is non-empty.
+  expect(hasPrelude(tl)).toBe(circuit.length > 0);
+  const preludeTypes = circuit.length > 0 ? ['fires-start', ...circuit.map(() => 'gate'), 'fires-arrive'] : [];
+  expect(types(ev).slice(0, preludeTypes.length + 1)).toEqual([...preludeTypes, 'trucks-arrive']);
+  expect(ev.filter((e) => PRELUDE_EVENTS.has(e.type))).toHaveLength(preludeTypes.length);
   expect(ev[0]?.t).toBe(0);
   expect(ev[ev.length - 1]?.type).toBe('done');
+  const trucks = ev.find((e) => e.type === 'trucks-arrive');
+  if (circuit.length > 0) {
+    // Prelude payloads come from the engine: every gate's before/after are consecutive propagate() frames.
+    const traj = propagate(fromString(debrief.startFires), circuit);
+    const gates = ev.filter((e): e is Extract<EffectEvent, { type: 'gate' }> => e.type === 'gate');
+    gates.forEach((g, i) => {
+      expect(g.index).toBe(i);
+      expect(g.gate).toEqual(circuit[i]);
+      expect(g.before).toBe(toString(traj.frames[i] ?? fromString(debrief.startFires)));
+      expect(g.after).toBe(toString(traj.frames[i + 1] ?? fromString(debrief.startFires)));
+      expect(g.changed).toBe(g.before !== g.after);
+      expect(g.travel).toBe(GATE_TRAVEL);
+    });
+    const start = ev[0];
+    expect(start?.type === 'fires-start' ? start.fires : null).toBe(debrief.startFires);
+    const arrive = ev.find((e) => e.type === 'fires-arrive');
+    expect(arrive?.type === 'fires-arrive' ? arrive.fires : null).toBe(debrief.fires);
+    // The trucks arrive exactly when the prelude ends: after the arrival and its hold (the arrival line stays readable).
+    if (!reduced) expect(trucks?.t).toBe(EFFECT_TIMING.firesStart + circuit.length * EFFECT_TIMING.gate + EFFECT_TIMING.arrive + EFFECT_TIMING.arriveHold);
+  } else if (!reduced) {
+    expect(trucks?.t).toBe(0);
+  }
   const crewQs = support(crews);
   const runs = ev.filter((e) => e.type === 'crew-run');
   const sprays = ev.filter((e) => e.type === 'spray-start');
@@ -322,4 +349,117 @@ describe('buildEffects timeline', () => {
       }
     });
   }
+});
+
+describe('buildEffects · propagation prelude (fires travel through the gates before the trucks)', () => {
+  const bridge = confirmDispatch('red-forward-blue-backward', { 0: 'Y', 1: 'Y' }); // XZ → CNOT → YY
+  const lab = confirmDispatch('color-switch', { 0: 'X', 1: 'Z' }); // ZI → H, CNOT, H → XZ
+
+  it('mission 2: fires-start → gate(CNOT) → fires-arrive → trucks-arrive …; before/after are the engine frames XZ → YY', () => {
+    const tl = buildEffects(bridge, false);
+    const T = EFFECT_TIMING;
+    expect(hasPrelude(tl)).toBe(true);
+    expect(types(tl.events).slice(0, 5)).toEqual(['fires-start', 'gate', 'fires-arrive', 'trucks-arrive', 'crew-run']);
+    expect(tl.events[0]).toEqual({ type: 'fires-start', t: 0, dur: T.firesStart, fires: 'XZ' });
+    expect(tl.events[1]).toEqual({ type: 'gate', t: T.firesStart, dur: T.gate, index: 0, gate: { kind: 'CNOT', c: 0, t: 1 }, before: 'XZ', after: 'YY', changed: true, travel: GATE_TRAVEL });
+    expect(tl.events[2]).toEqual({ type: 'fires-arrive', t: T.firesStart + T.gate, dur: T.arrive, fires: 'YY' });
+    const preludeEnd = T.firesStart + T.gate + T.arrive + T.arriveHold;
+    expect(tl.events[3]).toEqual({ type: 'trucks-arrive', t: preludeEnd, dur: T.trucks });
+    // Every later event is shifted by the prelude; the duration includes it.
+    const plain = buildEffects(bridge, false, { propagation: false });
+    const shifted = tl.events.slice(3).map((e) => ({ ...e, t: e.t - preludeEnd }));
+    expect(shifted).toEqual(plain.events);
+    expect(tl.durationMs).toBe(plain.durationMs + preludeEnd);
+    for (let i = 1; i < tl.events.length; i++) expect((tl.events[i]?.t ?? 0) >= (tl.events[i - 1]?.t ?? 0)).toBe(true);
+    expect(tl.events[tl.events.length - 1]?.type).toBe('done');
+  });
+
+  it('mission 3: one gate event per circuit gate in order (H, CNOT, H) with the frames ZI → XI → XX → XZ; the arrival equals Debrief.fires', () => {
+    const tl = buildEffects(lab, false);
+    const gates = tl.events.filter((e): e is Extract<EffectEvent, { type: 'gate' }> => e.type === 'gate');
+    expect(gates.map((g) => g.gate.kind)).toEqual(['H', 'CNOT', 'H']);
+    expect(gates.map((g) => [g.before, g.after])).toEqual([
+      ['ZI', 'XI'],
+      ['XI', 'XX'],
+      ['XX', 'XZ'],
+    ]);
+    expect(gates.every((g) => g.changed)).toBe(true);
+    const arrive = tl.events.find((e) => e.type === 'fires-arrive');
+    expect(arrive?.type === 'fires-arrive' ? arrive.fires : null).toBe(lab.fires);
+    expect(lab.fires).toBe('XZ');
+    const traj = propagate(fromString(lab.startFires), getPublicMission('color-switch').circuit);
+    expect(toString(traj.frames[traj.frames.length - 1] ?? fromString('II'))).toBe(lab.fires);
+  });
+
+  it('the arrival holds before the trucks: fires-arrive completes, then the trucks start arriveHold (≥ CAPTION_HOLD) later, so the arrival line is never replaced the instant it appears', () => {
+    expect(EFFECT_TIMING.arriveHold).toBeGreaterThanOrEqual(CAPTION_HOLD);
+    for (const d of [bridge, lab, confirmDispatch('red-forward-blue-backward', {})]) {
+      const tl = buildEffects(d, false);
+      const arrive = tl.events.find((e) => e.type === 'fires-arrive');
+      const trucks = tl.events.find((e) => e.type === 'trucks-arrive');
+      if (arrive === undefined || trucks === undefined) throw new Error('prelude');
+      expect(trucks.t - (arrive.t + arrive.dur)).toBe(EFFECT_TIMING.arriveHold);
+      // Nothing else starts inside the hold.
+      expect(tl.events.filter((e) => e.t > arrive.t && e.t < trucks.t)).toEqual([]);
+    }
+  });
+
+  it('no prelude for missions with an empty circuit (rep3 / rsc3): the timeline is unchanged (trucks first at t = 0)', () => {
+    for (const id of ['first-alarm', 'blind-dispatch', 'two-kinds-of-trouble', 'silent-failure']) {
+      const def = getMission(id);
+      const d = confirmDispatch(id, placementsOf(def.expected.minWeightCorrection));
+      const tl = buildEffects(d, false);
+      expect(hasPrelude(tl)).toBe(false);
+      expect(tl.events[0]).toEqual({ type: 'trucks-arrive', t: 0, dur: EFFECT_TIMING.trucks });
+      expect(tl).toEqual(buildEffects(d, false, { propagation: false }));
+      expect(buildEffects(d, true)).toEqual(buildEffects(d, true, { propagation: false }));
+    }
+  });
+
+  it('propagation:false removes the prelude; a synthetic debrief (unknown mission id) gets one only through options.circuit', () => {
+    const off = buildEffects(bridge, false, { propagation: false });
+    expect(hasPrelude(off)).toBe(false);
+    expect(off.events[0]?.type).toBe('trucks-arrive');
+    const synthetic: Debrief = { ...bridge, missionId: 'no-such-mission' };
+    expect(hasPrelude(buildEffects(synthetic, false))).toBe(false);
+    const circuit: Circuit = [{ kind: 'CNOT', c: 0, t: 1 }];
+    const withCircuit = buildEffects(synthetic, false, { circuit });
+    expect(hasPrelude(withCircuit)).toBe(true);
+    expect(types(withCircuit.events).slice(0, 4)).toEqual(['fires-start', 'gate', 'fires-arrive', 'trucks-arrive']);
+    // propagation:false wins over an explicit circuit.
+    expect(hasPrelude(buildEffects(synthetic, false, { circuit, propagation: false }))).toBe(false);
+  });
+
+  it('throws when the propagated start fires do not reach Debrief.fires (the honesty rule)', () => {
+    const forged: Debrief = { ...bridge, startFires: 'XI' }; // XI → XX ≠ YY
+    expect(() => buildEffects(forged, false)).toThrow(/propagating XI .* gives XX, but the debrief says YY/);
+    // A circuit that does not match the debrief's fires is refused too.
+    expect(() => buildEffects(bridge, false, { circuit: [{ kind: 'H', q: 0 }] })).toThrow(/gives ZZ, but the debrief says YY/);
+  });
+
+  it('reduced motion: one frame per event, so the stepper gains k + 2 frames (fires start → each gate → fires arrive) and keeps the order', () => {
+    for (const d of [bridge, lab]) {
+      const k = getPublicMission(d.missionId).circuit.length;
+      const reduced = buildEffects(d, true);
+      const plain = buildEffects(d, true, { propagation: false });
+      expect(reduced.events).toHaveLength(plain.events.length + k + 2);
+      expect(reduced.durationMs).toBe(reduced.events.length);
+      reduced.events.forEach((e, i) => {
+        expect(e.t).toBe(i);
+        if (e.type !== 'done') expect(e.dur).toBe(1);
+      });
+      expect(types(reduced.events).slice(0, k + 3)).toEqual(['fires-start', ...Array.from({ length: k }, () => 'gate'), 'fires-arrive', 'trucks-arrive']);
+      // Payloads identical to the full-motion timeline apart from timing.
+      const strip = (e: EffectEvent): Record<string, unknown> => Object.fromEntries(Object.entries(e).filter(([key]) => key !== 't' && key !== 'dur'));
+      expect(reduced.events.map(strip)).toEqual(buildEffects(d, false).events.map(strip));
+    }
+  });
+
+  it('stand down on a lane board still plays the prelude, then reveals the fires nobody sprayed', () => {
+    const d = confirmDispatch('red-forward-blue-backward', {});
+    const tl = buildEffects(d, false);
+    expect(types(tl.events)).toEqual(['fires-start', 'gate', 'fires-arrive', 'trucks-arrive', 'reveal-remaining', 'alarms', 'outcome', 'done']);
+    const reveal = tl.events.find((e) => e.type === 'reveal-remaining');
+    expect(reveal?.type === 'reveal-remaining' ? reveal.qs : null).toEqual([0, 1]);
+  });
 });

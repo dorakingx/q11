@@ -175,6 +175,17 @@ export async function openChallenge(page: Page, index: number, opts: { through?:
   await startChallenge(page, opts);
 }
 
+/**
+ * Pause the page's clock (Playwright fake timers; the test must have called `page.clock.install()` before its first
+ * navigation) just ahead of its current reading. From here `performance.now()`, requestAnimationFrame and timers only
+ * move through `page.clock.runFor()` / `page.clock.resume()`, so a replay mounted after this call sits at t = 0 until
+ * the test advances it — every transient frame can then be asserted at a known timeline instant, whatever the load.
+ */
+export async function freezeClock(page: Page): Promise<void> {
+  const now = await page.evaluate(() => Date.now());
+  await page.clock.pauseAt(now + 1000);
+}
+
 /** Spray! → skip the showpiece → result overlay. */
 export async function sprayAndSkip(page: Page): Promise<void> {
   await page.getByTestId('confirm').click();
@@ -184,10 +195,14 @@ export async function sprayAndSkip(page: Page): Promise<void> {
   await expect(page.getByTestId('result-overlay')).toBeVisible({ timeout: 10_000 });
 }
 
-/** Reduced motion: press "Next frame" until the result overlay appears (tolerates the disabled final-state button). */
+/**
+ * Reduced motion: press "Next frame" until the result overlay appears (tolerates the disabled final-state button).
+ * Lane boards add the propagation prelude (fires start → one frame per gate → fires arrive): up to 16 frames on
+ * Conversion Lab with two crews, so the walk allows 24 presses.
+ */
 export async function stepSprayToEnd(page: Page, viaKeyboard = false): Promise<void> {
   await expect(page.getByTestId('spray-player')).toHaveAttribute('data-reduced-motion', 'true');
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 24; i++) {
     if ((await page.getByTestId('result-overlay').count()) > 0) break;
     const next = page.getByTestId('spray-next');
     // isEnabled would wait for a detached locator forever once the player unmounts: bound it.
