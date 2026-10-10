@@ -1,6 +1,6 @@
 # Q11 Status
 
-_Last updated: 2026-10-10 18:20 JST_
+_Last updated: 2026-10-10 19:30 JST_
 
 Overall: **UX REDESIGN IN PROGRESS** (started 2026-10-10 18:15 JST on top of the 2cfae98 READY build; acceptance criteria R1–R15 in `docs/UX_REDESIGN.md`). The earlier READY_FOR_RELEASE_APPROVAL report applies to 2cfae98 only; the redesign must pass all gates again before any release. Nothing has been published or submitted.
 
@@ -21,6 +21,12 @@ Overall: **UX REDESIGN IN PROGRESS** (started 2026-10-10 18:15 JST on top of the
 - Files: JS/Qiskit project (index.html, main.js, main.css, game/q11-game.js, q11/ package + data, main.py fallback, requirements.txt, README.md). Runs: see `reports/qollab-runs.md` (8 runs; 4 on IonQ Aria 1 with job ids).
 - Project Card: write-up pasted from `submission/PROJECT_PAGE.md` (saved), thumbnail = `public/og-image.png`, tags being added (quantum, education, visualization, game). Project Website / Repository fields left empty (both are private until approval).
 - **Publish not pressed.**
+
+## Redesign waves (docs/UX_REDESIGN.md)
+- [x] Wave A (18:25–19:00 JST, commit 5751ebb): game core — 'dispatch' screen, save v2 + migration, city unlock rules, deterministic effect timeline, undo/redo, tutorial flag (98 tests); i18n EN/JA (447 keys, mission copy, 57 tests); SVG art library + gallery (105 tests, `reports/art/gallery.png`).
+- [ ] Wave B (started 19:25 JST): city map screen (src/ui/city) ∥ scene + spray player + four results + Why comparison (src/ui/scene).
+- [ ] Wave C: integration (App/screens/play rewired, warm theme, i18n migration, tutorial, mobile bottom bar, settings), e2e rewrite, screenshots at 375/390/768/1440.
+- [ ] Review/fix wave, Qollab bundle + run, demo re-record, verify:release, protected deploy check, final report.
 
 ## P0 items
 - [x] Scaffold Vite/React/TS + vitest + playwright + eslint, pinned, lockfile
