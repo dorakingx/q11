@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Q11 scene preview (dev only)</title>
+    <style>
+      body { margin: 0; background: #dff0ff; color: #2b2420; font-family: "Nunito", "Avenir Next", "Segoe UI", system-ui, sans-serif; }
+      .preview { max-width: 1200px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
+      .preview-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .preview-head h1 { font-size: 1.2rem; margin: 0; }
+      .preview-section { margin: 24px 0; padding: 16px; border: 2px solid #3a2f2a; border-radius: 20px; background: #fffaf0; }
+      .preview-section h2 { font-size: 1.05rem; margin: 0 0 12px; }
+      .preview-section h3 { font-size: 0.95rem; margin: 16px 0 8px; }
+      .preview-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+      .preview-row .btn, .preview-head .btn { min-height: 48px; padding: 8px 14px; border: 2px solid #3a2f2a; border-radius: 999px; background: #fffaf0; font: inherit; font-weight: 800; cursor: pointer; }
+      .preview-row .btn-primary { background: #ff9b2f; }
+      .preview-check { display: inline-flex; align-items: center; gap: 6px; min-height: 48px; }
+      .preview-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+      .preview-grid-lanes { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+      .preview-frames { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; }
+      .preview-frame { margin: 0; }
+      .preview-frame figcaption { text-align: center; font-size: 0.8rem; color: #6b5f58; margin-top: 4px; }
+      .preview-stage { margin-bottom: 20px; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/ui/scene/preview-entry.tsx"></script>
+  </body>
+</html>

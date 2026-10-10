@@ -1,0 +1,340 @@
+/* City map screen — warm daytime theme (src/ui/tokens.css). Class names are prefixed `city-` so nothing here
+   depends on, or collides with, the app-level stylesheet. */
+@import '../tokens.css';
+
+main.screen-city {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 8px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--ink);
+  font-family: var(--font);
+  box-sizing: border-box;
+  overflow-x: clip;
+}
+main.screen-city * { box-sizing: border-box; }
+.screen-city button { font: inherit; color: inherit; cursor: pointer; }
+.screen-city button:focus-visible,
+.screen-city [tabindex]:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* ------------------------------------------------------------------ HUD */
+.city-hud {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'brand gear' 'stats stats' 'storage storage';
+  align-items: center;
+  gap: 6px 14px;
+  background: var(--panel);
+  border: 2px solid var(--outline);
+  border-radius: var(--radius-lg);
+  padding: 8px 12px;
+  box-shadow: 0 2px 0 var(--shadow);
+}
+@media (min-width: 768px) {
+  .city-hud { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'brand stats gear' 'storage storage storage'; }
+}
+.city-brand {
+  grid-area: brand;
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius);
+  padding: 4px 8px 4px 4px;
+  min-height: var(--tap);
+  text-align: left;
+}
+.city-brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+.city-brand-name { font-weight: 800; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--muted); }
+.city-brand-title { margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--ink); }
+.city-hud-stats {
+  grid-area: stats;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  min-width: 0;
+}
+.city-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  background: var(--panel-2);
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  min-height: 36px;
+  white-space: nowrap;
+}
+.city-badges {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  min-width: 0;
+}
+.city-badges-empty { color: var(--muted); font-size: 0.85rem; font-weight: 700; }
+.city-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }
+.city-badge svg { display: block; }
+.city-pill {
+  display: inline-flex;
+  align-items: center;
+  background: var(--ok);
+  color: #fff;
+  border: 2px solid var(--outline);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  min-height: 32px;
+}
+.city-storage { grid-area: storage; margin: 0; font-size: 0.8rem; color: var(--muted); }
+.city-icon-btn {
+  grid-area: gear;
+  width: var(--tap);
+  height: var(--tap);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel-2);
+  border: 2px solid var(--outline);
+  border-radius: 50%;
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------------ body: map + panel */
+.city-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (min-width: 1024px) {
+  .city-body { grid-template-columns: minmax(0, 1fr) 360px; }
+}
+
+.city-map-wrap { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.city-map {
+  position: relative;
+  width: 100%;
+  background: var(--sky);
+  border: 2px solid var(--outline);
+  border-radius: var(--radius-lg);
+  touch-action: manipulation;
+}
+.city-svg { display: block; width: 100%; height: 100%; border-radius: calc(var(--radius-lg) - 2px); }
+.city-hint { margin: 0; font-size: 0.95rem; color: var(--ink-soft); text-align: center; }
+
+/* district buttons: real <button>s over the SVG, centred on the district box, never below the tap size */
+.city-district {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  min-width: var(--tap);
+  min-height: var(--tap);
+  padding: 0;
+  background: transparent;
+  border: 3px solid transparent;
+  border-radius: 14px;
+  -webkit-tap-highlight-color: transparent;
+}
+.city-district:hover,
+.city-district:focus-visible { border-color: var(--focus); background: rgba(255, 155, 47, 0.12); }
+.city-district.is-selected { border-color: var(--focus); }
+.city-district.is-locked { cursor: pointer; }
+/* name chip: "N · Name" above the district; under 640px only the number fits (the panel + aria-label carry the name) */
+.city-district-name {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -112%);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  font-size: clamp(11px, 1.15vw, 15px);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--ink);
+  background: rgba(255, 250, 240, 0.94);
+  border: 1.5px solid var(--outline);
+  border-radius: 999px;
+  padding: 2px 8px 2px 3px;
+  pointer-events: none;
+}
+.city-district-n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--panel);
+  font-size: 0.9em;
+}
+.city-district.is-locked .city-district-name { color: var(--muted); background: rgba(246, 239, 224, 0.9); }
+.city-district.is-locked .city-district-n { background: var(--muted); }
+.city-district.is-solved .city-district-name { border-color: var(--ok); }
+.city-district.is-solved .city-district-n { background: var(--ok); }
+/* right-edge districts: hug the box's right edge so long (Japanese) names never leave the map */
+.city-district[data-district='market'] .city-district-name,
+.city-district[data-district='old-town'] .city-district-name { left: auto; right: 0; transform: translate(0, -112%); }
+.city-district[data-district='old-town'] .city-district-name { transform: translate(0, -100%); }
+@media (max-width: 639px) {
+  .city-district-text { display: none; }
+  .city-district-name { padding: 2px; font-size: 13px; }
+  .city-district[data-district='market'] .city-district-name,
+  .city-district[data-district='old-town'] .city-district-name { left: 50%; right: auto; transform: translate(-50%, -112%); }
+}
+
+/* ------------------------------------------------------------------ selection panel */
+.city-panel {
+  background: var(--panel);
+  border: 2px solid var(--outline);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 0 var(--shadow);
+  min-width: 0;
+}
+.city-panel[hidden] { display: none; }
+.city-panel-inner { display: flex; flex-direction: column; gap: 12px; padding: 14px 16px 16px; }
+.city-panel-head { display: flex; flex-direction: column; gap: 2px; }
+.city-panel-title { margin: 0; font-size: 1.3rem; font-weight: 800; }
+.city-panel-sub { margin: 0; color: var(--muted); font-weight: 700; font-size: 0.9rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.city-panel-facts { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.city-fact { display: flex; flex-direction: column; gap: 2px; }
+.city-fact dt { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+.city-fact dd { margin: 0; font-size: 1rem; line-height: 1.4; }
+.city-fact-row { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+.city-fact-row dd { display: inline-flex; align-items: center; gap: 8px; }
+.city-status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  border: 2px solid var(--outline);
+  background: var(--panel-2);
+}
+.city-status.is-available { background: var(--alarm); color: var(--ink); }
+.city-status.is-solved { background: var(--ok); color: #fff; }
+.city-status.is-locked { background: var(--line); color: var(--ink-soft); }
+.city-stars { display: inline-flex; gap: 2px; }
+.city-stars-text { font-size: 0.85rem; color: var(--ink-soft); }
+.city-panel-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 4px;
+  position: sticky;
+  bottom: 0;
+  background: var(--panel);
+}
+
+/* buttons */
+.city-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  border: 2px solid var(--outline);
+  background: var(--panel-2);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 1rem;
+}
+.city-btn-primary {
+  flex: 1 1 auto;
+  min-height: 52px;
+  font-size: 1.15rem;
+  background: var(--x);
+  border-color: var(--outline);
+  color: #fff;
+  box-shadow: 0 3px 0 var(--outline);
+}
+.city-btn-primary:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--outline); }
+.city-btn-ghost { background: transparent; border-color: var(--line); color: var(--ink-soft); }
+.city-btn[aria-disabled='true'] { opacity: 0.6; }
+
+/* phones + tablets: the panel is a bottom sheet above a bottom action bar */
+@media (max-width: 1023px) {
+  .city-panel.is-open {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border-bottom: 0;
+    max-height: min(62vh, 520px);
+    overflow-y: auto;
+    box-shadow: 0 -8px 24px var(--shadow);
+  }
+  .city-panel.is-open .city-panel-inner { padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .city-panel.is-open .city-panel-actions { padding-bottom: 4px; }
+  main.screen-city.has-panel { padding-bottom: min(62vh, 520px); }
+}
+
+/* ------------------------------------------------------------------ truck travel overlay */
+.city-travel {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  background: transparent;
+}
+.city-travel-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel);
+  border: 2px solid var(--outline);
+  border-radius: var(--radius-lg);
+  padding: 10px 12px 10px 16px;
+  box-shadow: 0 4px 0 var(--shadow);
+  max-width: calc(100vw - 32px);
+}
+.city-travel-text { font-weight: 700; }
+
+/* ------------------------------------------------------------------ toasts */
+.city-toast-region { position: fixed; left: 50%; top: 12px; transform: translateX(-50%); z-index: 50; pointer-events: none; max-width: calc(100vw - 32px); }
+.city-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--ink);
+  color: var(--panel);
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px var(--shadow);
+  animation: city-toast-in 240ms ease-out;
+}
+.city-toast.is-badge { background: var(--panel); color: var(--ink); border: 2px solid var(--outline); }
+@keyframes city-toast-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+/* ------------------------------------------------------------------ restoration moment (SVG) */
+.city-restore-smoke { animation: city-smoke-clear 1.3s ease-out forwards; }
+@keyframes city-smoke-clear { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-90px); } }
+.city-restore-spark { opacity: 0; transform-box: fill-box; transform-origin: center; animation: city-spark 1s ease-out forwards; }
+@keyframes city-spark { 0% { opacity: 0; transform: scale(0.2); } 40% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0; transform: scale(1.5); } }
+.city-restore-ring { animation: city-ring 1.3s ease-out forwards; }
+@keyframes city-ring { from { opacity: 0.9; } to { opacity: 0; } }
+
+/* ------------------------------------------------------------------ reduced motion: static frames, no transitions */
+@media (prefers-reduced-motion: reduce) {
+  .screen-city *, .screen-city *::before, .screen-city *::after { animation: none !important; transition: none !important; }
+  .city-restore-spark { opacity: 1; }
+}
+[data-reduced-motion='true'] .screen-city *,
+[data-reduced-motion='true'] .screen-city *::before,
+[data-reduced-motion='true'] .screen-city *::after { animation: none !important; transition: none !important; }
+[data-reduced-motion='true'] .city-restore-spark { opacity: 1; }

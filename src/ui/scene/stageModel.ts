@@ -1,0 +1,51 @@
+/** Stage model helpers (no React): frame options and result decoration derived from a Debrief. */
+import { fromString, letterAt, support } from '../../quantum';
+import { districtForMission, getPublicMission, isCrewLetter, type CrewLetter, type Debrief, type MissionKind } from '../../game';
+import type { HouseState } from '../art';
+import type { FrameOptions, SceneFrame } from './frame';
+import type { SceneOutcome } from './Scene';
+import { letterOf } from './houseState';
+
+export function missionKindOf(missionId: string, override: MissionKind | undefined): MissionKind {
+  if (override !== undefined) return override;
+  try {
+    return getPublicMission(missionId).kind;
+  } catch {
+    return 'dispatch';
+  }
+}
+
+/** Frame options for a debrief: fog before impact on dispatch missions, the propagated true fire on propagation missions. */
+export function frameOptionsFor(debrief: Debrief, n: number, kind: MissionKind): FrameOptions {
+  const fires = fromString(debrief.fires);
+  const residual = fromString(debrief.residual);
+  const preState = (q: number): HouseState => {
+    if (kind === 'dispatch') return { kind: 'fog' };
+    const l = letterOf(debrief.fires, q);
+    return l === 'I' ? { kind: 'normal' } : { kind: 'fire', letter: l };
+  };
+  return { n: Math.max(n, fires.n, residual.n), preState, residualAt: (q) => letterOf(debrief.residual, q) };
+}
+
+/** Result decoration for the end of a spray: the chain is the engine residual's support; beacon for the old town or a logical failure. */
+export function outcomeFor(debrief: Debrief, frame: SceneFrame): SceneOutcome | undefined {
+  if (frame.outcome === null) return undefined;
+  const hasBeacon = districtForMission(debrief.missionId)?.hasBeacon ?? false;
+  return {
+    result: frame.outcome,
+    logicalFlip: debrief.logicalFlip,
+    patternQubits: support(fromString(debrief.residual)),
+    beacon: hasBeacon || frame.outcome === 'logical-failure',
+  };
+}
+
+/** Crews string → placements map (the shape confirmDispatch takes). */
+export function placementsFromCrews(crews: string): Record<number, CrewLetter> {
+  const p = fromString(crews);
+  const out: Record<number, CrewLetter> = {};
+  for (let q = 0; q < p.n; q++) {
+    const l = letterAt(p, q);
+    if (isCrewLetter(l)) out[q] = l;
+  }
+  return out;
+}

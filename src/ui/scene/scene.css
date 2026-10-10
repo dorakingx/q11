@@ -1,0 +1,385 @@
+/*
+ * Scene, spray player, result overlay and Why comparison (src/ui/scene). Uses the warm theme variables from
+ * src/ui/tokens.css only. Motion: the spray is driven by a rAF clock that re-renders static SVG frames, so there
+ * are no layout-affecting animations here; the few CSS transitions are switched off under prefers-reduced-motion.
+ */
+
+/* ------------------------------------------------------------------ scene */
+.scene {
+  position: relative;
+  width: 100%;
+  max-width: var(--scene-max, 560px);
+  margin: 0 auto;
+  border-radius: var(--radius-lg);
+  background: var(--ground);
+  box-shadow: 0 2px 0 var(--shadow);
+  overflow: visible;
+  font-family: var(--font);
+  color: var(--ink);
+}
+.scene-bridge,
+.scene-lab {
+  --scene-max: 760px;
+}
+.scene-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: var(--radius-lg);
+}
+
+/* house + detector hit areas: a positioned slot per object, the button centred and never smaller than --tap */
+.house-slot,
+.detector-slot {
+  position: absolute;
+  pointer-events: none;
+}
+.house-slot > .block,
+.detector-slot > .detector-hit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  min-width: var(--tap);
+  min-height: var(--tap);
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  pointer-events: auto;
+  color: inherit;
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.detector-slot > .detector-hit {
+  border-radius: 50%;
+}
+button.block,
+button.detector-hit {
+  cursor: pointer;
+}
+button.block:hover,
+button.detector-hit:hover {
+  border-color: rgba(58, 47, 42, 0.35);
+}
+button.block:focus-visible,
+button.detector-hit:focus-visible,
+.result-title:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+button.block.has-crew {
+  border-color: var(--outline);
+  border-style: dashed;
+}
+button.detector-hit.is-pressed {
+  border-color: var(--focus);
+}
+button.block.is-budget-reached {
+  cursor: not-allowed;
+}
+
+/* selected-crew preview: present on every house, visible only while focused or hovered (no per-house leak) */
+.crew-preview {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -40%);
+  width: 30px;
+  height: 25px;
+  opacity: 0;
+  transition: opacity 120ms ease-out;
+  pointer-events: none;
+}
+button.block:hover > .crew-preview,
+button.block:focus-visible > .crew-preview {
+  opacity: 0.9;
+}
+.plan-tag {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  padding: 1px 8px;
+  border: 2px solid var(--outline);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.scene-badge {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  padding: 4px 12px;
+  border: 2px solid var(--outline);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 800;
+  box-shadow: 0 2px 0 var(--shadow);
+}
+.scene-badge-safe {
+  border-color: var(--ok);
+}
+
+/* ------------------------------------------------------------------ spray player */
+.spray-player {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  font-family: var(--font);
+  color: var(--ink);
+}
+.spray-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.spray-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+.spray-caption,
+.why-caption {
+  margin: 0;
+  min-height: 1.6em;
+  padding: 8px 14px;
+  border: 2px solid var(--outline);
+  border-radius: var(--radius);
+  background: var(--panel);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.spray-rules {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.spray-stepper,
+.why-controls,
+.result-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.spray-step-label {
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+/* buttons used by the scene components (the app's global button styles may override) */
+.spray-player .btn,
+.result-overlay .btn,
+.why-compare .btn {
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 10px 18px;
+  border: 2px solid var(--outline);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 0 var(--shadow);
+}
+.spray-player .btn:disabled,
+.result-overlay .btn:disabled,
+.why-compare .btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+  box-shadow: none;
+}
+.spray-player .btn-primary,
+.result-overlay .btn-primary,
+.why-compare .btn-primary {
+  background: var(--focus);
+  border-color: var(--outline);
+}
+.spray-player .btn:focus-visible,
+.result-overlay .btn:focus-visible,
+.why-compare .btn:focus-visible,
+.result-details summary:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ result overlay */
+.scene-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gap);
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .scene-stage {
+    grid-template-columns: minmax(0, 3fr) minmax(300px, 2fr);
+  }
+  .scene-stage > .result-overlay {
+    align-self: end;
+  }
+}
+.result-overlay {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 16px 18px;
+  border: 2px solid var(--outline);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  box-shadow: 0 4px 0 var(--shadow);
+  font-family: var(--font);
+  color: var(--ink);
+}
+.result-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.result-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  width: 56px;
+  height: 70px;
+}
+.result-titles {
+  min-width: 0;
+}
+.result-title {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.15;
+  font-weight: 900;
+}
+.result-restored .result-title {
+  color: #1f7a43;
+}
+.result-still-burning .result-title {
+  color: var(--x);
+}
+.result-logical-failure .result-title {
+  color: var(--y);
+}
+.result-stars {
+  margin: 4px 0 0;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+.result-stars .star {
+  font-size: 1.3rem;
+  color: var(--line);
+}
+.result-stars .star-on {
+  color: var(--alarm);
+}
+.result-reaction {
+  margin: 12px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  font-weight: 700;
+}
+.result-body,
+.result-beacon {
+  margin: 8px 0 0;
+  line-height: 1.45;
+}
+.result-rules {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.result-actions {
+  margin-top: 14px;
+}
+.result-details {
+  margin-top: 12px;
+  border-top: 2px solid var(--line);
+  padding-top: 8px;
+}
+.result-details summary {
+  cursor: pointer;
+  font-weight: 800;
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+}
+.result-details-body {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------------------ why comparison */
+.why-compare {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: var(--font);
+  color: var(--ink);
+}
+.why-panes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gap);
+}
+@media (min-width: 760px) {
+  .why-panes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.why-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.why-pane-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+.why-verdict {
+  margin: 0;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.why-explanation {
+  margin: 0;
+  padding: 10px 14px;
+  border: 2px solid var(--outline);
+  border-radius: var(--radius);
+  background: var(--panel-2);
+  line-height: 1.45;
+}
+.why-noblame {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+/* ------------------------------------------------------------------ motion */
+@media (prefers-reduced-motion: reduce) {
+  .crew-preview {
+    transition: none;
+  }
+}
