@@ -19,7 +19,7 @@ export function GearIcon({ size = 22 }: { readonly size?: number }) {
   );
 }
 
-/** The Q11 Emergency mark (the fire truck with its Q11 plate), shared with public/icon.svg through src/ui/art/brandMark.tsx. */
+/** The Q11 Emergency mark (the fire truck with Q11 painted on its side), shared with public/icon.svg through src/ui/art/brandMark.tsx. */
 export function Q11Mark({ size = 72, label, lettering }: { readonly size?: number; readonly label?: string; readonly lettering?: string }) {
   return <BrandMark size={size} label={label} lettering={lettering} />;
 }

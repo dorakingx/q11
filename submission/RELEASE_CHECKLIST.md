@@ -1,4 +1,4 @@
-# Q11 release checklist (pre-publication gates + approval-only publication steps)
+# Q11 Emergency release checklist (pre-publication gates + approval-only publication steps)
 
 Status legend: ☐ not done · ☑ done with evidence · ⛔ blocked (external). Nothing below the "APPROVAL REQUIRED" line is executed without the user's explicit, written approval naming the target and time.
 

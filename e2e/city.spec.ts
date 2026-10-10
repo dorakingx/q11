@@ -7,7 +7,7 @@ test('city: locked districts toast, Dispatch! drives the truck (skippable), free
   // Focus lands on the city heading (outside the brand button, whose name starts with its visible text).
   await expect(page.locator('main h1')).toHaveText('Quantum City');
   await expect(page.locator('main h1')).toBeFocused();
-  await expect(page.getByTestId('city-title')).toHaveAccessibleName('Q11 Quantum City — back to title');
+  await expect(page.getByTestId('city-title')).toHaveAccessibleName('Q11 Emergency Quantum City — back to title');
   await expect(page.getByTestId('mission-1')).toHaveAccessibleName('1 Rowhouse Lane — Safe, 3 of 3 stars');
   await expect(page.getByTestId('mission-1')).toHaveAttribute('data-status', 'solved');
   await expect(page.getByTestId('mission-2')).toHaveAttribute('data-status', 'available');
@@ -35,7 +35,10 @@ test('city: locked districts toast, Dispatch! drives the truck (skippable), free
   if (info.project.name === 'desktop-chromium') await screenshot(page, 'city-panel-1280x800');
   await page.getByTestId('dispatch-go').click();
   await expect(page.getByTestId('travel-overlay')).toBeVisible();
-  await expect(page.getByTestId('travel-truck')).toBeVisible();
+  // The truck <g> only exists between the first requestAnimationFrame frame and arrival (~1.5 s), after which the
+  // overlay unmounts and the briefing is on screen. Under parallel load (throttled frames, slow polls) or a fast
+  // WebKit the drive can complete before this check runs, so accept either state; the two never coexist.
+  await expect(page.getByTestId('travel-truck').or(page.getByTestId('briefing'))).toBeVisible();
   // force: the drive runs on requestAnimationFrame, which parallel (occluded) Chromium pages throttle; the
   // stability check would otherwise wait on the same frames the truck is waiting for.
   // WebKit can finish the 1.5 s drive before this click runs; skipping is optional, arriving is what matters.

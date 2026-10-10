@@ -16,7 +16,7 @@
  */
 export const en = {
   /* ------------------------------------------------------------------ app / document titles */
-  'app.name': 'Q11',
+  'app.name': 'Q11 Emergency',
   'app.tagline': 'Quantum Emergency Response',
   'doc.title': '{app} — Quantum Emergency Response',
   'doc.how': '{app} — How it works',
@@ -41,7 +41,7 @@ export const en = {
 
   /* ------------------------------------------------------------------ how it works */
   'how.title': 'How it works',
-  'how.intro': 'Q11 is a fire-dispatch story about quantum error correction. Nothing here is about real fires or real firefighting: every fire, alarm and crew is a piece of quantum algebra wearing a costume.',
+  'how.intro': 'Q11 Emergency is a fire-dispatch story about quantum error correction. Nothing here is about real fires or real firefighting: every fire, alarm and crew is a piece of quantum algebra wearing a costume.',
   'how.houses.term': 'Houses',
   'how.houses.desc': 'Qubits. The number on a house is its qubit index.',
   'how.fires.term': 'Fires',
@@ -534,20 +534,20 @@ export const en = {
   'a11y.replaySteps': 'Replay steps',
   'a11y.step': 'Step {n}: {title}',
   'a11y.gameNav': 'Game',
-  'a11y.backToTitle': 'Q11 — back to title',
-  'a11y.cityBackToTitle': 'Q11 Quantum City — back to title',
+  'a11y.backToTitle': 'Q11 Emergency — back to title',
+  'a11y.cityBackToTitle': 'Q11 Emergency Quantum City — back to title',
   'a11y.langPill': 'Language: EN / JA, switch to {lang}',
   'a11y.alarmsAndCrews': 'Alarms and crews',
   'a11y.tutorialSteps': 'First call: three steps',
   'a11y.dismissNotice': 'Dismiss notice',
-  'a11y.q11mark': 'Q11 mark: a Q-shaped protective ring with a small flame inside',
+  'a11y.q11mark': 'Q11 Emergency mark: the red fire truck with Q11 painted on its side and a red X flame and a blue Z flame above it',
   'a11y.wires.start': 'start',
   'a11y.wires.end': 'end',
   'a11y.stationRinging': '{station}, ringing, watches houses {list}',
   'a11y.stationQuiet': '{station}, quiet, watches houses {list}',
   'a11y.fogHouse': 'House {q}, hidden',
   'a11y.pressToPredict': 'press to predict this house burns next',
-  'a11y.screen.title': 'Q11 title screen.',
+  'a11y.screen.title': 'Q11 Emergency title screen.',
   'a11y.screen.how': 'How it works.',
   'a11y.screen.settings': 'Settings.',
   'a11y.screen.city': 'City map.',

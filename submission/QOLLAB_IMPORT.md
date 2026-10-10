@@ -32,7 +32,7 @@ Limits: ≤100 files, ≤2 MB each. `index.html` + `main.js` at the top level ma
 
 ## Steps (user or assistant with the user's signed-in session)
 1. Sign in at https://qollab.xyz/login (Google or GitHub). Drafts are private to the owner.
-2. Create a new project (title "Q11 — Quantum Emergency Response"). Keep it a **draft** (do not publish).
+2. Create a new project (title "Q11 Emergency — Quantum Emergency Response"). Keep it a **draft** (do not publish).
 3. In the **Code** tab, create each file above with the exact relative path and paste the contents (or use the editor's file upload if present). Folders are created by naming files `q11/pauli.py` etc.
 4. Press **Run Project** → **Select QPU** → *Built-in simulator*. The game page renders above the console. Open a surface-code mission → Debrief → **Verify on this backend**: the Python module builds the Qiskit circuit, `backend.run(circuit, {shots})` executes it, the page shows measured syndrome / logical outcome next to the classical prediction.
 5. Press **Stop**, then **Run Project** → *IonQ Aria 1* (free remote noise-model simulator). Start with 100 shots (shot-aware; slow at high shots). Only **one job per run** on IonQ: a second verify click is refused by design; press Stop/Run to try another mission.

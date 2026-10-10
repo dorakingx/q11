@@ -3,8 +3,20 @@ import { allBlocksLargeEnough, expect, expectNoHorizontalOverflow, expectTutoria
 
 test('first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge', async ({ page }, info) => {
   await page.goto('/');
-  await expect(page).toHaveTitle(/Q11/);
-  await expect(page.getByRole('heading', { name: /Quantum Emergency Response/ })).toBeVisible();
+  await expect(page).toHaveTitle('Q11 Emergency — Quantum Emergency Response');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Q11 Emergency');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.getByTestId('title-kicker')).toHaveText('Quantum Emergency Response');
+  await expect(page.getByTestId('title-kicker')).toBeVisible();
+  // the kicker sits under the app name and is set smaller than it
+  const h1Box = await page.getByRole('heading', { level: 1 }).boundingBox();
+  const kickerBox = await page.getByTestId('title-kicker').boundingBox();
+  expect(kickerBox?.y ?? 0).toBeGreaterThan(h1Box?.y ?? 0);
+  const [h1Size, kickerSize] = await Promise.all([
+    page.getByRole('heading', { level: 1 }).evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
+    page.getByTestId('title-kicker').evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
+  ]);
+  expect(kickerSize).toBeLessThan(h1Size);
   await expect(page.getByTestId('lang-toggle')).toBeVisible();
   await expectNoHorizontalOverflow(page);
   const play = page.getByTestId('play');
@@ -163,17 +175,19 @@ test('mission 1 can be played with the keyboard only', async ({ page }, info) =>
 test('language toggle EN → JA changes the headings, document.title and <html lang>; the setting persists', async ({ page }) => {
   await seedSave(page, {});
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Quantum Emergency Response');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Q11 Emergency');
+  await expect(page.getByTestId('title-kicker')).toHaveText('Quantum Emergency Response');
   await expect(page.getByTestId('lang-toggle')).toHaveAccessibleName('Language: EN / JA, switch to 日本語');
   await expect(page.getByTestId('lang-toggle')).toContainText('EN');
   await page.getByTestId('lang-toggle').click();
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('クアンタム・エマージェンシー・レスポンス');
-  await expect(page).toHaveTitle('Q11 — クアンタム・エマージェンシー・レスポンス');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Q11 Emergency');
+  await expect(page.getByTestId('title-kicker')).toHaveText('クアンタム・エマージェンシー・レスポンス');
+  await expect(page).toHaveTitle('Q11 Emergency — クアンタム・エマージェンシー・レスポンス');
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
   await expect(page.getByTestId('play')).toHaveText('あそぶ');
   await page.getByTestId('play').click();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('量子の街');
-  await expect(page).toHaveTitle('Q11 — 街の地図');
+  await expect(page).toHaveTitle('Q11 Emergency — 街の地図');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
   await page.getByTestId('settings').click();
@@ -185,14 +199,14 @@ test('language toggle EN → JA changes the headings, document.title and <html l
 test('document.title follows the screen and the live region announces each screen', async ({ page }) => {
   await seedSave(page, { reducedMotion: true, freeRoam: true });
   await page.goto('/');
-  await expect(page).toHaveTitle('Q11 — Quantum Emergency Response');
-  await expect(page.getByTestId('announcer')).toHaveText('Q11 title screen.');
+  await expect(page).toHaveTitle('Q11 Emergency — Quantum Emergency Response');
+  await expect(page.getByTestId('announcer')).toHaveText('Q11 Emergency title screen.');
   await page.getByTestId('play').click();
-  await expect(page).toHaveTitle('Q11 — City map');
+  await expect(page).toHaveTitle('Q11 Emergency — City map');
   await expect(page.getByTestId('announcer')).toHaveText('City map.');
   await page.getByTestId('mission-4').click();
   await page.getByTestId('dispatch-go').click();
-  await expect(page).toHaveTitle('Q11 — Mission 4 · Blind Dispatch');
+  await expect(page).toHaveTitle('Q11 Emergency — Mission 4 · Blind Dispatch');
   await expect(page.locator('main h1')).toBeFocused();
   await page.getByTestId('briefing-skip').click();
   await expect(page.getByTestId('announcer')).toHaveText('Mission 4 dispatch. 2 of 8 stations ringing: Z0, Z1.');

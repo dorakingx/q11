@@ -1,4 +1,4 @@
-// Q11 — Quantum Emergency Response · Qollab entry (JS/Qiskit project).
+// Q11 Emergency — Quantum Emergency Response · Qollab entry (JS/Qiskit project).
 // The game itself is a self-contained ES module bundle (./game/q11-game.js) built from the same TypeScript
 // source as the web version. Quantum circuits are built and analysed in Python (q11/*.py, Qiskit) and run on
 // whatever backend the person pressing Run selected in the Select QPU dialog — never a hard-coded one.

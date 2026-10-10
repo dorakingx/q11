@@ -1,13 +1,13 @@
-# Q11 — Quantum Emergency Response
+# Q11 Emergency — Quantum Emergency Response
 
-*A fire-dispatch game that teaches how quantum error correction reasons: errors you cannot see, alarms you can, and the moment a perfect call still fails.*
+*Q11 Emergency is a fire-dispatch game that teaches how quantum error correction reasons: errors you cannot see, alarms you can, and the moment a perfect call still fails.*
 
 **This effort is supported by Qollab & IonQ.** · MIT License · Theme: **Quantum Unlocked** (also playable as a Quantum Playground entry)
 
 ---
 
 ## The problem
-Quantum error correction is usually explained with equations: stabilizers, syndromes, decoders. The intuition behind them is simple but rarely *felt*: you never observe the error itself, only parity checks; a correction that looks right can still destroy the logical information; and the code distance tells you exactly when you are safe and when you are not. Q11 turns that reasoning into a game you can finish in a few minutes.
+Quantum error correction is usually explained with equations: stabilizers, syndromes, decoders. The intuition behind them is simple but rarely *felt*: you never observe the error itself, only parity checks; a correction that looks right can still destroy the logical information; and the code distance tells you exactly when you are safe and when you are not. Q11 Emergency turns that reasoning into a game you can finish in a few minutes.
 
 ## How to play
 You are the dispatcher of a toy quantum city. On the **city map**, each district is one mission: Rowhouse Lane, Harbor Bridge, Conversion Lab, Central District, Market Square and Old Town. Tap a district with smoke, press **Dispatch!**, and the fire truck drives you to the scene. Houses are qubits. An arsonist called *Noise* lights **red fires (X errors)** and **blue fires (Z errors)**; a split red/blue fire is a **Y**. **Alarm stations** between the houses are stabilizer checks: a station rings when the fire pattern anticommutes with its parity check — not because a fire is "near". You respond by sending **crews**: a red crew applies X, a blue crew applies Z. A crew on a burning house puts the fire out (X·X = I); a crew on a safe house starts a new one (it's XOR).
@@ -24,7 +24,7 @@ Missions: **First Alarm** (3-qubit repetition code) · **Red Forward / Blue Back
 The first run is a three-tap guided scene (pick a crew → tap a house → Spray!). Everything works by tapping; keyboard and screen readers are supported; shapes and X/Z/Y letters carry every meaning so colour is never required; the interface is available in **English and Japanese**; sound is off until you turn it on; reduced motion plays the same causality as static frames.
 
 ## What is original here
-Not "QEC as a game" — that exists. Q11's contribution is the *combination* inside one consistent model:
+Not "QEC as a game" — that exists. Q11 Emergency's contribution is the *combination* inside one consistent model:
 - **Time-resolved propagation**: Pauli frames move through gates by the actual Clifford rules (H: X↔Z; CNOT: X forward, Z backward), not by adjacency or "entanglement spreads it".
 - **Hidden-error inference**: the challenge view is given only the syndrome and the public circuit; the true error lives in the game state and is revealed only after you press Spray! (the answer check).
 - **Counterfactual replay with a real verdict**: success is decided by GF(2) algebra — the residual must lie in the stabilizer group. Stabilizer-equivalent corrections count as equal successes; "alarms off" alone never does.

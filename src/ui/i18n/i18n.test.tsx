@@ -172,7 +172,7 @@ describe('interpolate / translate', () => {
   it('translates with params in both languages and binds a translator', () => {
     expect(translate('en', 'title.progress', { stars: 3, max: 16 })).toBe('Progress: 3 of 16 stars.');
     expect(translate('ja', 'title.progress', { stars: 3, max: 16 })).toBe('進み具合：星 3 / 16');
-    expect(translate('en', 'doc.mission', { app: 'Q11', n: 4, title: 'Blind Dispatch' })).toBe('Q11 — Mission 4 · Blind Dispatch');
+    expect(translate('en', 'doc.mission', { app: 'Q11 Emergency', n: 4, title: 'Blind Dispatch' })).toBe('Q11 Emergency — Mission 4 · Blind Dispatch');
     const t = translator('ja');
     expect(t('city.dispatch')).toBe('出動！');
     expect(t('city.truck.travel', { district: '中央地区' })).toBe('消防車が 中央地区 へ向かっています…');

@@ -13,6 +13,7 @@ import { firstAvailable, getPublicMission, maxTotalStars, totalStars, type Actio
 import { ART, CITY_H, CITY_W, ChapterBadge, CityBackdrop, DISTRICTS, FireTruck, ROADS, ROAD_START, SmokePlume, districtById, type DistrictBox, type DistrictId, type DistrictVisualState } from '../art';
 import { GearIcon, Q11Mark } from '../glyphs';
 import { missionCopy, plural, useLanguage, useT } from '../i18n';
+import { BrandName } from '../panels';
 import { RESTORE_MS, TOAST_MS, TRAVEL_MS, WHEEL_MS, badgeColour, badgeKey, detectReducedMotion, easeInOut, hitBoxStyle, isDistrictId, neighbourDistrict, pointOnRoad, statusesOf, type MeasurablePath, type TruckPose } from './geometry';
 import './city.css';
 
@@ -290,7 +291,9 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
         <div className="city-brand-group">
           <button type="button" className="city-brand" onClick={onTitle} aria-label={t('a11y.cityBackToTitle')} data-testid="city-title">
             <Q11Mark size={40} />
-            <span className="city-brand-name">{t('app.name')}</span>
+            <span className="city-brand-name">
+              <BrandName />
+            </span>
           </button>
           <h1 className="city-brand-title" tabIndex={-1} data-focus-target>
             {t('city.title')}

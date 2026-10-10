@@ -111,7 +111,7 @@ export function watchersOf(codeId: CodeId, q: number): string[] {
     .map((c) => c.id);
 }
 
-/** document.title per screen, e.g. "Q11 — Mission 4 · Blind Dispatch". */
+/** document.title per screen, e.g. "Q11 Emergency — Mission 4 · Blind Dispatch". */
 export function documentTitle(t: Translate, state: GameState, mission: PublicMissionView | null): string {
   const app = t('app.name');
   switch (state.screen) {

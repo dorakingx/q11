@@ -2,6 +2,7 @@
  * Non-play screens: title, how it works, settings, briefing, result, summary. The city map lives in src/ui/city.
  * Every visible string comes from useT(); mission kid copy from missionCopy(); art from src/ui/art.
  */
+import { Fragment } from 'react';
 import { getCode } from '../quantum';
 import { DISTRICTS, districtForMission, listPublicMissions, maxTotalStars, resultType, totalStars, type Action, type Debrief, type DistrictKind, type GameState, type Language, type PublicMissionView } from '../game';
 import { BridgeSpan, ChapterBadge, ConversionLab, Detector, House, MemoryTower, Tree } from './art';
@@ -20,6 +21,26 @@ const BADGE_COLOURS = ['#2f6fdd', '#2bb673', '#8a4fd6', '#e8432a', '#f2b200', '#
 
 /* ------------------------------------------------------------------ title */
 
+/** The kicker line; a Japanese katakana compound may wrap only after its middle dots ("クアンタム・" | "エマージェンシー・" | "レスポンス"). */
+function KickerText({ text }: { readonly text: string }) {
+  const parts = text.split('・');
+  if (parts.length === 1) return <>{text}</>;
+  return (
+    <>
+      {parts.map((part, i) => (
+        <Fragment key={i}>
+          {i > 0 ? (
+            <>
+              ・<wbr />
+            </>
+          ) : null}
+          {part}
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
 export function TitleScreen({ state, dispatch }: ScreenProps) {
   const t = useT();
   const stars = totalStars(state.progress);
@@ -28,8 +49,11 @@ export function TitleScreen({ state, dispatch }: ScreenProps) {
       <div className="title-card">
         <Q11Mark size={112} label={t('a11y.q11mark')} />
         <h1 className="title-h" tabIndex={-1} data-focus-target>
-          {t('app.name')} <span className="title-dash">—</span> {t('title.heading')}
+          {t('app.name')}
         </h1>
+        <p className="title-kicker" data-testid="title-kicker">
+          <KickerText text={t('title.heading')} />
+        </p>
         <p className="title-lead">{t('title.kidLine')}</p>
         <div className="title-actions">
           <button type="button" className="btn btn-primary btn-large btn-play" onClick={() => dispatch({ type: 'PLAY' })} data-testid="play">

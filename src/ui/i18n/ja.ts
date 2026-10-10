@@ -11,7 +11,7 @@ import type { Key } from './en';
 
 export const ja: Readonly<Record<Key, string>> = {
   /* ------------------------------------------------------------------ app / document titles */
-  'app.name': 'Q11',
+  'app.name': 'Q11 Emergency',
   'app.tagline': 'クアンタム・エマージェンシー・レスポンス',
   'doc.title': '{app} — クアンタム・エマージェンシー・レスポンス',
   'doc.how': '{app} — あそび方',
@@ -36,7 +36,7 @@ export const ja: Readonly<Record<Key, string>> = {
 
   /* ------------------------------------------------------------------ how it works */
   'how.title': 'あそび方',
-  'how.intro': 'Q11 は、量子エラー訂正 (quantum error correction) を消防隊のお話にしたゲームです。本物の火事や消防の話ではありません。火も警報も隊も、ぜんぶ量子の計算が着ぐるみを着たものです。',
+  'how.intro': 'Q11 Emergency は、量子エラー訂正 (quantum error correction) を消防隊のお話にしたゲームです。本物の火事や消防の話ではありません。火も警報も隊も、ぜんぶ量子の計算が着ぐるみを着たものです。',
   'how.houses.term': '家',
   'how.houses.desc': '量子ビット (qubit) です。家の番号は量子ビットの番号です。',
   'how.fires.term': '火',
@@ -529,20 +529,20 @@ export const ja: Readonly<Record<Key, string>> = {
   'a11y.replaySteps': 'リプレイのステップ',
   'a11y.step': 'ステップ {n}：{title}',
   'a11y.gameNav': 'ゲーム',
-  'a11y.backToTitle': 'Q11 — タイトルにもどる',
-  'a11y.cityBackToTitle': 'Q11 量子の街 — タイトルにもどる',
+  'a11y.backToTitle': 'Q11 Emergency — タイトルにもどる',
+  'a11y.cityBackToTitle': 'Q11 Emergency 量子の街 — タイトルにもどる',
   'a11y.langPill': '言語：EN / JA、{lang} に切りかえる',
   'a11y.alarmsAndCrews': '警報と隊',
   'a11y.tutorialSteps': 'はじめての出動：3 つの手順',
   'a11y.dismissNotice': 'お知らせを閉じる',
-  'a11y.q11mark': 'Q11 のマーク：Q の形の守りの輪と、中の小さな炎',
+  'a11y.q11mark': 'Q11 Emergency のマーク：側面に Q11 と書かれた赤い消防車と、その上の赤い X の炎と青い Z の炎',
   'a11y.wires.start': 'はじめ',
   'a11y.wires.end': 'おわり',
   'a11y.stationRinging': '{station}、鳴っている、家 {list} を見ている',
   'a11y.stationQuiet': '{station}、静か、家 {list} を見ている',
   'a11y.fogHouse': '家 {q}、かくれている',
   'a11y.pressToPredict': '押すとこの家が次に燃えると予想する',
-  'a11y.screen.title': 'Q11 タイトル画面。',
+  'a11y.screen.title': 'Q11 Emergency タイトル画面。',
   'a11y.screen.how': 'あそび方。',
   'a11y.screen.settings': '設定。',
   'a11y.screen.city': '街の地図。',

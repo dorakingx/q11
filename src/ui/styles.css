@@ -1,4 +1,4 @@
-/* Q11 — Quantum Emergency Response · warm daytime theme (docs/UX_SCREENS.md). Colours come from tokens.css;
+/* Q11 Emergency — Quantum Emergency Response · warm daytime theme (docs/UX_SCREENS.md). Colours come from tokens.css;
    the scene and the city have their own sheets (scene.css, city.css) built on the same tokens. */
 @import './tokens.css';
 
@@ -70,8 +70,10 @@ kbd { font: 700 0.8em ui-monospace, SFMono-Regular, Menlo, monospace; background
 .screen { width: 100%; max-width: 1240px; margin: 0 auto; padding: 12px 16px 24px; flex: 1; display: flex; flex-direction: column; gap: var(--gap); }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 12px; min-height: 60px; background: var(--panel); border: 2px solid var(--outline); border-radius: var(--radius-lg); box-shadow: 0 2px 0 var(--shadow); }
 .topbar-title { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 auto; }
-.brand, .brand-btn { font-weight: 900; letter-spacing: 0.06em; color: var(--z); font-size: 1.05rem; }
-.brand-btn { padding: 8px 10px; }
+.brand, .brand-btn { display: inline-flex; align-items: center; gap: 6px; font-weight: 900; letter-spacing: 0.06em; color: var(--z); font-size: 1.05rem; white-space: nowrap; }
+.brand-btn { padding: 6px 10px 6px 6px; }
+.brand-mark { display: inline-flex; flex: 0 0 auto; }
+.brand-mark svg { display: block; }
 .topbar-text { min-width: 0; }
 .topbar-h { font-size: 1.15rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .topbar-sub { color: var(--muted); font-size: 0.88rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -89,8 +91,8 @@ kbd { font: 700 0.8em ui-monospace, SFMono-Regular, Menlo, monospace; background
 /* ---------- title */
 .screen-title { justify-content: center; align-items: center; min-height: 100vh; padding-top: 24px; }
 .title-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; max-width: 680px; background: var(--panel); border: 2px solid var(--outline); border-radius: 28px; padding: 32px 28px; box-shadow: 0 6px 0 var(--shadow); }
-.title-h { font-size: clamp(1.5rem, 4vw, 2.3rem); font-weight: 900; letter-spacing: -0.01em; line-height: 1.2; }
-.title-dash { color: var(--muted); font-weight: 400; }
+.title-h { font-size: clamp(1.9rem, 5vw, 2.6rem); font-weight: 900; letter-spacing: -0.01em; line-height: 1.15; }
+.title-kicker { margin-top: -6px; font-size: clamp(1rem, 2.6vw, 1.25rem); font-weight: 800; letter-spacing: 0.02em; color: var(--ink); max-width: 30ch; word-break: keep-all; overflow-wrap: anywhere; }
 .title-lead { font-size: 1.2rem; color: var(--ink-soft); font-weight: 700; max-width: 34ch; }
 .title-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 6px; }
 .title-tools { display: flex; align-items: center; justify-content: center; gap: 10px; }
@@ -297,7 +299,8 @@ kbd { font: 700 0.8em ui-monospace, SFMono-Regular, Menlo, monospace; background
   .topbar .brand { display: none; }
   .topbar .brand-btn { padding: 8px 6px; }
   .title-card { padding: 24px 18px; }
-  .title-h { font-size: 1.5rem; }
+  .title-h { font-size: 1.85rem; }
+  .title-kicker { font-size: 1rem; }
   .how-list > div { grid-template-columns: 1fr; gap: 4px; }
   .brief-facts, .result-facts { grid-template-columns: 1fr 1fr; }
   .step-dots, .lesson-dots { margin-left: 0; width: 100%; }
@@ -307,6 +310,8 @@ kbd { font: 700 0.8em ui-monospace, SFMono-Regular, Menlo, monospace; background
 }
 /* phones: scene first, compact alarms, palette, then a fixed bottom bar (Undo · Spray!) that never covers the scene */
 @media (max-width: 480px) {
+  /* brand chips show "Q11" only; the word stays in the accessible name (visually hidden, not display:none) */
+  .brand-word { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .topbar-sub { white-space: normal; overflow: visible; text-overflow: clip; }
   .screen-challenge { padding-bottom: 104px; }
   .screen-challenge .action-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: var(--panel); border-top: 2px solid var(--outline); margin: 0; box-shadow: 0 -4px 12px var(--shadow); }

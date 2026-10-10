@@ -8,7 +8,7 @@ import { createPortal } from 'react-dom';
 import { getCode, type CodeId } from '../quantum';
 import type { CrewLetter, Language } from '../game';
 import { DetectorLamp, Drop, Flame, HelmetChip } from './art';
-import { GearIcon, StarIcon } from './glyphs';
+import { GearIcon, Q11Mark, StarIcon } from './glyphs';
 import { LANGUAGE_NAMES, useT } from './i18n';
 import { alarmSummary, CREW_KEY, PUTS_OUT_KEY } from './text';
 
@@ -208,16 +208,41 @@ export interface TopBarProps {
   readonly onTitle?: () => void;
 }
 
+/**
+ * The app name as the brand chips show it: "Q11" plus the word "Emergency", which narrow viewports (< 480 px) hide
+ * visually (CSS .brand-word) while it stays part of the accessible name.
+ */
+export function BrandName() {
+  const t = useT();
+  const name = t('app.name');
+  const cut = name.indexOf(' ');
+  if (cut < 0) return <>{name}</>;
+  return (
+    <>
+      {name.slice(0, cut)}
+      <span className="brand-word">{name.slice(cut)}</span>
+    </>
+  );
+}
+
 export function TopBar({ title, subtitle, onMissions, onSettings, settingsLabel, onTitle }: TopBarProps) {
   const t = useT();
   return (
     <header className="topbar">
       <div className="topbar-title">
         {onTitle === undefined ? (
-          <span className="brand">{t('app.name')}</span>
+          <span className="brand">
+            <span className="brand-mark" aria-hidden="true">
+              <Q11Mark size={28} />
+            </span>
+            <BrandName />
+          </span>
         ) : (
           <button type="button" className="btn btn-ghost brand-btn" onClick={onTitle} aria-label={t('a11y.backToTitle')}>
-            {t('app.name')}
+            <span className="brand-mark" aria-hidden="true">
+              <Q11Mark size={28} />
+            </span>
+            <BrandName />
           </button>
         )}
         <div className="topbar-text">

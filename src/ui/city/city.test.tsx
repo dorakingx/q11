@@ -177,7 +177,7 @@ describe('CityScreen — HUD', () => {
     const h1 = screen.getByRole('heading', { level: 1, name: 'Quantum City' });
     expect(h1).toHaveAttribute('data-focus-target');
     expect(h1.closest('button')).toBeNull(); // the heading is a focus target of its own, not part of the brand button
-    expect(screen.getByTestId('city-title')).toHaveAccessibleName('Q11 Quantum City — back to title');
+    expect(screen.getByTestId('city-title')).toHaveAccessibleName('Q11 Emergency Quantum City — back to title');
     const badges = screen.getByTestId('city-badges');
     expect(within(badges).getByText('Alarm Reader')).toBeInTheDocument();
     expect(within(badges).getByText('Gate Tracker')).toBeInTheDocument();

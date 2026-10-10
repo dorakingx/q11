@@ -40,7 +40,8 @@ describe('App · guided first run (R5)', () => {
   it('Play → tutorial scene (callouts follow the taps) → Spray! → result → city with the chapter badge', async () => {
     const u = user();
     render(<App storage="memory" />);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Quantum Emergency Response');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Q11 Emergency');
+    expect(screen.getByTestId('title-kicker')).toHaveTextContent('Quantum Emergency Response');
     expect(screen.getByTestId('play')).toHaveTextContent('Take the first call');
     await u.click(screen.getByTestId('play'));
     // Straight into the planning scene of Rowhouse Lane in tutorial mode (no briefing).
@@ -89,7 +90,7 @@ describe('App · returning player', () => {
     expect(screen.getByTestId('play')).toHaveTextContent('Play');
     await u.click(screen.getByTestId('play'));
     expect(await screen.findByTestId('city-map')).toBeInTheDocument();
-    expect(document.title).toBe('Q11 — City map');
+    expect(document.title).toBe('Q11 Emergency — City map');
     await u.click(screen.getByTestId('mission-1'));
     await u.click(screen.getByTestId('dispatch-go')); // reduced motion → no truck drive
     expect(await screen.findByTestId('briefing')).toBeInTheDocument();
@@ -229,12 +230,13 @@ describe('App · returning player', () => {
     const u = user();
     render(<App storage="memory" />);
     await u.click(screen.getByTestId('lang-toggle'));
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('クアンタム・エマージェンシー・レスポンス');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Q11 Emergency');
+    expect(screen.getByTestId('title-kicker')).toHaveTextContent('クアンタム・エマージェンシー・レスポンス');
     expect(document.documentElement.lang).toBe('ja');
     await act(async () => {
       await new Promise((r) => setTimeout(r, 80));
     });
-    expect(document.title).toBe('Q11 — クアンタム・エマージェンシー・レスポンス');
+    expect(document.title).toBe('Q11 Emergency — クアンタム・エマージェンシー・レスポンス');
     expect(screen.getByTestId('play')).not.toHaveTextContent('Play');
     await u.click(screen.getByTestId('settings'));
     expect(screen.getByTestId('lang-ja')).toHaveAttribute('aria-pressed', 'true');

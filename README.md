@@ -1,6 +1,6 @@
-# Q11 — Quantum Emergency Response
+# Q11 Emergency — Quantum Emergency Response
 
-A fire-dispatch command game about quantum error correction, built for the **Qollab × IonQ Global Quantum Hackathon 2026** (theme: Quantum Unlocked).
+**Q11 Emergency** is a fire-dispatch command game about quantum error correction, built for the **Qollab × IonQ Global Quantum Hackathon 2026** (theme: Quantum Unlocked).
 
 > A toy city with houses, alarm stations and fire crews. Fires are Pauli errors (red = X, blue = Z, split = Y); alarm stations are stabilizer checks; crews are corrections.
 > Pick a district on the city map, ride the fire truck to the scene, read the alarms, plan your crews, press **Spray!** and watch the hoses do one exact Pauli correction each — then the answer-check replay reveals the hidden fires and one of four outcomes: houses restored, a harmless pattern, fires still burning, or a silent logical failure shown on the city's memory tower. English and Japanese.

@@ -1,4 +1,4 @@
-# Q11 — Quantum Emergency Response (project instructions)
+# Q11 Emergency — Quantum Emergency Response (project instructions)
 
 Hackathon entry for the Qollab × IonQ Global Quantum Hackathon 2026.
 Submission deadline: **2026-10-12 08:00 JST = 2026-10-11 23:00 UTC**.

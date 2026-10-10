@@ -4,18 +4,18 @@
     "url": "/"
   },
   {
-    "type": "caption",
-    "text": "Q11 — Quantum Emergency Response. A toy city where fires are quantum errors and alarms are parity checks.",
-    "ms": 8000
+    "type": "narrate",
+    "text": "Q11 Emergency. Quantum Emergency Response: a toy city where fires are quantum errors, alarm stations are parity checks, and you are the dispatcher.",
+    "block": true
   },
   {
     "type": "click",
     "selector": "[data-testid=play]"
   },
   {
-    "type": "caption",
-    "text": "First call: three taps. Pick a crew, tap a house, spray.",
-    "ms": 3500
+    "type": "narrate",
+    "text": "Your first call takes three taps. Pick a crew, tap the house, and spray.",
+    "block": true
   },
   {
     "type": "click",
@@ -30,32 +30,39 @@
     "selector": "[data-testid=block-1]"
   },
   {
-    "type": "caption",
-    "text": "Both alarms ring — the fire is in the house they both watch.",
-    "ms": 3000
+    "type": "narrate",
+    "text": "Both alarms ring, so the fire must be in the house they both watch.",
+    "block": true
   },
   {
     "type": "click",
     "selector": "[data-testid=confirm]"
   },
   {
-    "type": "caption",
-    "text": "Answer check: the truck arrives, the crew runs, one hose = one exact Pauli correction.",
-    "ms": 6500
+    "type": "narrate",
+    "text": "Answer check. The truck arrives, the crew runs in, and one hose is exactly one Pauli correction.",
+    "block": false
   },
   {
-    "type": "caption",
-    "text": "Fires out, houses restored. X·X = I.",
-    "ms": 3500
+    "type": "wait",
+    "ms": 3200
+  },
+  {
+    "type": "narrate-wait"
+  },
+  {
+    "type": "narrate",
+    "text": "Fires out, houses restored. X times X is the identity.",
+    "block": true
   },
   {
     "type": "click",
     "selector": "[data-testid=result-next]"
   },
   {
-    "type": "caption",
-    "text": "The city map. Districts unlock in order; the smoke clears and a badge is earned.",
-    "ms": 6000
+    "type": "narrate",
+    "text": "This is the city map. Districts unlock in order, the smoke clears, and you earn a badge.",
+    "block": true
   },
   {
     "type": "click",
@@ -70,18 +77,25 @@
     "selector": "[data-testid=dispatch-go]"
   },
   {
-    "type": "caption",
+    "type": "narrate",
     "text": "Dispatch! The fire truck drives to Harbor Bridge.",
-    "ms": 3000
+    "block": false
+  },
+  {
+    "type": "wait",
+    "ms": 2200
+  },
+  {
+    "type": "narrate-wait"
   },
   {
     "type": "click",
     "selector": "[data-testid=start-mission]"
   },
   {
-    "type": "caption",
-    "text": "Training: tap where the fire will be after the CNOT gate — red copies forward.",
-    "ms": 3500
+    "type": "narrate",
+    "text": "Training first. Tap where the fire will be after the gate. A red fire copies forward through the coupler.",
+    "block": true
   },
   {
     "type": "click",
@@ -100,9 +114,9 @@
     "ms": 800
   },
   {
-    "type": "caption",
-    "text": "Blue copies backward.",
-    "ms": 1500
+    "type": "narrate",
+    "text": "And a blue fire copies backward.",
+    "block": true
   },
   {
     "type": "click",
@@ -121,9 +135,9 @@
     "ms": 800
   },
   {
-    "type": "caption",
-    "text": "Challenge: X on house 0 and Z on house 1 — where do the fires end up? Both become Y.",
-    "ms": 5000
+    "type": "narrate",
+    "text": "Now the challenge. A red fire starts on house zero and a blue fire on house one. After the gate, both houses carry a red-and-blue fire, so we send a Y crew to each.",
+    "block": true
   },
   {
     "type": "click",
@@ -146,8 +160,16 @@
     "selector": "[data-testid=confirm]"
   },
   {
+    "type": "narrate",
+    "text": "Watch the fires travel first. Through the coupler the red fire copies forward and the blue fire copies backward. Then the crews spray, and every pair cancels.",
+    "block": false
+  },
+  {
     "type": "wait",
-    "ms": 6000
+    "ms": 6500
+  },
+  {
+    "type": "narrate-wait"
   },
   {
     "type": "click",
@@ -155,7 +177,7 @@
   },
   {
     "type": "wait",
-    "ms": 2500
+    "ms": 1500
   },
   {
     "type": "click",
@@ -170,9 +192,9 @@
     "selector": "[data-testid=switch-free-roam]"
   },
   {
-    "type": "caption",
-    "text": "Free selection (for judges): with this switch every district opens from the map.",
-    "ms": 3000
+    "type": "narrate",
+    "text": "For reviewers there is free selection: with this switch every district opens from the map.",
+    "block": true
   },
   {
     "type": "click",
@@ -195,9 +217,16 @@
     "selector": "[data-testid=dispatch-go]"
   },
   {
-    "type": "caption",
-    "text": "Central District: the distance-3 surface code. Nine houses, eight alarm stations.",
-    "ms": 3200
+    "type": "narrate",
+    "text": "Central District is the distance-three surface code. Nine houses, eight alarm stations.",
+    "block": false
+  },
+  {
+    "type": "wait",
+    "ms": 2200
+  },
+  {
+    "type": "narrate-wait"
   },
   {
     "type": "click",
@@ -212,9 +241,9 @@
     "selector": "[data-testid=detector-Z0]"
   },
   {
-    "type": "caption",
-    "text": "Fires are hidden behind fog. Tap a station to see the houses it watches.",
-    "ms": 5000
+    "type": "narrate",
+    "text": "Here the fires are hidden behind fog. Tap a station to see which houses it watches.",
+    "block": true
   },
   {
     "type": "click",
@@ -229,31 +258,34 @@
     "selector": "[data-testid=block-4]"
   },
   {
-    "type": "caption",
-    "text": "Z0 and Z1 both ring — only house 4 is watched by both. Plan a red crew there and spray.",
-    "ms": 5500
+    "type": "narrate",
+    "text": "Z zero and Z one both ring, and only house four is watched by both. So we plan a red crew there and spray.",
+    "block": true
   },
   {
     "type": "click",
     "selector": "[data-testid=confirm]"
   },
   {
-    "type": "caption",
-    "text": "The hose reveals the true fire, puts it out, every station goes quiet.",
-    "ms": 6500
+    "type": "narrate",
+    "text": "The hose reveals the true fire, puts it out, and every station goes quiet.",
+    "block": false
   },
   {
     "type": "wait",
-    "ms": 1000
+    "ms": 4500
+  },
+  {
+    "type": "narrate-wait"
   },
   {
     "type": "click",
     "selector": "[data-testid=result-next]"
   },
   {
-    "type": "caption",
-    "text": "Central District restored and a new badge earned. With free selection, Old Town is already open.",
-    "ms": 4500
+    "type": "narrate",
+    "text": "Central District is restored and a new badge is earned. With free selection, Old Town is already open.",
+    "block": true
   },
   {
     "type": "click",
@@ -268,9 +300,16 @@
     "selector": "[data-testid=dispatch-go]"
   },
   {
-    "type": "caption",
-    "text": "Old Town: one alarm. The best explanation is one fire on house 0.",
-    "ms": 3200
+    "type": "narrate",
+    "text": "Old Town. One alarm rings, and the best explanation is a single fire on house zero.",
+    "block": false
+  },
+  {
+    "type": "wait",
+    "ms": 2200
+  },
+  {
+    "type": "narrate-wait"
   },
   {
     "type": "click",
@@ -297,44 +336,46 @@
     "selector": "[data-testid=confirm]"
   },
   {
-    "type": "caption",
-    "text": "Every alarm goes quiet… yet the memory tower flips: two fires fooled the alarms. That is distance 3.",
-    "ms": 8000
+    "type": "narrate",
+    "text": "Every alarm goes quiet. And yet the memory tower flips. Two fires fooled the alarms. That is what distance three means.",
+    "block": false
+  },
+  {
+    "type": "wait",
+    "ms": 4500
+  },
+  {
+    "type": "narrate-wait"
   },
   {
     "type": "click",
     "selector": "[data-testid=result-why]"
   },
   {
-    "type": "caption",
-    "text": "Why? Your spray and the alternative side by side. Investigation complete — nobody could have known from the alarms alone.",
-    "ms": 8000
+    "type": "narrate",
+    "text": "Why? Your spray and the alternative, side by side. The investigation is complete: nobody could have known from the alarms alone.",
+    "block": true
   },
   {
-    "type": "caption",
-    "text": "The same missions run as Qiskit circuits on Qollab: built-in simulator (exact) and IonQ Aria 1 (logical bit 1 in 97% of shots).",
-    "ms": 8000
-  },
-  {
-    "type": "viewport",
-    "width": 390,
-    "height": 844
-  },
-  {
-    "type": "goto",
-    "url": "/"
+    "type": "narrate",
+    "text": "The same missions run as Qiskit circuits on Qollab. Exact on the built-in simulator, and on IonQ's Aria 1 simulator the logical bit flipped in ninety-seven percent of shots.",
+    "block": true
   },
   {
     "type": "click",
-    "selector": "[data-testid=lang-toggle]"
+    "selector": "[data-testid=topbar-city]"
   },
   {
     "type": "wait",
-    "ms": 800
+    "ms": 1000
   },
   {
-    "type": "caption",
-    "text": "日本語でも遊べます。タッチだけで操作。 Open source, MIT. This effort is supported by Qollab & IonQ.",
-    "ms": 8000
+    "type": "narrate",
+    "text": "Q11 Emergency is open source under the MIT license. This effort is supported by Qollab and IonQ.",
+    "block": true
+  },
+  {
+    "type": "wait",
+    "ms": 1200
   }
 ]

@@ -1,23 +1,36 @@
-# Demo video script & storyboard (target ~140 s; hard range 120–180 s)
+# Demo video script (narrated, no captions; hard range 120–180 s)
 
-**Redesign take (2026-10-10, after the city/scene redesign).** Recorded with `scripts/record-demo.mjs` + `scripts/demo-shots.json` (79 scripted shots) against the built app on `http://localhost:4173`: `submission/DEMO.mp4` (git-ignored, never uploaded). Final take 2026-10-10 13:36 UTC: **138.4 s**, sha256 `3596c11d…` (full value in `reports/demo-recording.json` and `submission/EVIDENCE_INDEX.md`); four earlier takes (123–124 s or failed on a stale shot) were discarded. Captions are burned in; no narration; no cloud run is shown as live (the Qollab/IonQ results are quoted in a caption with their recorded figures from `reports/qollab-runs.md`). The earlier 149 s take of the card-list build (2cfae98) is superseded.
+**Narrated take (2026-10-11).** `scripts/record-demo.mjs` drives the built app in Chromium at 1280×800, records the screen and lays a narration track under it. The narration is synthesised offline with macOS `say` (voice Samantha, 172 wpm) from the `narrate` shots in `scripts/demo-shots.json`; no captions are burned in, there is no phone insert and no language section (the EN/JA switch is still visible on the title screen). Nothing is uploaded; the file stays at `submission/DEMO.mp4` (git-ignored). Duration, sha256, the voice and every cue time are written to `reports/demo-recording.json` and copied into `submission/EVIDENCE_INDEX.md` after each take.
 
-Recording: the real app in Chromium at 1280×800 (desktop) with one phone-size insert (390×844); captions burned in; no narration required. The table below is the storyboard the shot list implements (times approximate; spray showpieces and truck drives add a few seconds each).
+## Narration script (22 lines, ≈130 s of speech)
+| # | On screen | Spoken line |
+|---|---|---|
+| 1 | Title screen (Q11 icon, Take the first call) | Q11, Quantum Emergency Response. A toy city where fires are quantum errors, alarm stations are parity checks, and you are the dispatcher. |
+| 2 | Rowhouse Lane: first-call tutorial callouts | Your first call takes three taps. Pick a crew, tap the house, and spray. |
+| 3 | Red crew planned on house 1 | Both alarms ring, so the fire must be in the house they both watch. |
+| 4 | Answer check: truck, crew, hose, splash | Answer check. The truck arrives, the crew runs in, and one hose is exactly one Pauli correction. |
+| 5 | Result: Fires out, houses restored (3 stars) | Fires out, houses restored. X times X is the identity. |
+| 6 | City map: smoke clears over Rowhouse Lane, Alarm Reader badge | This is the city map. Districts unlock in order, the smoke clears, and you earn a badge. |
+| 7 | Truck drives along the road to Harbor Bridge | Dispatch! The fire truck drives to Harbor Bridge. |
+| 8 | Training lesson 1: CNOT, red copies forward (tap to predict) | Training first. Tap where the fire will be after the gate. A red fire copies forward through the coupler. |
+| 9 | Training lesson 2: blue copies backward | And a blue fire copies backward. |
+| 10 | Challenge: X on house 0, Z on house 1; Y crews planned | Now the challenge. A red fire starts on house zero and a blue fire on house one. After the gate, both houses carry a red-and-blue fire, so we send a Y crew to each. |
+| 11 | Answer check: fires travel through the coupler (propagation prelude), then the crews spray | Watch the fires travel first. Through the coupler the red fire copies forward and the blue fire copies backward. Then the crews spray, and every pair cancels. |
+| 12 | Settings: free selection switch | For reviewers there is free selection: with this switch every district opens from the map. |
+| 13 | Truck drives to Central District (surface code briefing) | Central District is the distance-three surface code. Nine houses, eight alarm stations. |
+| 14 | Fogged houses; station Z0 tapped: watched houses highlighted | Here the fires are hidden behind fog. Tap a station to see which houses it watches. |
+| 15 | Red crew planned on house 4 | Z zero and Z one both ring, and only house four is watched by both. So we plan a red crew there and spray. |
+| 16 | Answer check: fog lifts on house 4, fire out, stations quiet | The hose reveals the true fire, puts it out, and every station goes quiet. |
+| 17 | City map: Central District restored, Blind Dispatcher badge | Central District is restored and a new badge is earned. With free selection, Old Town is already open. |
+| 18 | Truck drives to Old Town; briefing (no training) | Old Town. One alarm rings, and the best explanation is a single fire on house zero. |
+| 19 | Answer check: alarms quiet, memory tower flips (Silent failure) | Every alarm goes quiet. And yet the memory tower flips. Two fires fooled the alarms. That is what distance three means. |
+| 20 | Why?: your spray vs the alternative side by side | Why? Your spray and the alternative, side by side. The investigation is complete: nobody could have known from the alarms alone. |
+| 21 | Why? view (verification line) | The same missions run as Qiskit circuits on Qollab. Exact on the built-in simulator, and on IonQ's Aria 1 simulator the logical bit flipped in ninety-seven percent of shots. |
+| 22 | City map outro | Q11 is open source under the MIT license. This effort is supported by Qollab and IonQ. |
 
-| t (s) | Shot | On screen | Caption |
-|---|---|---|---|
-| 0–8 | Title | Q11 icon, warm city title screen, Play | "Q11 — Quantum Emergency Response. A toy city where fires are quantum errors and alarms are parity checks." |
-| 8–24 | First call (Station Row, 3-qubit repetition code) | Straight into the three-tap experience: pick the red crew → tap house 1 → Spray. Answer check: the truck arrives, firefighters run, one hose = one exact Pauli correction; fires out, houses restored | "Both alarms ring — the fire is in the house they both watch." · "Fires out, houses restored. X·X = I." |
-| 24–32 | City map | The map replaces the card list: roads, fire station, districts; smoke clears over Station Row and a chapter badge appears; the next district unlocks | "The city map. Districts unlock in order; the smoke clears and a badge is earned." |
-| 32–58 | Harbor Bridge (CNOT) | Dispatch: the truck drives along the road. Training: tap where the fire will be after the CNOT (red copies forward, blue copies backward). Challenge: X on house 0 and Z on house 1 → predict both become Y; Spray; result | "Dispatch! The fire truck drives to Harbor Bridge." · "Red copies forward… Blue copies backward." · "Both become Y." |
-| 58–62 | Free selection | City HUD Settings → "free selection" switch (for judges) → back to the map; from here every district opens | "Free selection (for judges): with this switch every district opens from the map." |
-| 62–88 | Central District (distance-3 surface code) | Briefing skipped; fog hides the fires; tapping alarm station Z0 highlights the houses it watches; plan a red crew on house 4; Spray reveals the true fire and puts it out; every station goes quiet | "Fires are hidden behind fog. Tap a station to see the houses it watches." · "Z0 and Z1 both ring — only house 4 is watched by both." |
-| 88–116 | Old Town (Silent Failure) | Briefing → Go (no training here); one alarm; red crew on house 0; Spray; **every alarm goes quiet, yet the memory tower flips** (logical X); Why? shows the player's spray and the alternative side by side; "Investigation complete" (non-blaming) | "Every alarm goes quiet… yet the memory tower flips: two fires fooled the alarms. That is distance 3." · "Why? Your spray and the alternative side by side." |
-| 116–124 | Verification caption (on the Why? view) | Caption quoting the recorded Qollab runs: built-in simulator exact; IonQ Aria 1 simulator logical bit 1 in 97 % of shots | "The same missions run as Qiskit circuits on Qollab…" |
-| 124–136 | Phone insert + outro | 390×844 title screen; EN → JA switch; outro caption with MIT + "This effort is supported by Qollab & IonQ" | "日本語でも遊べます。タッチだけで操作。 Open source, MIT…" |
+Lines marked non-blocking in the shot list play over an animation (truck drive, spray answer check, propagation prelude) instead of pausing the recording.
 
 ## Production notes
-- Capture with the Playwright-driven recorder (`BASE_URL=http://localhost:4173 node scripts/record-demo.mjs`) against `npm run build && npm run preview`; 30 fps; ffmpeg to H.264 MP4, no audio track (sound in the game is opt-in and off by default).
-- Keep the real UI; no mock-ups. Old Town must show the *actual* result overlay text and the real Why? comparison.
-- Verify duration with `ffprobe`; `npm run verify:release` enforces 120–180 s.
-- Store at `submission/DEMO.mp4` (git-ignored). Record sha256 in `EVIDENCE_INDEX.md`. Do not upload without approval.
+- `npm run build && npx vite preview --port 4173 --strictPort`, then `BASE_URL=http://localhost:4173 node scripts/record-demo.mjs`. Env: `DEMO_VOICE`, `DEMO_RATE`.
+- The recorder never overlaps two lines and pads 350 ms after each blocking line; cue times are shifted by the capture lead Playwright introduces before the first action (`leadMs` in the report).
+- Verify with `ffprobe` (video + audio streams) and `npm run verify:release` (120–180 s). Store sha256 in `EVIDENCE_INDEX.md`. Do not upload without approval.

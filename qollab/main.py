@@ -1,4 +1,4 @@
-# Q11 — Quantum Emergency Response · text-mode mission runner (Python / Qiskit).
+# Q11 Emergency — Quantum Emergency Response · text-mode mission runner (Python / Qiskit).
 #
 # This file is the Python fallback of the Qollab project. When index.html and main.js are present the page
 # version runs instead; delete those two files (or fork without them) to use this plain runner.
@@ -40,7 +40,7 @@ def main(shots: int = 200, mission: str = "blind-dispatch", correction: str = "I
     if mission not in MISSION_IDS:
         raise SystemExit("unknown mission %r; choose one of %s" % (mission, ", ".join(MISSION_IDS)))
     m = missions.get_mission(mission)
-    print("Q11 mission:", m["title"], "(%s, code %s)" % (mission, m["code"]))
+    print("Q11 Emergency mission:", m["title"], "(%s, code %s)" % (mission, m["code"]))
     print("Hidden fires (true error E):", m["challenge"]["error"], "| your crews (C):", correction)
 
     prediction = circuits.predict(mission, correction, prep=prep, readout_basis=readout_basis)
