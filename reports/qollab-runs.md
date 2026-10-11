@@ -1,6 +1,6 @@
 # Qollab runs (real executions in the user's Qollab account; no credentials recorded)
 
-Project: **Q11 — Quantum Emergency Response** — draft (private), owner `doraking`, URL `https://qollab.xyz/u/doraking/q11-quantum-emergency-response` (draft; only the owner can open it). Created 2026-10-10 ≈01:03 UTC via the Qollab web editor (Brave + Claude in Chrome, user-authorised). **Not published.**
+Project: **Q11 — Quantum Emergency Response** — draft (private), owner `doraking`, URL `https://qollab.xyz/u/doraking/q11-emergency` (draft; only the owner can open it). Created 2026-10-10 ≈01:03 UTC via the Qollab web editor (Brave + Claude in Chrome, user-authorised). **Not published.**
 
 | # | Time (UTC) | Files | Backend (Select QPU dialog) | Kind | Shots | Params | Result | Match vs Pauli-frame prediction |
 |---|---|---|---|---|---|---|---|---|

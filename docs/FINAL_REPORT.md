@@ -2,7 +2,7 @@
 
 > Applies to commit **cd7fc7f** (web sources verified at **aed04f3** by `verify:release`; c1760e1 added the verification evidence, the rebuilt Qollab bundle, two Playwright environment knobs and two hardened e2e assertions; 1e2d138 added the brand lettering on every fire truck (targeted 4-project e2e 85 passed / 5 skipped, Qollab run 14); ce42c30 adds Back to briefing and 6629b3e places it inside the screens (unit 461/461, targeted 4-project e2e 54 passed / 5 skipped on both, Qollab runs 15–16); 7a0296e and cd7fc7f add the brand lockup, the brand button → city map, the inset trim stripes and the home-screen row chip (targeted e2e 58/13/0 and 49/13/0, Qollab run 17). Supersedes the 2026-10-10 23:50 JST report (b0a6f5f). Fun is not self-certified: what is claimed below is what was executed and recorded.
 
-**Status: SUBMITTED (2026-10-11 11:36 UTC).** Published 2026-10-11 11:30 UTC and submitted on the team page on the user's second approval (1 of 5 submitted, theme Quantum Unlocked, demo video linked). Every A1–A9 and R1–R15 gate and every follow-up requested on 2026-10-11 passes with execution evidence. Public artefacts: Qollab v1.0 `https://qollab.xyz/u/doraking/q11-quantum-emergency-response` · demo https://www.youtube.com/watch?v=Riyu0jshkGU (unlisted) · source `https://github.com/dorakingx/q11` · web build `https://q11-emergency.vercel.app`.
+**Status: SUBMITTED (2026-10-11 11:36 UTC).** Published 2026-10-11 11:30 UTC and submitted on the team page on the user's second approval (1 of 5 submitted, theme Quantum Unlocked, demo video linked). Every A1–A9 and R1–R15 gate and every follow-up requested on 2026-10-11 passes with execution evidence. Public artefacts: Qollab v1.0 `https://qollab.xyz/u/doraking/q11-emergency` · demo https://www.youtube.com/watch?v=Riyu0jshkGU (unlisted) · source `https://github.com/dorakingx/q11` · web build `https://q11-emergency.vercel.app`.
 
 ## Follow-ups requested on 2026-10-11 (all done)
 | # | Request (owner, JA) | Result | Evidence |
@@ -59,7 +59,7 @@
 ## Where things are
 - Repo: `https://github.com/dorakingx/q11` (private), branch `main`, HEAD cd7fc7f (+ this docs commit).
 - Protected deployment: `https://q11-emergency.vercel.app` (project domain) = `https://q11-m72i37iyr-doraking.vercel.app` (+ q11-doraking / q11-git-main-doraking .vercel.app) — requires Vercel login; every push to `main` deploys.
-- Qollab draft (owner only, unpublished): `https://qollab.xyz/u/doraking/q11-quantum-emergency-response` — title "Q11 Emergency — Quantum Emergency Response", final bundle, card, About, tags, thumbnail (truck OG image).
+- Qollab draft (owner only, unpublished): `https://qollab.xyz/u/doraking/q11-emergency` — title "Q11 Emergency — Quantum Emergency Response", final bundle, card, About, tags, thumbnail (truck OG image).
 - Demo video: `submission/DEMO.mp4` (git-ignored), 162.6 s with narration, sha256 `3b503c131e299048c5df397448c7decb84dd22507aecd1ad37f6c78a414093b7`; script `submission/DEMO_SCRIPT.md`; uploaded 2026-10-11 to YouTube (unlisted, @dorakingxyz): https://www.youtube.com/watch?v=Riyu0jshkGU.
 - Icons: `public/` (icon.svg, icon-rounded.svg, wordmark.svg, favicons, ICO, 192/512/maskable, apple-touch, og-image.png); sources `src/ui/art/brandMark.tsx`; candidate sheets and review `reports/icons/`.
 - Screenshots: `reports/screenshots/before/` (6) and `reports/screenshots/after/` (62 at 1440×900 / 768×1024 / 390×844 / 375×812 + 1280×800).
