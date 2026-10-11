@@ -23,15 +23,15 @@ You are the dispatcher of a toy quantum city. Houses are qubits. An arsonist cal
 | In the city | In the physics |
 |---|---|
 | House | Data qubit |
-| Red fire / blue fire / split fire | $X$ / $Z$ / $Y$ Pauli error |
+| Red fire / blue fire / split fire | *X* / *Z* / *Y* Pauli error |
 | Alarm station (rings or stays quiet) | Stabilizer check: rings when the error **anticommutes** with it |
-| Red crew / blue crew | $X$ / $Z$ correction applied to one qubit (composition is XOR, $X \cdot X = I$: a crew on a burning house puts it out, a crew on a safe house starts a fire) |
+| Red crew / blue crew | *X* / *Z* correction applied to one qubit (composition is XOR, *X*·*X* = *I*: a crew on a burning house puts it out, a crew on a safe house starts a fire) |
 | Fog over the houses | The error is hidden; only the syndrome is observable |
-| Spray! → answer check | Residual $R = C \cdot E$ evaluated over $\mathbb{F}_2$ |
-| Houses restored / harmless pattern | $R = I$ / $R \in \mathcal{S}$ (a stabilizer): logical information safe |
-| Fires still burning | $R$ anticommutes with a check: detectable |
-| Memory tower flips, every alarm quiet | $R \in N(\mathcal{S}) \setminus \mathcal{S}$ (commutes with every check, not a stabilizer): **logical error** |
-| Fire truck driving through gates | Pauli frame propagation: $H$ swaps $X \leftrightarrow Z$, CNOT copies $X$ forward and $Z$ backward |
+| Spray! → answer check | Residual *R* = *C*·*E* evaluated over 𝔽₂ |
+| Houses restored / harmless pattern | *R* = *I* / *R* ∈ 𝒮 (a stabilizer): logical information safe |
+| Fires still burning | *R* anticommutes with a check: detectable |
+| Memory tower flips, every alarm quiet | *R* ∈ N(𝒮) ∖ 𝒮 (commutes with every check, not a stabilizer): **logical error** |
+| Fire truck driving through gates | Pauli frame propagation: *H* swaps *X* ↔ *Z*, CNOT copies *X* forward and *Z* backward |
 
 ## A tour
 
@@ -80,21 +80,25 @@ The Qollab project is a **JS/Qiskit** page: the game itself plus a pure-Python Q
 
 An $n$-qubit Pauli error (up to phase) is a binary symplectic vector $P = (x, z) \in \mathbb{F}_2^{n} \times \mathbb{F}_2^{n}$. Composing errors and corrections is XOR, and two Paulis commute exactly when their symplectic product is zero:
 
-$$
+```math
 (x, z) \cdot (x', z') = (x \oplus x',\ z \oplus z'), \qquad \langle P, P' \rangle = x \cdot z' + z \cdot x' \bmod 2 .
-$$
+```
 
 Gates move the frame (fires never move on their own):
 
-$$
+```math
 H:\ x \leftrightarrow z, \qquad S:\ z \leftarrow z \oplus x, \qquad \mathrm{CNOT}_{c \to t}:\ x_t \leftarrow x_t \oplus x_c,\quad z_c \leftarrow z_c \oplus z_t .
-$$
+```
 
 A check $S_j$ rings when $\langle E, S_j \rangle = 1$. After the crews apply the correction $C$, the residual $R = C \cdot E$ decides the result by $\mathbb{F}_2$ linear algebra over the stabilizer group $\mathcal{S}$:
 
-$$
-R \in \mathcal{S} \Rightarrow \text{success}, \qquad R \in N(\mathcal{S}) \setminus \mathcal{S} \Rightarrow \text{logical error}, \qquad \langle R, S_j \rangle = 1 \text{ for some } j \Rightarrow \text{detectable} .
-$$
+```math
+\begin{aligned}
+R \in \mathcal{S} &\;\Rightarrow\; \text{success} \\
+R \in N(\mathcal{S}) \setminus \mathcal{S} &\;\Rightarrow\; \text{logical error (commutes with every check, not a stabilizer)} \\
+\langle R, S_j \rangle = 1 \text{ for some } j &\;\Rightarrow\; \text{detectable}
+\end{aligned}
+```
 
 For the distance-3 rotated surface code the logical operators are $\bar X = X_0 X_1 X_2$ and $\bar Z = Z_0 Z_3 Z_6$; "alarms off" alone is never counted as success. Perfect-syndrome, Clifford + Pauli educational model. Details: [`docs/SCIENCE.md`](docs/SCIENCE.md).
 
