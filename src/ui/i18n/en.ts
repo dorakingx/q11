@@ -33,7 +33,6 @@ export const en = {
   'title.lead': 'Fires you cannot see. Alarms you can. Read them, send the crews, keep the quantum city safe.',
   'title.play': 'Play',
   'title.continue': 'Continue',
-  'title.firstCall': 'Take the first call',
   'title.how': 'How it works',
   'title.settings': 'Settings',
   'title.progress': 'Progress: {stars} of {max} stars.',

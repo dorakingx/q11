@@ -54,7 +54,7 @@ export function TitleScreen({ state, dispatch }: ScreenProps) {
         <p className="title-lead">{t('title.kidLine')}</p>
         <div className="title-actions">
           <button type="button" className="btn btn-primary btn-large btn-play" onClick={() => dispatch({ type: 'PLAY' })} data-testid="play">
-            {state.tutorialDone ? t('title.play') : t('title.firstCall')}
+            {t('title.play')}
           </button>
           <button type="button" className="btn btn-large" onClick={() => dispatch({ type: 'OPEN_HOW' })} data-testid="how">
             {t('title.how')}

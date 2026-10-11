@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
-import { allBlocksLargeEnough, expect, expectNoHorizontalOverflow, expectTutorialOrder, readSave, screenshot, seedSave, serialisedHouses, stepSprayToEnd, test } from './helpers';
+import { allBlocksLargeEnough, expect, expectNoHorizontalOverflow, dispatchDistrict, expectTutorialOrder, goToDistrict, readSave, screenshot, seedSave, serialisedHouses, stepSprayToEnd, test } from './helpers';
 
-test('first run: Play → tutorial scene → three taps → spray → result → city with the chapter badge', async ({ page }, info) => {
+test('first run: Play → city → Rowhouse Lane → tutorial scene → three taps → spray → result → city with the chapter badge', async ({ page }, info) => {
   await page.goto('/');
   await expect(page).toHaveTitle('Q11 Emergency — Quantum Emergency Response');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Q11 Emergency');
@@ -22,9 +22,16 @@ test('first run: Play → tutorial scene → three taps → spray → result →
   const play = page.getByTestId('play');
   const box = await play.boundingBox();
   expect(box?.height ?? 0).toBeGreaterThanOrEqual(52);
+  await expect(play).toHaveText('Play');
   await play.click();
 
-  // Tutorial mode: straight into Rowhouse Lane's planning scene, three numbered callouts, fog on every house.
+  // Play opens the city even on a fresh save; only Rowhouse Lane is open. Dispatching it starts the guided scene.
+  await expect(page.getByTestId('city-map')).toBeVisible();
+  await expect(page.getByTestId('mission-1')).toHaveAttribute('data-status', 'available');
+  await expect(page.getByTestId('mission-2')).toHaveAttribute('data-status', 'locked');
+  await dispatchDistrict(page, 1);
+
+  // Tutorial mode: straight into Rowhouse Lane's planning scene (no briefing), three numbered callouts, fog on every house.
   await expect(page.getByTestId('tutorial-bar')).toBeVisible();
   await expect(page.getByTestId('confirm')).toHaveText('Spray!');
   await expect(page.getByTestId('tutorial-callout-1')).toHaveAttribute('data-active', 'true');
@@ -86,9 +93,11 @@ test('first run: Play → tutorial scene → three taps → spray → result →
   await expectNoHorizontalOverflow(page);
 });
 
-test('skip tutorial lands on the city; Play afterwards goes to the city, not the tutorial', async ({ page }) => {
+test('skip tutorial lands on the city; dispatching Rowhouse Lane afterwards opens its briefing, not the tutorial', async ({ page }) => {
   await page.goto('/');
   await page.getByTestId('play').click();
+  await expect(page.getByTestId('city-map')).toBeVisible();
+  await dispatchDistrict(page, 1);
   await page.getByTestId('tutorial-skip').click();
   await expect(page.getByTestId('city-map')).toBeVisible();
   await page.reload();
@@ -96,6 +105,9 @@ test('skip tutorial lands on the city; Play afterwards goes to the city, not the
   await page.getByTestId('play').click();
   await expect(page.getByTestId('city-map')).toBeVisible();
   await expect(page.locator('main h1')).toBeFocused();
+  await goToDistrict(page, 1);
+  await expect(page.getByTestId('briefing')).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByTestId('tutorial-bar')).toHaveCount(0);
 });
 
 test('mission 1 can be played with the keyboard only', async ({ page }, info) => {

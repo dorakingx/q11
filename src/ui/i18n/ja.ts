@@ -39,7 +39,6 @@ export const ja: Readonly<Record<Key, string>> = {
   'title.lead': '火は見えない。でも警報は聞こえる。警報を読んで隊を送り、量子の街を守ろう。',
   'title.play': 'あそぶ',
   'title.continue': 'つづきから',
-  'title.firstCall': 'はじめての出動',
   'title.how': 'あそび方',
   'title.settings': '設定',
   'title.progress': '進み具合：星 {stars} / {max}',

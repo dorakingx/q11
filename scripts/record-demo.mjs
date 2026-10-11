@@ -13,7 +13,8 @@
  *   { "type": "narrate-wait" }                                wait until a non-blocking narration has ended
  * Requires: a preview of the built app on BASE_URL (default http://localhost:4173), ffmpeg + ffprobe on PATH, macOS `say`.
  * Env: DEMO_VOICE (default Samantha), DEMO_RATE (words per minute, default 172).
- * Output: submission/DEMO.mp4 (git-ignored) + reports/demo-recording.json (duration, sha256, narration lines).
+ * Output: submission/DEMO.mp4 (git-ignored) + submission/DEMO_SILENT.mp4 (same picture, no audio track, git-ignored)
+ *         + reports/demo-recording.json (duration, sha256, narration lines with their start times).
  */
 import { chromium } from '@playwright/test';
 import { readFileSync, writeFileSync, mkdirSync, statSync, rmSync, existsSync } from 'node:fs';
@@ -103,6 +104,9 @@ const webm = await videoPath;
 const silent = path.join(rawDir, 'video.mp4');
 run('ffmpeg', ['-y', '-loglevel', 'error', '-i', webm, '-vf', `scale=${String(VIEWPORT.width)}:${String(VIEWPORT.height)}:force_original_aspect_ratio=decrease,pad=${String(VIEWPORT.width)}:${String(VIEWPORT.height)}:(ow-iw)/2:(oh-ih)/2:color=0xfff6e9,fps=30`, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '20', '-an', silent]);
 const videoSeconds = probeDuration(silent);
+// Silent copy (no audio track) for narration added elsewhere (e.g. Google Vids); the cue list in the report says where each line starts.
+const silentOut = path.join(root, 'submission/DEMO_SILENT.mp4');
+run('ffmpeg', ['-y', '-loglevel', 'error', '-i', silent, '-c', 'copy', '-movflags', '+faststart', silentOut]);
 // Playwright starts the capture slightly before `videoStart`; shift every cue by that lead so speech lines up with the picture.
 const lead = Math.max(0, Math.round(videoSeconds * 1000 - videoEnd));
 const out = path.join(root, 'submission/DEMO.mp4');
@@ -135,6 +139,8 @@ const report = {
   bytes: statSync(out).size,
   sha256,
   output: 'submission/DEMO.mp4',
+  silentOutput: 'submission/DEMO_SILENT.mp4',
+  silentBytes: statSync(silentOut).size,
 };
 writeFileSync(path.join(root, 'reports/demo-recording.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(`[record-demo] ${report.durationSeconds}s, audio=${String(report.audioStream)}, ${String(cues.length)} lines, sha256 ${sha256.slice(0, 8)}… → submission/DEMO.mp4`);

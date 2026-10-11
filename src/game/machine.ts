@@ -263,8 +263,8 @@ function step(state: GameState, action: Action): GameState {
         notice: action.notice ?? state.notice,
       };
     case 'PLAY':
-      // First run: skip the city and go straight into the guided first scene (pick a crew → tap a house → spray).
-      if (!state.tutorialDone) return { ...enterBriefing(state, TUTORIAL_MISSION_ID), tutorialActive: true };
+      // Play always opens the city map. The guided first scene (pick a crew → tap a house → spray) starts when the
+      // first district is dispatched for the first time (SELECT_MISSION below); until then tutorialDone stays false.
       return { ...state, screen: 'missions', tutorialActive: false, celebrate: null, citySelect: null };
     case 'TUTORIAL_SKIP':
       return state.tutorialActive ? enterCity(state) : { ...state, tutorialDone: true };
@@ -284,7 +284,8 @@ function step(state: GameState, action: Action): GameState {
       // Districts open in order; locked ones are not selectable (unless Free roam is on). Unknown ids are ignored.
       const status = missionStatus(action.id, state.progress, state.settings.freeRoam);
       if (status === undefined || status === 'locked') return state;
-      return { ...enterBriefing(state, action.id), tutorialActive: false };
+      // First dispatch of the first district on a fresh save: the guided three-tap scene (no briefing, callouts, Skip).
+      return { ...enterBriefing(state, action.id), tutorialActive: !state.tutorialDone && action.id === TUTORIAL_MISSION_ID };
     }
     case 'START_MISSION': {
       const m = currentMission(state);

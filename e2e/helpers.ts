@@ -136,8 +136,8 @@ export async function expectTutorialOrder(page: Page): Promise<void> {
   expect(domOrder, 'callouts 1, 2, 3 follow each other in the DOM').toBe(true);
 }
 
-/** City → district panel → Dispatch! → (skip the truck) → briefing. */
-export async function goToDistrict(page: Page, index: number): Promise<void> {
+/** City → district panel → Dispatch! → (skip the truck). Lands on the briefing, or on the guided scene for a first-run Rowhouse Lane. */
+export async function dispatchDistrict(page: Page, index: number): Promise<void> {
   await page.getByTestId(`mission-${String(index)}`).click();
   await expect(page.getByTestId('dispatch-go')).toBeVisible();
   await page.getByTestId('dispatch-go').click();
@@ -147,6 +147,11 @@ export async function goToDistrict(page: Page, index: number): Promise<void> {
   } catch {
     /* the drive already finished or motion is reduced */
   }
+}
+
+/** City → district panel → Dispatch! → (skip the truck) → briefing. */
+export async function goToDistrict(page: Page, index: number): Promise<void> {
+  await dispatchDistrict(page, index);
   await expect(page.getByTestId('briefing')).toBeVisible();
 }
 

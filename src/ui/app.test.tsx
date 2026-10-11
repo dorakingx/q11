@@ -37,13 +37,19 @@ async function finishSpray(u: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('App · guided first run (R5)', () => {
-  it('Play → tutorial scene (callouts follow the taps) → Spray! → result → city with the chapter badge', async () => {
+  it('Play → city → Rowhouse Lane → tutorial scene (callouts follow the taps) → Spray! → result → city with the chapter badge', async () => {
     const u = user();
     render(<App storage="memory" />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Q11 Emergency');
     expect(screen.getByTestId('title-kicker')).toHaveTextContent('Quantum Emergency Response');
-    expect(screen.getByTestId('play')).toHaveTextContent('Take the first call');
+    expect(screen.getByTestId('play')).toHaveTextContent('Play');
     await u.click(screen.getByTestId('play'));
+    // Play opens the city map even on a fresh save; the first dispatch of Rowhouse Lane is the guided scene.
+    expect(await screen.findByTestId('city-map')).toBeInTheDocument();
+    expect(screen.getByTestId('mission-1')).toHaveAttribute('data-status', 'available');
+    await u.click(screen.getByTestId('mission-1'));
+    await u.click(screen.getByTestId('dispatch-go'));
+    await u.click(await screen.findByTestId('travel-skip'));
     // Straight into the planning scene of Rowhouse Lane in tutorial mode (no briefing).
     expect(await screen.findByTestId('tutorial-bar')).toBeInTheDocument();
     expect(screen.getByTestId('confirm')).toHaveTextContent('Spray!');
@@ -75,6 +81,9 @@ describe('App · guided first run (R5)', () => {
     const u = user();
     render(<App storage="memory" />);
     await u.click(screen.getByTestId('play'));
+    await u.click(await screen.findByTestId('mission-1'));
+    await u.click(screen.getByTestId('dispatch-go'));
+    await u.click(await screen.findByTestId('travel-skip'));
     await u.click(await screen.findByTestId('tutorial-skip'));
     expect(await screen.findByTestId('city-map')).toBeInTheDocument();
     await u.click(screen.getByTestId('city-title'));

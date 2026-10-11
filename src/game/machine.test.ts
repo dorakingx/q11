@@ -67,17 +67,27 @@ describe('navigation', () => {
 });
 
 describe('guided first run (tutorial)', () => {
-  it('PLAY on a fresh save skips the city and opens the first district briefing with the tutorial active', () => {
-    const s = reducer(fresh(), { type: 'PLAY' });
+  it('PLAY on a fresh save opens the city; dispatching the first district then opens its briefing with the tutorial active', () => {
+    const city = reducer(fresh(), { type: 'PLAY' });
+    expect(city.screen).toBe('missions');
+    expect(city.tutorialActive).toBe(false);
+    expect(city.tutorialDone).toBe(false);
     expect(TUTORIAL_MISSION_ID).toBe('first-alarm');
+    const s = reducer(city, { type: 'SELECT_MISSION', id: TUTORIAL_MISSION_ID });
     expect(s.screen).toBe('briefing');
     expect(s.missionId).toBe('first-alarm');
     expect(s.tutorialActive).toBe(true);
     expect(s.tutorialDone).toBe(false);
   });
 
+  it('a returning player (tutorialDone) never gets the guided scene, even on the first district', () => {
+    const s = run(initialState(openSave({ tutorialDone: true })), { type: 'PLAY' }, { type: 'SELECT_MISSION', id: TUTORIAL_MISSION_ID });
+    expect(s.screen).toBe('briefing');
+    expect(s.tutorialActive).toBe(false);
+  });
+
   it('success in the tutorial marks it done; Next then reveals the city; PLAY afterwards goes to the city', () => {
-    let s = run(fresh(), { type: 'PLAY' }, { type: 'START_MISSION' }, { type: 'START_CHALLENGE' });
+    let s = run(fresh(), { type: 'PLAY' }, { type: 'SELECT_MISSION', id: TUTORIAL_MISSION_ID }, { type: 'START_MISSION' }, { type: 'START_CHALLENGE' });
     expect(s.screen).toBe('challenge');
     s = place(s, { 1: 'X' });
     s = confirmAndFinish(s);
@@ -94,7 +104,7 @@ describe('guided first run (tutorial)', () => {
   });
 
   it('a failed tutorial attempt keeps the tutorial active and not done; Try again stays in the guided scene', () => {
-    let s = run(fresh(), { type: 'PLAY' }, { type: 'START_MISSION' }, { type: 'START_CHALLENGE' });
+    let s = run(fresh(), { type: 'PLAY' }, { type: 'SELECT_MISSION', id: TUTORIAL_MISSION_ID }, { type: 'START_MISSION' }, { type: 'START_CHALLENGE' });
     s = place(s, { 0: 'X' });
     s = confirmAndFinish(s);
     expect(s.debrief?.verdict).toBe('detectable');
@@ -103,12 +113,14 @@ describe('guided first run (tutorial)', () => {
     s = reducer(s, { type: 'TRY_AGAIN' });
     expect(s.screen).toBe('challenge');
     expect(s.tutorialActive).toBe(true);
-    // Replaying the saved state: PLAY would still enter the tutorial.
-    expect(run(initialState(toSave(s)), { type: 'PLAY' }).screen).toBe('briefing');
+    // Replaying the saved state: dispatching the first district would still enter the tutorial.
+    const replay = run(initialState(toSave(s)), { type: 'PLAY' }, { type: 'SELECT_MISSION', id: TUTORIAL_MISSION_ID });
+    expect(replay.screen).toBe('briefing');
+    expect(replay.tutorialActive).toBe(true);
   });
 
   it('TUTORIAL_SKIP and OPEN_MISSIONS end the tutorial and open the city with tutorialDone = true', () => {
-    const inTutorial = run(fresh(), { type: 'PLAY' });
+    const inTutorial = run(fresh(), { type: 'PLAY' }, { type: 'SELECT_MISSION', id: TUTORIAL_MISSION_ID });
     const skipped = reducer(inTutorial, { type: 'TUTORIAL_SKIP' });
     expect(skipped.screen).toBe('missions');
     expect(skipped.tutorialDone).toBe(true);
@@ -683,7 +695,7 @@ describe('city arrival contract (celebrate / citySelect / CELEBRATED)', () => {
   });
 
   it('the guided first run: Next reveals the city celebrating Rowhouse Lane with Harbor Bridge pre-selected', () => {
-    let s = run(fresh(), { type: 'PLAY' }, { type: 'START_MISSION' }, { type: 'START_CHALLENGE' });
+    let s = run(fresh(), { type: 'PLAY' }, { type: 'SELECT_MISSION', id: TUTORIAL_MISSION_ID }, { type: 'START_MISSION' }, { type: 'START_CHALLENGE' });
     s = place(s, { 1: 'X' });
     s = confirmAndFinish(s);
     s = reducer(s, { type: 'NEXT_MISSION' });
@@ -784,7 +796,7 @@ describe('settings', () => {
 
 describe('BACK_TO_BRIEFING', () => {
   it('returns from training and from the planning stage to the briefing, discarding the plan', () => {
-    let s = run(fresh(), { type: 'PLAY' }, { type: 'START_MISSION' });
+    let s = run(fresh(), { type: 'PLAY' }, { type: 'SELECT_MISSION', id: TUTORIAL_MISSION_ID }, { type: 'START_MISSION' });
     expect(s.screen).toBe('training');
     s = reducer(s, { type: 'BACK_TO_BRIEFING' });
     expect(s.screen).toBe('briefing');
@@ -800,7 +812,7 @@ describe('BACK_TO_BRIEFING', () => {
   it('is ignored once the crews are committed and outside a mission', () => {
     const start = fresh();
     expect(reducer(start, { type: 'BACK_TO_BRIEFING' })).toBe(start);
-    const s = run(fresh(), { type: 'PLAY' }, { type: 'START_MISSION' }, { type: 'START_CHALLENGE' }, { type: 'SELECT_LETTER', letter: 'X' }, { type: 'TOGGLE_BLOCK', qubit: 1 }, { type: 'CONFIRM' });
+    const s = run(fresh(), { type: 'PLAY' }, { type: 'SELECT_MISSION', id: TUTORIAL_MISSION_ID }, { type: 'START_MISSION' }, { type: 'START_CHALLENGE' }, { type: 'SELECT_LETTER', letter: 'X' }, { type: 'TOGGLE_BLOCK', qubit: 1 }, { type: 'CONFIRM' });
     expect(s.screen).toBe('dispatch');
     expect(reducer(s, { type: 'BACK_TO_BRIEFING' })).toBe(s);
   });

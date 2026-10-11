@@ -5,7 +5,7 @@
 ## Narration script (22 lines, ≈130 s of speech)
 | # | On screen | Spoken line |
 |---|---|---|
-| 1 | Title screen (Q11 icon, Take the first call) | Q11, Quantum Emergency Response. A toy city where fires are quantum errors, alarm stations are parity checks, and you are the dispatcher. |
+| 1 | Title screen (Q11 icon, Play) → city map → Rowhouse Lane → Dispatch! | Q11, Quantum Emergency Response. A toy city where fires are quantum errors, alarm stations are parity checks, and you are the dispatcher. |
 | 2 | Rowhouse Lane: first-call tutorial callouts | Your first call takes three taps. Pick a crew, tap the house, and spray. |
 | 3 | Red crew planned on house 1 | Both alarms ring, so the fire must be in the house they both watch. |
 | 4 | Answer check: truck, crew, hose, splash | Answer check. The truck arrives, the crew runs in, and one hose is exactly one Pauli correction. |

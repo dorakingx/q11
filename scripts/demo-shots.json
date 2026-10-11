@@ -13,6 +13,31 @@
     "selector": "[data-testid=play]"
   },
   {
+    "type": "wait",
+    "ms": 900
+  },
+  {
+    "type": "narrate",
+    "text": "Play opens the city map. Every district is one lesson; they unlock in order. We start at Rowhouse Lane.",
+    "block": true
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=mission-1]"
+  },
+  {
+    "type": "wait",
+    "ms": 700
+  },
+  {
+    "type": "click",
+    "selector": "[data-testid=dispatch-go]"
+  },
+  {
+    "type": "wait",
+    "ms": 2600
+  },
+  {
     "type": "narrate",
     "text": "Your first call takes three taps. Pick a crew, tap the house, and spray.",
     "block": true
