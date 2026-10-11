@@ -9423,7 +9423,7 @@ function dn({ title: n, subtitle: s, onMissions: l, onSettings: a, settingsLabel
         s !== void 0 ? /* @__PURE__ */ i.jsx("p", { className: "topbar-sub", children: s }) : null
       ] })
     ] }),
-    /* @__PURE__ */ i.jsx("nav", { className: "topbar-actions", "aria-label": p("a11y.gameNav"), children: /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-ghost btn-icon", onClick: a, "aria-label": u ?? p("title.settings"), "data-testid": "topbar-settings", children: /* @__PURE__ */ i.jsx(Ka, {}) }) })
+    /* @__PURE__ */ i.jsx("nav", { className: "topbar-actions", "aria-label": p("a11y.gameNav"), children: /* @__PURE__ */ i.jsx("button", { type: "button", className: "topbar-gear", onClick: a, "aria-label": u ?? p("title.settings"), "data-testid": "topbar-settings", children: /* @__PURE__ */ i.jsx(Ka, { size: 24 }) }) })
   ] });
 }
 function Gy({ language: n, onChange: s, testId: l = "lang-toggle" }) {
