@@ -23,15 +23,15 @@ You are the dispatcher of a toy quantum city. Houses are qubits. An arsonist cal
 | In the city | In the physics |
 |---|---|
 | House | Data qubit |
-| Red fire / blue fire / split fire | X / Z / Y Pauli error |
+| Red fire / blue fire / split fire | $X$ / $Z$ / $Y$ Pauli error |
 | Alarm station (rings or stays quiet) | Stabilizer check: rings when the error **anticommutes** with it |
-| Red crew / blue crew | X / Z correction applied to one qubit (composition is XOR: crew on a burning house puts it out, crew on a safe house starts a fire) |
+| Red crew / blue crew | $X$ / $Z$ correction applied to one qubit (composition is XOR, $X \cdot X = I$: a crew on a burning house puts it out, a crew on a safe house starts a fire) |
 | Fog over the houses | The error is hidden; only the syndrome is observable |
-| Spray! → answer check | Residual R = C·E evaluated by GF(2) algebra |
-| Houses restored / harmless pattern | R is identity / R is a stabilizer: logical information safe |
-| Fires still burning | R anticommutes with a check: detectable |
-| Memory tower flips, every alarm quiet | R commutes with every check but is not a stabilizer: **logical error** |
-| Fire truck driving through gates | Pauli frame propagation: H swaps X↔Z, CNOT copies X forward and Z backward |
+| Spray! → answer check | Residual $R = C \cdot E$ evaluated over $\mathbb{F}_2$ |
+| Houses restored / harmless pattern | $R = I$ / $R \in \mathcal{S}$ (a stabilizer): logical information safe |
+| Fires still burning | $R$ anticommutes with a check: detectable |
+| Memory tower flips, every alarm quiet | $R \in N(\mathcal{S}) \setminus \mathcal{S}$ (commutes with every check, not a stabilizer): **logical error** |
+| Fire truck driving through gates | Pauli frame propagation: $H$ swaps $X \leftrightarrow Z$, CNOT copies $X$ forward and $Z$ backward |
 
 ## A tour
 
@@ -76,9 +76,27 @@ The Qollab project is a **JS/Qiskit** page: the game itself plus a pure-Python Q
 - IonQ Aria 1 free noise-model simulator: counts deviate statistically and the page says so. Recorded jobs, histograms and raw counts: [`reports/qollab-runs.md`](reports/qollab-runs.md), [`reports/qollab-runs/`](reports/qollab-runs/).
 - **No hardware (QPU) runs were made, and none are claimed.**
 
-## The science in one paragraph
+## The science
 
-Errors are binary symplectic Pauli frames (x, z) composed by XOR; gates act as H: x↔z, S: z ^= x, CNOT(c,t): x_t ^= x_c, z_c ^= z_t. A check rings when the error anticommutes with it (symplectic product). The verdict on the residual R = C·E is decided by GF(2) algebra: R in the stabilizer group ⇒ success; commuting but not in the group ⇒ logical error (which logical is read from X̄ = X0X1X2 and Z̄ = Z0Z3Z6); anticommuting with a check ⇒ detectable. Perfect-syndrome, Clifford + Pauli educational model. Details: [`docs/SCIENCE.md`](docs/SCIENCE.md).
+An $n$-qubit Pauli error (up to phase) is a binary symplectic vector $P = (x, z) \in \mathbb{F}_2^{n} \times \mathbb{F}_2^{n}$. Composing errors and corrections is XOR, and two Paulis commute exactly when their symplectic product is zero:
+
+$$
+(x, z) \cdot (x', z') = (x \oplus x',\ z \oplus z'), \qquad \langle P, P' \rangle = x \cdot z' + z \cdot x' \bmod 2 .
+$$
+
+Gates move the frame (fires never move on their own):
+
+$$
+H:\ x \leftrightarrow z, \qquad S:\ z \leftarrow z \oplus x, \qquad \mathrm{CNOT}_{c \to t}:\ x_t \leftarrow x_t \oplus x_c,\quad z_c \leftarrow z_c \oplus z_t .
+$$
+
+A check $S_j$ rings when $\langle E, S_j \rangle = 1$. After the crews apply the correction $C$, the residual $R = C \cdot E$ decides the result by $\mathbb{F}_2$ linear algebra over the stabilizer group $\mathcal{S}$:
+
+$$
+R \in \mathcal{S} \Rightarrow \text{success}, \qquad R \in N(\mathcal{S}) \setminus \mathcal{S} \Rightarrow \text{logical error}, \qquad \langle R, S_j \rangle = 1 \text{ for some } j \Rightarrow \text{detectable} .
+$$
+
+For the distance-3 rotated surface code the logical operators are $\bar X = X_0 X_1 X_2$ and $\bar Z = Z_0 Z_3 Z_6$; "alarms off" alone is never counted as success. Perfect-syndrome, Clifford + Pauli educational model. Details: [`docs/SCIENCE.md`](docs/SCIENCE.md).
 
 ## Run it yourself
 
