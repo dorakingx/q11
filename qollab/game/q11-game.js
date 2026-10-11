@@ -9420,7 +9420,7 @@ function As({ size: n = "small", nameAs: s = "span", nameProps: l, layout: a = "
   ] });
 }
 function un({ title: n, subtitle: s, onMissions: l, onSettings: a, settingsLabel: u, onTitle: f }) {
-  const p = Ce(), g = l !== void 0 ? /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-ghost brand-btn", onClick: l, "aria-label": p("a11y.backToCity"), "data-testid": "topbar-city", children: /* @__PURE__ */ i.jsx(As, {}) }) : f !== void 0 ? /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-ghost brand-btn", onClick: f, "aria-label": p("a11y.backToTitle"), children: /* @__PURE__ */ i.jsx(As, {}) }) : /* @__PURE__ */ i.jsx("span", { className: "brand", children: /* @__PURE__ */ i.jsx(As, {}) });
+  const p = Ce(), g = l !== void 0 ? /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-ghost brand-btn", onClick: l, "aria-label": p("a11y.backToCity"), "data-testid": "topbar-city", children: /* @__PURE__ */ i.jsx(As, { layout: "row" }) }) : f !== void 0 ? /* @__PURE__ */ i.jsx("button", { type: "button", className: "btn btn-ghost brand-btn", onClick: f, "aria-label": p("a11y.backToTitle"), children: /* @__PURE__ */ i.jsx(As, { layout: "row" }) }) : /* @__PURE__ */ i.jsx("span", { className: "brand", children: /* @__PURE__ */ i.jsx(As, { layout: "row" }) });
   return /* @__PURE__ */ i.jsxs("header", { className: "topbar", children: [
     /* @__PURE__ */ i.jsxs("div", { className: "topbar-title", children: [
       g,

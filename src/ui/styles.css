@@ -87,6 +87,10 @@ kbd { font: 700 0.8em ui-monospace, SFMono-Regular, Menlo, monospace; background
 .brand-lockup-row { flex-direction: row; align-items: center; gap: 8px; width: auto; }
 .brand-lockup-row .brand-lockup-name { margin-top: 0; font-size: 1rem; text-align: left; }
 .brand-lockup-title .brand-lockup-name { font-size: clamp(1.9rem, 5vw, 2.6rem); }
+/* Mission screens: the brand chip sits left of the district title. The chip's name is muted and lighter and a thin rule
+   separates it from the (bold, ink) title, so the two names never read as one line. */
+.topbar .brand-btn .brand-lockup-name, .topbar .brand .brand-lockup-name { color: var(--muted); font-weight: 700; }
+.topbar .brand-btn + .topbar-text, .topbar .brand + .topbar-text { border-left: 2px solid var(--outline); padding-left: 12px; margin-left: 2px; }
 .topbar-text { min-width: 0; }
 .topbar-h { font-size: 1.15rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .topbar-sub { color: var(--muted); font-size: 0.88rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

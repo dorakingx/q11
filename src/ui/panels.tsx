@@ -242,19 +242,19 @@ export function BrandLockup({ size = 'small', nameAs = 'span', nameProps, layout
 
 export function TopBar({ title, subtitle, onMissions, onSettings, settingsLabel, onTitle }: TopBarProps) {
   const t = useT();
-  // The brand lockup is the way back: to the city map on mission screens, to the title elsewhere.
+  // The brand chip (same row layout and size as the city map's) is the way back: to the city map on mission screens, to the title elsewhere.
   const brand =
     onMissions !== undefined ? (
       <button type="button" className="btn btn-ghost brand-btn" onClick={onMissions} aria-label={t('a11y.backToCity')} data-testid="topbar-city">
-        <BrandLockup />
+        <BrandLockup layout="row" />
       </button>
     ) : onTitle !== undefined ? (
       <button type="button" className="btn btn-ghost brand-btn" onClick={onTitle} aria-label={t('a11y.backToTitle')}>
-        <BrandLockup />
+        <BrandLockup layout="row" />
       </button>
     ) : (
       <span className="brand">
-        <BrandLockup />
+        <BrandLockup layout="row" />
       </span>
     );
   return (
