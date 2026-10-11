@@ -5,7 +5,7 @@ Submission deadline: **2026-10-12 08:00 JST = 2026-10-11 23:00 UTC**.
 The authoritative build spec is `spec/Q11_BUILD_SPEC.md`. Plan / status / decisions live in `docs/`.
 
 ## Hard constraints (never violate)
-> Publication state (2026-10-11 11:30 UTC, on the user's written approval): the repo is **public**, Vercel protection is **off**, the Qollab project is **published** (v1.0, public default) and the demo video is on YouTube (unlisted). Those four items are done and must not be reverted or re-done without being asked. Everything else below still holds — in particular **do not submit on the team page** without a separate explicit approval.
+> Publication state (2026-10-11 11:30 UTC, on the user's written approval): the repo is **public**, Vercel protection is **off**, the Qollab project is **published** (v1.0, public default) and the demo video is on YouTube (unlisted). Those four items are done and must not be reverted or re-done without being asked. The team-page submission was also made (2026-10-11 11:36 UTC, second approval): 1 of 5 submitted. Do not withdraw or resubmit without being asked. Everything else below still holds.
 
 > Publication state (2026-10-11 11:30 UTC, on the user's written approval): the repo is **public**, Vercel protection is **off**, the Qollab project is **published** (v1.0, public default) and the demo video is on YouTube (unlisted). Those four items are done and must not be reverted or re-done without being asked. Everything else below still holds — in particular **do not submit on the team page** without a separate explicit approval.
 
