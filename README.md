@@ -14,12 +14,9 @@
 
 Built for the **Qollab × IonQ Global Quantum Hackathon 2026** (theme: *Quantum Unlocked*). **This effort is supported by Qollab & IonQ.**
 
-You are the dispatcher of a toy quantum city. Houses are qubits. An arsonist called *Noise* lights **red fires (X errors)** and **blue fires (Z errors)**. You never see the fires in the field: you only hear the **alarm stations** (stabilizer checks), send **crews** (Pauli corrections), press **Spray!** and find out whether the city is safe, or whether a perfect-looking call silently flipped the logical qubit. English and Japanese (日本語版は「11Q Emergency」).
+You are the dispatcher of a toy quantum city. Houses are qubits. An arsonist called *Noise* lights **red fires (X errors)** and **blue fires (Z errors)**. You never see the fires in the field: you only hear the **alarm stations** (stabilizer checks), send **crews** (Pauli corrections), press **Spray!** and find out whether the city is safe, or whether a perfect-looking call silently flipped the logical qubit. Available in English and Japanese.
 
-<p align="center">
-  <img src="docs/images/title.png" alt="Title screen: the Q11 fire truck with X and Z flames, 'Fires you cannot see. Alarms you can. Send the right crew!'" width="49%">
-  <img src="docs/images/title-ja.png" alt="Japanese title screen, 11Q Emergency" width="49%">
-</p>
+<p align="center"><img src="docs/images/title.png" alt="Title screen: the Q11 fire truck with X and Z flames, 'Fires you cannot see. Alarms you can. Send the right crew!'" width="85%"></p>
 
 ## How the game maps to quantum error correction
 

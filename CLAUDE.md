@@ -7,8 +7,6 @@ The authoritative build spec is `spec/Q11_BUILD_SPEC.md`. Plan / status / decisi
 ## Hard constraints (never violate)
 > Publication state (2026-10-11 11:30 UTC, on the user's written approval): the repo is **public**, Vercel protection is **off**, the Qollab project is **published** (v1.0, public default) and the demo video is on YouTube (unlisted). Those four items are done and must not be reverted or re-done without being asked. The team-page submission was also made (2026-10-11 11:36 UTC, second approval): 1 of 5 submitted. Do not withdraw or resubmit without being asked. Everything else below still holds.
 
-> Publication state (2026-10-11 11:30 UTC, on the user's written approval): the repo is **public**, Vercel protection is **off**, the Qollab project is **published** (v1.0, public default) and the demo video is on YouTube (unlisted). Those four items are done and must not be reverted or re-done without being asked. Everything else below still holds — in particular **do not submit on the team page** without a separate explicit approval.
-
 - GitHub repo `dorakingx/q11-emergency` (renamed from `q11` on 2026-10-11; old URL redirects) stays **private**. Never make it public, never force-push, never rewrite history.
 - Vercel project `q11` (scope `doraking`, Hobby) must have **Vercel Authentication = All Deployments** before any deployment exists. Never remove protection, never add public exceptions, never widen Trusted Sources.
 - Do **not** publish on Qollab, do **not** submit, do **not** upload the demo video anywhere, no paid plans, no QPU (hardware) jobs, no billable API calls. Free simulators only, and never a flood of jobs.
