@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-11T14:33:19.476Z",
+  "generatedAt": "2026-10-11T15:28:19.298Z",
   "fileCount": 19,
-  "totalBytes": 703297,
+  "totalBytes": 703190,
   "files": [
     {
       "path": "LICENSE",
@@ -30,8 +30,8 @@
     },
     {
       "path": "main.css",
-      "bytes": 39690,
-      "sha256": "12f777fd3d2cfeca2ecdd9f25a02ffde97c5f03903d0e6a6b4b37e97e840350e"
+      "bytes": 39583,
+      "sha256": "b2123d7eabf70e33be0f10715b850fb5aaf35729b9e5e155af6275571dbe5edc"
     },
     {
       "path": "main.js",
