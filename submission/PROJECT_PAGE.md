@@ -43,9 +43,9 @@ This is a **JS/Qiskit** Qollab project: the page is the game; `q11/*.py` is a pu
 Recorded runs (free IonQ Aria 1 noise-model simulator, 100 shots each, from this project's `main.py`): *Blind Dispatch* — job `01a12378-c4f2-71ea-b5df-920acd440520`, dominant alarm pattern Z0·Z1 in 69% of shots, logical readout 0 in 93%; *Silent Failure* with the minimum-weight crew — job `01a1237b-5f60-7349-89d0-a343dca0201c`, dominant alarm pattern Z0 in 73%, logical readout **1 in 97%**: the alarms are explained and silenced, and the logical qubit is flipped, exactly as the GF(2) verdict predicts. On the built-in ideal simulator the same circuits reproduce the prediction in 100% of shots.
 
 ## Reproduce and extend
-Source (MIT): https://github.com/dorakingx/q11 · Live web build of the same game: https://q11-emergency.vercel.app (the Qollab page above is the entry; the web build is an extra).
+Source (MIT): https://github.com/dorakingx/q11-emergency · Live web build of the same game: https://q11-emergency.vercel.app (the Qollab page above is the entry; the web build is an extra).
 ```
-# source repository (MIT): https://github.com/dorakingx/q11
+# source repository (MIT): https://github.com/dorakingx/q11-emergency
 npm ci && npm run dev       # play locally
 npm run test:unit           # engine + game tests
 npm run verify:quantum      # independent Python/Qiskit comparison: exhaustive gate tables, 28 single-error patterns,

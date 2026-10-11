@@ -1,57 +1,116 @@
-# Q11 Emergency — Quantum Emergency Response
+<p align="center">
+  <img src="docs/images/icon.png" alt="Q11 Emergency icon: a red fire truck lettered Q11 with a red X flame and a blue Z flame above its ladder" width="160">
+</p>
 
-**Q11 Emergency** is a fire-dispatch command game about quantum error correction, built for the **Qollab × IonQ Global Quantum Hackathon 2026** (theme: Quantum Unlocked).
+<h1 align="center">Q11 Emergency</h1>
+<p align="center"><strong>Quantum Emergency Response</strong> — a fire-dispatch game that teaches how quantum error correction reasons.</p>
 
-> A toy city with houses, alarm stations and fire crews. Fires are Pauli errors (red = X, blue = Z, split = Y); alarm stations are stabilizer checks; crews are corrections.
-> Pick a district on the city map, ride the fire truck to the scene, read the alarms, plan your crews, press **Spray!** and watch the hoses do one exact Pauli correction each — then the answer-check replay reveals the hidden fires and one of four outcomes: houses restored, a harmless pattern, fires still burning, or a silent logical failure shown on the city's memory tower. English and Japanese.
+<p align="center">
+  <a href="https://qollab.xyz/u/doraking/q11-emergency">Play on Qollab</a> ·
+  <a href="https://q11-emergency.vercel.app">Play on the web</a> ·
+  <a href="https://www.youtube.com/watch?v=Riyu0jshkGU">Demo video (2:43)</a> ·
+  <a href="LICENSE">MIT License</a>
+</p>
 
-**This effort is supported by Qollab & IonQ.** License: MIT (see `LICENSE`). Play: https://q11-emergency.vercel.app · Qollab project: https://qollab.xyz/u/doraking/q11-emergency · Demo video (2:43): https://www.youtube.com/watch?v=Riyu0jshkGU. Attribution and tool disclosure: `submission/ATTRIBUTION.md`.
+Built for the **Qollab × IonQ Global Quantum Hackathon 2026** (theme: *Quantum Unlocked*). **This effort is supported by Qollab & IonQ.**
 
-## Play
-- Web (Vite + React, client-side): `npm ci && npm run dev` → http://localhost:5173
-- Qollab (JS/Qiskit project, runs on Qollab's free simulators incl. IonQ's): see `submission/QOLLAB_IMPORT.md`.
+You are the dispatcher of a toy quantum city. Houses are qubits. An arsonist called *Noise* lights **red fires (X errors)** and **blue fires (Z errors)**. You never see the fires in the field: you only hear the **alarm stations** (stabilizer checks), send **crews** (Pauli corrections), press **Spray!** and find out whether the city is safe, or whether a perfect-looking call silently flipped the logical qubit. English and Japanese (日本語版は「11Q Emergency」).
 
-## The city (six districts, six lessons)
-Rowhouse Lane (First Alarm) → Harbor Bridge (CNOT: red forward, blue backward) → Conversion Lab (Hadamard colour switch) → Central District (Blind Dispatch on the distance-3 surface code) → Market Square (two kinds of alarms) → Old Town (Silent Failure and the memory tower). Districts unlock in order; solved districts can be replayed; a Free roam setting opens everything for review.
+<p align="center">
+  <img src="docs/images/title.png" alt="Title screen: the Q11 fire truck with X and Z flames, 'Fires you cannot see. Alarms you can. Send the right crew!'" width="49%">
+  <img src="docs/images/title-ja.png" alt="Japanese title screen, 11Q Emergency" width="49%">
+</p>
+
+## How the game maps to quantum error correction
+
+| In the city | In the physics |
+|---|---|
+| House | Data qubit |
+| Red fire / blue fire / split fire | X / Z / Y Pauli error |
+| Alarm station (rings or stays quiet) | Stabilizer check: rings when the error **anticommutes** with it |
+| Red crew / blue crew | X / Z correction applied to one qubit (composition is XOR: crew on a burning house puts it out, crew on a safe house starts a fire) |
+| Fog over the houses | The error is hidden; only the syndrome is observable |
+| Spray! → answer check | Residual R = C·E evaluated by GF(2) algebra |
+| Houses restored / harmless pattern | R is identity / R is a stabilizer: logical information safe |
+| Fires still burning | R anticommutes with a check: detectable |
+| Memory tower flips, every alarm quiet | R commutes with every check but is not a stabilizer: **logical error** |
+| Fire truck driving through gates | Pauli frame propagation: H swaps X↔Z, CNOT copies X forward and Z backward |
+
+## A tour
+
+**1. The city map.** Six districts, six lessons, unlocked in order (a *Free roam* setting opens everything). Tap a district with smoke, press *Dispatch!*, and the fire truck drives you there.
+
+<p align="center"><img src="docs/images/city.png" alt="City map with six districts: Rowhouse Lane, Harbor Bridge, Conversion Lab, Central District, Market Square, Old Town" width="85%"></p>
+
+**2. Training: fires are visible.** In the propagation districts you step a fire through a small circuit and predict where it goes next: a CNOT copies a red fire *forward* and a blue fire *backward*; a Hadamard swaps the colours.
+
+<p align="center"><img src="docs/images/training.png" alt="Training at Harbor Bridge: two wires with a CNOT, a red X fire about to copy onto the target wire" width="85%"></p>
+
+**3. Dispatch: fires are hidden.** On the distance-3 rotated surface code (9 houses, 8 stations) you read which stations ring, tap a station to see the houses it watches, place crews within a budget (undo/redo), and press *Spray!*. Nothing on screen reads the hidden error before you commit.
+
+<p align="center"><img src="docs/images/challenge.png" alt="Dispatch at Market Square: fogged 3×3 houses, three ringing stations, an X crew planned on house 1" width="85%"></p>
+
+**4. Answer check.** The crews run in, each hose applies exactly one Pauli correction computed by the engine, the fog lifts, and one of four results appears. Below: *Silent Failure* in Old Town, the minimum-weight call that silences every alarm and still flips the memory tower.
+
+<p align="center"><img src="docs/images/result-logical.png" alt="Result screen 'Silent failure': three X fires in a row, every alarm quiet, the memory tower showing a logical X flip" width="85%"></p>
+
+**5. Why?** Your spray and the alternative correction (minimum-weight decoder, or crews on the true fires) replay side by side on the same board, with the step-by-step residual under *Details*.
+
+<p align="center"><img src="docs/images/why.png" alt="Why? screen: your spray and the other way animated on two identical boards" width="85%"></p>
 
 ## Missions
-1. **First Alarm** — 3-qubit repetition code, X noise only: read two alarms, send one crew.
-2. **Red Forward / Blue Backward** — X copies forward through a CNOT, Z copies backward.
-3. **Color Switch** — a Hadamard swaps red and blue; chain it with a CNOT.
-4. **Blind Dispatch** — distance-3 rotated surface code, one hidden fire, alarms only.
-5. **Two Kinds of Trouble** — red and blue alarms at once; one X crew and one Z crew (Y is taught in mission 2).
-6. **Silent Failure** — two fires, one alarm: the optimal dispatch silences everything and flips the logical qubit.
 
-## Science in one paragraph
-Errors are binary symplectic Pauli frames composed by XOR; gates act as H: x↔z, S: z^=x, CNOT(c,t): x_t^=x_c, z_c^=z_t.
-Checks ring on anticommutation. The verdict on the residual R = C·E is decided by GF(2) algebra: stabilizer ⇒ success,
-commuting-but-not-stabilizer ⇒ logical error, anticommuting ⇒ detectable. Details: `docs/SCIENCE.md`.
+| # | District | Mission | What it teaches |
+|---|---|---|---|
+| 1 | Rowhouse Lane | **First Alarm** | 3-qubit repetition code, X noise only: two alarms, one crew |
+| 2 | Harbor Bridge | **Red Forward / Blue Backward** | CNOT: X copies control→target, Z copies target→control |
+| 3 | Conversion Lab | **Color Switch** | Hadamard swaps red and blue; chained with a CNOT |
+| 4 | Central District | **Blind Dispatch** | distance-3 rotated surface code, one hidden fire, alarms only |
+| 5 | Market Square | **Two Kinds of Trouble** | X and Z alarms at once; one X crew and one Z crew |
+| 6 | Old Town | **Silent Failure** | two fires, one alarm: the optimal call flips the logical qubit |
 
-## Verification
+The first run is a three-tap guided scene. Everything works by tapping; keyboard and screen readers are supported; shapes and X/Z/Y letters carry every meaning so colour is never required; reduced motion plays the same causality as static frames.
+
+## Qiskit, Qollab and IonQ
+
+The Qollab project is a **JS/Qiskit** page: the game itself plus a pure-Python Qiskit package (`qollab/q11/*.py`) that builds encode → inject → syndrome-extraction → correct → readout circuits for every mission. Press *Run* on Qollab, pick a backend in *Select QPU*, and the page runs a self-test (Blind Dispatch, 100 shots) on that backend and prints the measured syndrome and logical statistics next to the Pauli-frame prediction; any surface-code result can then be verified as a circuit from *Details → Verify on this backend*.
+
+- Built-in ideal simulator: the measured distribution matches the prediction exactly.
+- IonQ Aria 1 free noise-model simulator: counts deviate statistically and the page says so. Recorded jobs, histograms and raw counts: [`reports/qollab-runs.md`](reports/qollab-runs.md), [`reports/qollab-runs/`](reports/qollab-runs/).
+- **No hardware (QPU) runs were made, and none are claimed.**
+
+## The science in one paragraph
+
+Errors are binary symplectic Pauli frames (x, z) composed by XOR; gates act as H: x↔z, S: z ^= x, CNOT(c,t): x_t ^= x_c, z_c ^= z_t. A check rings when the error anticommutes with it (symplectic product). The verdict on the residual R = C·E is decided by GF(2) algebra: R in the stabilizer group ⇒ success; commuting but not in the group ⇒ logical error (which logical is read from X̄ = X0X1X2 and Z̄ = Z0Z3Z6); anticommuting with a check ⇒ detectable. Perfect-syndrome, Clifford + Pauli educational model. Details: [`docs/SCIENCE.md`](docs/SCIENCE.md).
+
+## Run it yourself
+
 ```bash
-npm run lint && npm run typecheck && npm run test:unit && npm run build
-npm run test:e2e            # Playwright: Chromium desktop 1280×800 / tablet 768×1024 / phone 390×844 + WebKit desktop (smoke, city, spray); viewport matrix 1440/768/390/375 with screenshots in reports/screenshots/after
-npm run verify:quantum      # regenerates fixtures, runs the independent Python/Qiskit comparison (≥1000 seeded cases)
-npm run verify:release      # everything above + submission asset checks → reports/release-verification.json
+npm ci && npm run dev        # web game at http://localhost:5173
+npm run test:unit            # engine + game + UI tests (vitest)
+npm run test:e2e             # Playwright: desktop / tablet / phone Chromium + desktop WebKit
+npm run verify:quantum       # independent Python/Qiskit comparison (exhaustive gate tables, 28 single-error patterns,
+                             # ≥1000 seeded propagation and verdict cases, Aer runs of every mission circuit)
+npm run verify:release       # everything above + submission asset checks → reports/release-verification.json
 ```
-Python: `uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -r quantum/requirements.txt`.
+
+Python for the verification scripts: `uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -r quantum/requirements.txt` (Qiskit 2.5.x, qiskit-aer). Importing the project into your own Qollab account: [`submission/QOLLAB_IMPORT.md`](submission/QOLLAB_IMPORT.md).
 
 ## Repository layout
+
 ```
 src/quantum   Pauli frames, codes, GF(2), verdicts, decoder        quantum/   Python/Qiskit reference + comparison
 src/game      missions, state machine, scoring, replay, storage   qollab/    Qollab-native project (JS page + Python Qiskit modules)
-src/ui        React UI (SVG board)                                fixtures/  shared mission + verification JSON
-public/       original icon set                                   scripts/   verification, icons, protection checks
+src/ui        React UI: city map, scene art, spray effects, EN/JA fixtures/  shared mission + verification JSON
+public/       original icon set                                   scripts/   verification, icons, demo recording
 submission/   project page, demo script, checklist, evidence      reports/   test and verification outputs (no secrets)
-docs/         plan, status, decisions, science, Qollab runtime    spec/      build specification
+docs/         plan, status, decisions, science, images            spec/      build specification
 ```
 
-## Evidence of real runs
-- Qollab built-in simulator and **IonQ Aria 1 remote simulator** executed the project's surface-code mission circuits (17 qubits): see `reports/qollab-runs.md` (job ids, histograms) and `reports/qollab-runs/*.json` (raw counts, re-analysed locally).
-- Independent Python/Qiskit comparison: `reports/QUANTUM_VERIFICATION.md`.
-
 ## Limitations
-Clifford + Pauli educational model, perfect syndromes, distance 3, no QPU runs, no claims of quantum advantage. Full list: `submission/KNOWN_LIMITATIONS.md`.
 
-## Status
-See `docs/STATUS.md`. Published 2026-10-11 with the author's explicit approval (repository public, Vercel build public, demo video unlisted on YouTube, Qollab project published); see `submission/RELEASE_CHECKLIST.md`.
+Clifford + Pauli educational model, perfect syndromes, distance 3, no measurement noise or repeated rounds, no QPU runs, no claims of quantum advantage. Full list: [`submission/KNOWN_LIMITATIONS.md`](submission/KNOWN_LIMITATIONS.md).
+
+## Credits
+
+Design and implementation: Tomoya Hatanaka ([@dorakingx](https://github.com/dorakingx)), built during the hackathon window with AI assistance (Claude Code), disclosed in [`submission/ATTRIBUTION.md`](submission/ATTRIBUTION.md). Libraries: React, Vite (MIT); Qiskit, qiskit-aer (Apache-2.0). All art is original SVG. Status and publication record: [`docs/STATUS.md`](docs/STATUS.md).

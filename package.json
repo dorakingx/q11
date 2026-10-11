@@ -1,5 +1,5 @@
 {
-  "name": "q11-quantum-emergency-response",
+  "name": "q11-emergency",
   "private": true,
   "version": "0.1.0",
   "description": "Q11 — Quantum Emergency Response: a fire-dispatch game about Pauli error propagation and stabilizer error correction (Qollab x IonQ Hackathon 2026)",
