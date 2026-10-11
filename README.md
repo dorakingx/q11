@@ -5,7 +5,7 @@
 > A toy city with houses, alarm stations and fire crews. Fires are Pauli errors (red = X, blue = Z, split = Y); alarm stations are stabilizer checks; crews are corrections.
 > Pick a district on the city map, ride the fire truck to the scene, read the alarms, plan your crews, press **Spray!** and watch the hoses do one exact Pauli correction each — then the answer-check replay reveals the hidden fires and one of four outcomes: houses restored, a harmless pattern, fires still burning, or a silent logical failure shown on the city's memory tower. English and Japanese.
 
-**This effort is supported by Qollab & IonQ.** License: MIT (see `LICENSE`). Attribution and tool disclosure: `submission/ATTRIBUTION.md`.
+**This effort is supported by Qollab & IonQ.** License: MIT (see `LICENSE`). Play: https://q11-emergency.vercel.app · Qollab project: https://qollab.xyz/u/doraking/q11-quantum-emergency-response. Attribution and tool disclosure: `submission/ATTRIBUTION.md`.
 
 ## Play
 - Web (Vite + React, client-side): `npm ci && npm run dev` → http://localhost:5173
