@@ -1,196 +1,196 @@
 {
   "source": "Google Vids AI voiceover (voice Holt), same 23 line clips as the previous cut",
   "picture": "submission/DEMO_SILENT.mp4",
-  "recordedAt": "2026-10-11T20:53:41.204Z",
+  "recordedAt": "2026-10-11T21:06:12.267Z",
   "baseTempo": 1.07,
   "lines": [
     {
       "line": 1,
-      "cue": 3.4,
-      "start": 3.4,
+      "cue": 3.3,
+      "start": 3.3,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 10.07
     },
     {
       "line": 2,
-      "cue": 14.6,
-      "start": 14.6,
+      "cue": 15.1,
+      "start": 15.1,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 6.44
     },
     {
       "line": 3,
-      "cue": 24.6,
-      "start": 24.6,
+      "cue": 24.9,
+      "start": 24.9,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 4.55
     },
     {
       "line": 4,
-      "cue": 30.7,
-      "start": 30.7,
-      "late": 0.0,
-      "tempo": 1.079,
+      "cue": 31,
+      "start": 31,
+      "late": 0,
+      "tempo": 1.078,
       "dur": 4.0
     },
     {
       "line": 5,
-      "cue": 34.9,
-      "start": 34.9,
+      "cue": 35.2,
+      "start": 35.2,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 5.7
     },
     {
       "line": 6,
-      "cue": 41.3,
-      "start": 41.3,
+      "cue": 41.6,
+      "start": 41.6,
       "late": 0.0,
       "tempo": 1.071,
       "dur": 4.4
     },
     {
       "line": 7,
-      "cue": 45.9,
-      "start": 45.9,
+      "cue": 46.2,
+      "start": 46.2,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 5.27
     },
     {
       "line": 8,
-      "cue": 52.4,
-      "start": 52.4,
+      "cue": 52.8,
+      "start": 52.8,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 3.12
     },
     {
       "line": 9,
-      "cue": 55.8,
-      "start": 55.8,
+      "cue": 56.3,
+      "start": 56.3,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 5.84
     },
     {
       "line": 10,
-      "cue": 64.5,
-      "start": 64.5,
+      "cue": 65.1,
+      "start": 65.1,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 2.01
     },
     {
       "line": 11,
-      "cue": 69.5,
-      "start": 69.5,
+      "cue": 69.9,
+      "start": 69.9,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 10.52
     },
     {
       "line": 12,
-      "cue": 80.8,
-      "start": 80.8,
+      "cue": 81.3,
+      "start": 81.3,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 11.01
     },
     {
       "line": 13,
-      "cue": 92.8,
-      "start": 92.8,
+      "cue": 93.2,
+      "start": 93.2,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 5.36
     },
     {
       "line": 14,
-      "cue": 99.5,
-      "start": 99.5,
+      "cue": 99.9,
+      "start": 99.9,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 5.14
     },
     {
       "line": 15,
-      "cue": 106.2,
-      "start": 106.2,
+      "cue": 106.6,
+      "start": 106.6,
       "late": 0.0,
       "tempo": 1.118,
       "dur": 5.0
     },
     {
       "line": 16,
-      "cue": 111.4,
-      "start": 111.4,
+      "cue": 111.8,
+      "start": 111.8,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 6.16
     },
     {
       "line": 17,
-      "cue": 118.5,
-      "start": 118.5,
+      "cue": 118.8,
+      "start": 118.8,
       "late": 0.0,
       "tempo": 1.12,
       "dur": 5.14
     },
     {
       "line": 18,
-      "cue": 123.4,
-      "start": 123.84,
-      "late": 0.44,
+      "cue": 123.8,
+      "start": 124.14,
+      "late": 0.34,
       "tempo": 1.07,
       "dur": 5.78
     },
     {
       "line": 19,
-      "cue": 130.5,
-      "start": 130.5,
+      "cue": 130.9,
+      "start": 130.9,
       "late": 0.0,
       "tempo": 1.07,
       "dur": 5.21
     },
     {
       "line": 20,
-      "cue": 137.9,
-      "start": 137.9,
+      "cue": 138.2,
+      "start": 138.2,
       "late": 0.0,
       "tempo": 1.12,
       "dur": 8.56
     },
     {
       "line": 21,
-      "cue": 145.5,
-      "start": 146.66,
+      "cue": 145.8,
+      "start": 146.96,
       "late": 1.16,
       "tempo": 1.07,
       "dur": 7.74
     },
     {
       "line": 22,
-      "cue": 153.5,
-      "start": 154.6,
+      "cue": 153.8,
+      "start": 154.9,
       "late": 1.1,
       "tempo": 1.07,
       "dur": 10.9
     },
     {
       "line": 23,
-      "cue": 165.2,
-      "start": 165.71,
-      "late": 0.51,
+      "cue": 165.4,
+      "start": 166.01,
+      "late": 0.61,
       "tempo": 1.07,
       "dur": 6.06
     }
   ],
-  "durationSeconds": 172.9,
-  "bytes": 7754281,
-  "sha256": "2588f83faac41205c3df11378a3fa87eab5db5f56e2c974350867b64a3c46dc6",
+  "durationSeconds": 173.1,
+  "bytes": 7773329,
+  "sha256": "32fe83c1e8288ee96249f76dab8fd5b313cb1ef4e86701136542f2985c016ddc",
   "output": "submission/DEMO_VIDS.mp4"
 }
