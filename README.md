@@ -5,7 +5,7 @@
 > A toy city with houses, alarm stations and fire crews. Fires are Pauli errors (red = X, blue = Z, split = Y); alarm stations are stabilizer checks; crews are corrections.
 > Pick a district on the city map, ride the fire truck to the scene, read the alarms, plan your crews, press **Spray!** and watch the hoses do one exact Pauli correction each — then the answer-check replay reveals the hidden fires and one of four outcomes: houses restored, a harmless pattern, fires still burning, or a silent logical failure shown on the city's memory tower. English and Japanese.
 
-**This effort is supported by Qollab & IonQ.** License: MIT (see `LICENSE`). Play: https://q11-emergency.vercel.app · Qollab project: https://qollab.xyz/u/doraking/q11-quantum-emergency-response. Attribution and tool disclosure: `submission/ATTRIBUTION.md`.
+**This effort is supported by Qollab & IonQ.** License: MIT (see `LICENSE`). Play: https://q11-emergency.vercel.app · Qollab project: https://qollab.xyz/u/doraking/q11-quantum-emergency-response · Demo video (2:43): https://www.youtube.com/watch?v=Riyu0jshkGU. Attribution and tool disclosure: `submission/ATTRIBUTION.md`.
 
 ## Play
 - Web (Vite + React, client-side): `npm ci && npm run dev` → http://localhost:5173
@@ -54,4 +54,4 @@ docs/         plan, status, decisions, science, Qollab runtime    spec/      bui
 Clifford + Pauli educational model, perfect syndromes, distance 3, no QPU runs, no claims of quantum advantage. Full list: `submission/KNOWN_LIMITATIONS.md`.
 
 ## Status
-See `docs/STATUS.md`. Publication (Qollab publish, demo video link, repository visibility) happens only after the author's explicit approval; see `submission/RELEASE_CHECKLIST.md`.
+See `docs/STATUS.md`. Published 2026-10-11 with the author's explicit approval (repository public, Vercel build public, demo video unlisted on YouTube, Qollab project published); see `submission/RELEASE_CHECKLIST.md`.

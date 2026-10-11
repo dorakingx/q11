@@ -2,7 +2,7 @@
 
 > Applies to commit **cd7fc7f** (web sources verified at **aed04f3** by `verify:release`; c1760e1 added the verification evidence, the rebuilt Qollab bundle, two Playwright environment knobs and two hardened e2e assertions; 1e2d138 added the brand lettering on every fire truck (targeted 4-project e2e 85 passed / 5 skipped, Qollab run 14); ce42c30 adds Back to briefing and 6629b3e places it inside the screens (unit 461/461, targeted 4-project e2e 54 passed / 5 skipped on both, Qollab runs 15–16); 7a0296e and cd7fc7f add the brand lockup, the brand button → city map, the inset trim stripes and the home-screen row chip (targeted e2e 58/13/0 and 49/13/0, Qollab run 17). Supersedes the 2026-10-10 23:50 JST report (b0a6f5f). Fun is not self-certified: what is claimed below is what was executed and recorded.
 
-**Status: READY_FOR_RELEASE_APPROVAL.** Every A1–A9 and R1–R15 gate and every follow-up requested on 2026-10-11 passes with execution evidence; nothing has been published or submitted.
+**Status: PUBLISHED (2026-10-11 11:30 UTC), team-page submission pending the user's separate approval.** Every A1–A9 and R1–R15 gate and every follow-up requested on 2026-10-11 passes with execution evidence. Public artefacts: Qollab v1.0 `https://qollab.xyz/u/doraking/q11-quantum-emergency-response` · demo https://www.youtube.com/watch?v=Riyu0jshkGU (unlisted) · source `https://github.com/dorakingx/q11` · web build `https://q11-emergency.vercel.app`.
 
 ## Follow-ups requested on 2026-10-11 (all done)
 | # | Request (owner, JA) | Result | Evidence |
@@ -47,7 +47,7 @@
 | A6 | Protected Vercel deployment | PASS | dpl_CoAbUoPCjWViaXeP7bQ8FJAoJaLc = q11-m72i37iyr-doraking.vercel.app (cd7fc7f) + domain q11-emergency.vercel.app + 2 auto aliases: 16/16 anonymous → 302 sso-api; authenticated fetch returns the app (title Q11 Emergency, assets = local build); bypass secret revoked (0); sso "all" |
 | A7 | Qollab IonQ simulator run of a core mission | PASS | IonQ Aria 1 jobs 01a12375 / 01a12378 / 01a12396 / 01a1237b (unchanged circuits); built-in simulator exact on the final page (run 13, job e7ec00e7-f89b-458e-af92-a013bc2a7a8f) |
 | A8 | Icons, README/MIT/attribution/Qollab materials, demo video | PASS | mark v3 icon set; MIT; `submission/*` renamed; narrated DEMO.mp4 (local only) |
-| A9 | No publish/submit; only approval pending | PASS | Qollab draft unpublished; repo private; Vercel protected; video not uploaded; team page not submitted |
+| A9 | Publication only on explicit approval | PASS | Published 2026-10-11 on written approval (YouTube unlisted, Qollab v1.0 public default, repo public, Vercel unprotected); team page not submitted |
 
 ## Commands and exit codes (final run, 2026-10-10 18:19–22:56 UTC = 2026-10-11 03:19–03:44 JST)
 - `BASE_URL=http://localhost:4173 node scripts/record-demo.mjs` → 0 (91 shots, 22 narrated lines; `reports/demo-recording.json`)
@@ -60,12 +60,12 @@
 - Repo: `https://github.com/dorakingx/q11` (private), branch `main`, HEAD cd7fc7f (+ this docs commit).
 - Protected deployment: `https://q11-emergency.vercel.app` (project domain) = `https://q11-m72i37iyr-doraking.vercel.app` (+ q11-doraking / q11-git-main-doraking .vercel.app) — requires Vercel login; every push to `main` deploys.
 - Qollab draft (owner only, unpublished): `https://qollab.xyz/u/doraking/q11-quantum-emergency-response` — title "Q11 Emergency — Quantum Emergency Response", final bundle, card, About, tags, thumbnail (truck OG image).
-- Demo video: `submission/DEMO.mp4` (git-ignored, local only), 162.6 s with narration, sha256 `3b503c131e299048c5df397448c7decb84dd22507aecd1ad37f6c78a414093b7`; script `submission/DEMO_SCRIPT.md`.
+- Demo video: `submission/DEMO.mp4` (git-ignored), 162.6 s with narration, sha256 `3b503c131e299048c5df397448c7decb84dd22507aecd1ad37f6c78a414093b7`; script `submission/DEMO_SCRIPT.md`; uploaded 2026-10-11 to YouTube (unlisted, @dorakingxyz): https://www.youtube.com/watch?v=Riyu0jshkGU.
 - Icons: `public/` (icon.svg, icon-rounded.svg, wordmark.svg, favicons, ICO, 192/512/maskable, apple-touch, og-image.png); sources `src/ui/art/brandMark.tsx`; candidate sheets and review `reports/icons/`.
 - Screenshots: `reports/screenshots/before/` (6) and `reports/screenshots/after/` (62 at 1440×900 / 768×1024 / 390×844 / 375×812 + 1280×800).
 - Japanese glossary: `docs/I18N.md`. Submission texts: `submission/PROJECT_PAGE.md` (pasted into the Qollab card), `SHORT_DESCRIPTION.md`, `DEMO_SCRIPT.md`, `ATTRIBUTION.md`, `QOLLAB_IMPORT.md`, `RELEASE_CHECKLIST.md`, `KNOWN_LIMITATIONS.md`, `EVIDENCE_INDEX.md`.
 
 ## Open items (not blockers)
-- Publication requires the owner's explicit approval per `submission/RELEASE_CHECKLIST.md` (below the line): Qollab Publish, public demo-video link, optional repo public / Vercel unprotect, captain submission on the team page before Oct 11 19:00 ET (= Oct 12 08:00 JST).
+- Publication steps 1–5 of `submission/RELEASE_CHECKLIST.md` were executed 2026-10-11 on the owner's written approval. Remaining: captain submission on the team page (step 6) before Oct 11 19:00 ET (= Oct 12 08:00 JST) — needs a separate go-ahead.
 - The static icon files carry "Q11"; only the in-app mark switches to "11Q" in Japanese (one icon per store listing).
 - Known limitations: `submission/KNOWN_LIMITATIONS.md`.

@@ -55,7 +55,7 @@ npm run verify:quantum      # independent Python/Qiskit comparison: exhaustive g
 Ideas to extend: measurement noise and detection events across rounds; a union-find or MWPM decoder as a second "what if"; larger-distance codes; hook errors from the ancilla schedule.
 
 ## Demo video
-2–3 minute recording of the real app (link added at publication; viewable without sign-in).
+https://www.youtube.com/watch?v=Riyu0jshkGU — a 2 min 43 s narrated recording of the real app (YouTube, unlisted: viewable without sign-in).
 
 ## Limitations
 See `KNOWN_LIMITATIONS.md` in the repository: Clifford + Pauli only, perfect syndromes, distance 3, cached/absent cloud results in the web build, no QPU runs.
