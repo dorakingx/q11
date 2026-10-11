@@ -85,7 +85,6 @@ export function Preview() {
           key={`${sc}-${String(key)}`}
           state={{ ...data.state, settings: { ...data.state.settings, language: lang } }}
           dispatch={dispatch}
-          storageNote={lang === 'ja' ? '進み具合はこのブラウザに保存されます。' : 'Progress is saved in this browser.'}
           recentlySolved={data.recentlySolved}
           onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })}
           onTitle={() => dispatch({ type: 'OPEN_TITLE' })}

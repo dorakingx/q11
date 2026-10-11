@@ -37,7 +37,6 @@ function renderCity({ state = stateWith(), recentlySolved = null, reducedMotion,
       <CityScreen
         state={state}
         dispatch={dispatch}
-        storageNote="Progress is saved in this browser."
         recentlySolved={recentlySolved}
         initialSelected={initialSelected}
         onCelebrated={onCelebrated}
@@ -182,7 +181,7 @@ describe('CityScreen — HUD', () => {
     expect(within(badges).getByText('Alarm Reader')).toBeInTheDocument();
     expect(within(badges).getByText('Gate Tracker')).toBeInTheDocument();
     expect(within(badges).queryByText('Colour Switcher')).toBeNull();
-    expect(screen.getByTestId('storage-note')).toHaveTextContent('Progress is saved in this browser.');
+    expect(screen.queryByTestId('storage-note')).toBeNull();
     expect(screen.queryByTestId('free-roam')).toBeNull();
     await user.click(screen.getByTestId('settings'));
     expect(onSettings).toHaveBeenCalledTimes(1);
@@ -344,13 +343,13 @@ describe('CityScreen — restoration moment', () => {
     const dispatch = vi.fn<(a: Action) => void>();
     const { rerender } = render(
       <LanguageProvider language="en">
-        <CityScreen state={state} dispatch={dispatch} storageNote="" recentlySolved="station-row" onSettings={vi.fn()} onTitle={vi.fn()} />
+        <CityScreen state={state} dispatch={dispatch} recentlySolved="station-row" onSettings={vi.fn()} onTitle={vi.fn()} />
       </LanguageProvider>,
     );
     expect(screen.getByTestId('restore-fx')).toBeInTheDocument();
     rerender(
       <LanguageProvider language="en">
-        <CityScreen state={state} dispatch={dispatch} storageNote="" recentlySolved={null} onSettings={vi.fn()} onTitle={vi.fn()} />
+        <CityScreen state={state} dispatch={dispatch} recentlySolved={null} onSettings={vi.fn()} onTitle={vi.fn()} />
       </LanguageProvider>,
     );
     expect(screen.getByTestId('restore-fx')).toBeInTheDocument();

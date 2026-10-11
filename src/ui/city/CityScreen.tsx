@@ -21,7 +21,6 @@ export interface CityScreenProps {
   readonly state: GameState;
   readonly dispatch: (a: Action) => void;
   /** Where progress lives (localStorage / memory / Qollab run) — shown in the HUD. */
-  readonly storageNote: string;
   /** District id solved just before returning to the city: plays the restoration moment + badge toast on mount. */
   readonly recentlySolved: string | null;
   readonly onSettings: () => void;
@@ -43,7 +42,7 @@ interface Toast {
 /** The bottom-sheet breakpoint (city.css: the panel is fixed to the bottom below this width). */
 const SHEET_MAX_WIDTH = 1024;
 
-export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSettings, onTitle, onCelebrated, reducedMotion, initialSelected = null }: CityScreenProps) {
+export function CityScreen({ state, dispatch, recentlySolved, onSettings, onTitle, onCelebrated, reducedMotion, initialSelected = null }: CityScreenProps) {
   const t = useT();
   const lang = useLanguage();
   const statuses = statusesOf(state.progress, state.settings.freeRoam);
@@ -324,9 +323,6 @@ export function CityScreen({ state, dispatch, storageNote, recentlySolved, onSet
             </span>
           ) : null}
         </div>
-        <p className="city-storage" data-testid="storage-note">
-          {storageNote}
-        </p>
         <button type="button" className="city-icon-btn" onClick={onSettings} aria-label={t('title.settings')} data-testid="settings">
           <GearIcon size={24} />
         </button>

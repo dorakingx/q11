@@ -1,7 +1,7 @@
 /**
  * City map screen (src/ui/city). App renders `<CityScreen>` for `state.screen === 'missions'`:
  *
- *   <CityScreen state={state} dispatch={dispatch} storageNote={t('city.hud.storage.local')}
+ *   <CityScreen state={state} dispatch={dispatch}
  *               recentlySolved={lastSolvedDistrictId} onSettings={() => dispatch({ type: 'OPEN_SETTINGS' })}
  *               onTitle={() => dispatch({ type: 'OPEN_TITLE' })} />
  *

@@ -25,7 +25,7 @@ main.screen-city * { box-sizing: border-box; }
 .city-hud {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: 'brand gear' 'stats stats' 'storage storage';
+  grid-template-areas: 'brand gear' 'stats stats';
   align-items: center;
   gap: 6px 14px;
   background: var(--panel);
@@ -35,9 +35,10 @@ main.screen-city * { box-sizing: border-box; }
   box-shadow: 0 2px 0 var(--shadow);
 }
 @media (min-width: 768px) {
-  .city-hud { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'brand stats gear' 'storage storage storage'; }
+  .city-hud { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'brand stats gear'; }
 }
-.city-brand-group { grid-area: brand; justify-self: start; display: flex; align-items: center; gap: 2px; min-width: 0; }
+/* The brand chip is pinned to the bar's top-left corner, at the same spot as on every district screen (.topbar). */
+.city-brand-group { grid-area: brand; justify-self: start; align-self: start; display: flex; align-items: center; gap: 2px; min-width: 0; }
 .city-brand {
   display: flex;
   align-items: center;
@@ -101,7 +102,6 @@ main.screen-city * { box-sizing: border-box; }
   font-size: 0.85rem;
   min-height: 32px;
 }
-.city-storage { grid-area: storage; margin: 0; font-size: 0.8rem; color: var(--muted); }
 .city-icon-btn {
   grid-area: gear;
   width: var(--tap);

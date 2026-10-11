@@ -190,7 +190,6 @@ function AppBody({ state, dispatch, bridge, storageMode, store, reducedMotion, r
   const t = useT();
   const mission = currentMission(state);
   const storageLabel = storageMode === 'memory' ? t('settings.storage.qollab') : store === null ? t('settings.storage.memory') : t('settings.storage.local', { key: 'q11.save.v1' });
-  const storageNote = storageMode === 'memory' ? t('city.hud.storage.qollab') : store === null ? t('city.hud.storage.memory') : t('city.hud.storage.local');
   const noticeText = state.notice === PROGRESS_RESET_NOTICE ? t('notice.progressReset') : state.notice === RESET_NOTICE ? t('notice.saveReset') : state.notice;
   const props = { state, dispatch, storageLabel };
   // The reducer decides what the city celebrates (`celebrate`) and pre-selects (`citySelect`) after a mission;
@@ -199,7 +198,6 @@ function AppBody({ state, dispatch, bridge, storageMode, store, reducedMotion, r
     <CityScreen
       state={state}
       dispatch={dispatch}
-      storageNote={storageNote}
       recentlySolved={state.celebrate}
       initialSelected={state.citySelect}
       onCelebrated={() => dispatch({ type: 'CELEBRATED' })}

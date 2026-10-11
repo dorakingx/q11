@@ -105,9 +105,9 @@ describe('dictionaries', () => {
     // Water is not a blue Z fire.
     expect(en['legend.water']).toMatch(/not a blue fire/);
     expect(ja['legend.water']).toContain('青い火ではありません');
-    // Qollab storage note.
-    expect(en['city.hud.storage.qollab']).toContain('progress lasts for one Run');
-    expect(ja['city.hud.storage.qollab']).toContain('1 回の Run');
+    // Qollab storage note (shown in Settings; the city HUD no longer carries it).
+    expect(en['settings.storage.qollab']).toContain('progress lasts for one Run');
+    expect(ja['settings.storage.qollab']).toContain('1 回の Run');
   });
 
   it('exposes the tutorial, planning, four results, beacon, why, language and reduced-motion keys the redesign needs', () => {

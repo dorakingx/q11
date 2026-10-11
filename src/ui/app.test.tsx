@@ -74,7 +74,7 @@ describe('App · guided first run (R5)', () => {
     expect(screen.getByTestId('toast-badge')).toHaveTextContent('Alarm Reader earned!');
     expect(screen.getByTestId('mission-1')).toHaveAttribute('data-status', 'solved');
     expect(screen.getByTestId('mission-2')).toHaveAttribute('data-status', 'available');
-    expect(screen.getByTestId('storage-note')).toHaveTextContent('On Qollab, progress lasts for one Run.');
+    expect(screen.queryByTestId('storage-note')).toBeNull();
   });
 
   it('Skip tutorial goes to the city and the tutorial never returns', async () => {
