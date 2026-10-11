@@ -269,9 +269,8 @@ export function TopBar({ title, subtitle, onMissions, onSettings, settingsLabel,
         </div>
       </div>
       <nav className="topbar-actions" aria-label={t('a11y.gameNav')}>
-        <button type="button" className="btn btn-ghost btn-icon" onClick={onSettings} aria-label={settingsLabel ?? t('title.settings')} data-testid="topbar-settings">
-
-          <GearIcon />
+        <button type="button" className="topbar-gear" onClick={onSettings} aria-label={settingsLabel ?? t('title.settings')} data-testid="topbar-settings">
+          <GearIcon size={24} />
         </button>
       </nav>
     </header>

@@ -101,7 +101,10 @@ kbd { font: 700 0.8em ui-monospace, SFMono-Regular, Menlo, monospace; background
 .topbar-sub { color: var(--muted); font-size: 0.88rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .topbar-h:focus, .title-h:focus, .section-h:focus { outline: none; }
 .topbar-h:focus-visible, .title-h:focus-visible, .section-h:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; box-shadow: 0 0 0 6px var(--focus-halo); border-radius: 6px; }
-.topbar-actions { display: flex; gap: 4px; flex: 0 0 auto; }
+.topbar-actions { display: flex; gap: 4px; flex: 0 0 auto; align-self: flex-start; }
+/* the settings button matches the city HUD's (.city-icon-btn): 48 px round, outlined, 24 px gear, pinned top-right */
+.topbar-gear { width: var(--tap); height: var(--tap); display: inline-flex; align-items: center; justify-content: center; padding: 0; background: var(--panel-2); border: 2px solid var(--outline); border-radius: 50%; color: var(--ink); cursor: pointer; }
+.topbar-gear:focus-visible { outline: 3px solid var(--focus); outline-offset: 0; box-shadow: 0 0 0 6px var(--focus-halo); }
 .section-h { font-size: 1.35rem; font-weight: 900; }
 
 .notice { position: sticky; top: 0; z-index: 20; display: flex; justify-content: center; align-items: center; gap: 12px; padding: 8px 16px; background: var(--alarm); color: var(--ink); font-weight: 700; border-bottom: 2px solid var(--outline); }
