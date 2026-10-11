@@ -40,22 +40,22 @@ You are the dispatcher of a toy quantum city. Each district is one mission: Rowh
 ### 2. Training: the fires are visible
 In the propagation districts you step a fire through a small circuit and tap where it will be **before** the gate reveals it. A CNOT copies a red fire *forward* (control → target) and a blue fire *backward* (target → control); a Hadamard swaps the colours. Fires never move on their own.
 
-![Training at Harbor Bridge: two wires joined by a CNOT; a red X fire on the control has just copied onto the target](https://pub.qollab.xyz/assets/01a12c91-3792-75d1-ab33-b58398b1bb6d)
+![Training at Harbor Bridge: two wires joined by a CNOT; a red X fire on the control has just copied onto the target](https://pub.qollab.xyz/assets/01a12ca8-2ead-70d6-bd07-3d105281e965)
 
 ### 3. Dispatch: the fires are hidden
 On the distance-3 rotated surface code (9 houses, 8 alarm stations) the houses are covered in fog. You read which stations ring, tap a station to see the houses it watches, place crews within a budget (undo/redo), and press **Spray!**. Nothing on screen reads the hidden error before you commit.
 
-![Dispatch at Market Square: fogged 3×3 houses, three ringing stations, an X crew planned on house 1](https://pub.qollab.xyz/assets/01a12c91-6a56-78d1-b926-6fef1125a3fc)
+![Dispatch at Market Square: fogged 3×3 houses, three ringing stations, an X crew planned on house 1](https://pub.qollab.xyz/assets/01a12ca8-6dca-7b2b-8fed-9731e582aad0)
 
 ### 4. Spray: the answer check
 In the propagation missions the board first replays the fire travelling through the gates. Then the crews run in and each hose applies exactly **one Pauli correction computed by the engine**: the same colour puts a fire out, a different colour changes it ($X$ on $Z$ gives $Y$, since $XZ \propto Y$), and a crew on an empty house starts a new fire. The fog lifts and one of four results appears: houses restored, a harmless pattern, fires still burning, or a **silent logical failure**, shown below: the minimum-weight call in Old Town silences every alarm and still flips the city's memory tower.
 
-![Result screen "Silent failure": three X fires in a row, every alarm quiet, the memory tower showing a logical X flip](https://pub.qollab.xyz/assets/01a12c91-a133-736f-ae9d-d4a6061c1e55)
+![Result screen "Silent failure": three X fires in a row, every alarm quiet, the memory tower showing a logical X flip](https://pub.qollab.xyz/assets/01a12ca8-a7af-74f7-bfe5-1faaef548b6e)
 
 ### 5. Why?
 Your spray and the alternative correction (the minimum-weight decoder, or crews on the true fires) replay side by side on the same board. The step-by-step replay and the raw residual live under *Details*.
 
-![Why? screen: your spray and the other way animated on two identical boards](https://pub.qollab.xyz/assets/01a12c91-d3c5-7434-b223-bdc7398b01ff)
+![Why? screen: your spray and the other way animated on two identical boards](https://pub.qollab.xyz/assets/01a12ca8-eee9-77d3-8dcc-56e92c073555)
 
 ## Missions
 
