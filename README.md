@@ -8,7 +8,7 @@
 <p align="center">
   <a href="https://qollab.xyz/u/doraking/q11-emergency">Play on Qollab</a> ·
   <a href="https://q11-emergency.vercel.app">Play on the web</a> ·
-  <a href="https://www.youtube.com/watch?v=Riyu0jshkGU">Demo video (2:43)</a> ·
+  <a href="https://www.youtube.com/watch?v=caRB8CaDgBE">Demo video (2:54)</a> ·
   <a href="LICENSE">MIT License</a>
 </p>
 
